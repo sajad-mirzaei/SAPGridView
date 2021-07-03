@@ -1,0 +1,357 @@
+/*Grid*Styles*Start**************************************************************/
+
+/*-Start-Set-header&fotter-style-for-all-grids------------------------------------------*/
+
+.wtv_headerTable,
+.wtv_headerThead,
+.GridPager table td,
+.GridPager table td a,
+.GridPager table td span,
+.CustomGrid .GridRowHeader,
+.CustomGrid .GridRowHeader:hover,
+.DT_TrThead, .DT_TrTfoot,
+.DT_TrThead:hover, .DT_TrTfoot:hover,
+.dataTables_scrollHead table tr, .dataTables_scrollFoot table tr,
+.dataTables_scrollHead table tr:hover, .dataTables_scrollFoot table tr:hover {
+    background-color: #9cbecb;
+    color: #000000;
+}
+
+/*-End-Set-header&fotter-style-for-all-grids------------------------------------------*/
+
+.ButtonGrid {
+    color: #ffffff !important;
+    background-color: #2E6DA4 !important;
+    display: inline-block !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    border: 1px solid transparent !important;
+    font-size: 1rem !important;
+    line-height: 0.8 !important;
+    border-radius: .25rem !important;
+    transition: all .15s ease-in-out !important;
+    padding: 4px 2px 4px 2px;
+}
+
+    .ButtonGrid:hover {
+        text-decoration: none !important;
+        background-color: #347BB9 !important;
+    }
+
+.Grid td.aspNetDisabled > a.btn {
+    color: gray !important;
+    background: #e9ecef !important;
+    border-color: #ced4da;
+    cursor: default !important;
+    border-radius: .25rem;
+}
+
+.GridContainer .Grid tbody tr:hover {
+    background-color: #cbdcec !important;
+}
+
+.Grid td, .Grid th, .GridHeaderTable th {
+    vertical-align: middle;
+}
+
+.GridHeaderTable th {
+    color: #ffffff !important;
+}
+
+.GridRow {
+    background-color: rgba(30, 52, 87, 0.05);
+}
+
+.GridHeader a, th a {
+    color: #ffffff;
+}
+
+.GridSelectedRow, .GridSelectRow {
+    background-color: #FFFFD5 !important;
+}
+
+.GridPager td {
+    text-align: center !important;
+}
+
+.GridPager table {
+    display: unset;
+    text-align: center;
+    margin: auto;
+}
+
+    .GridPager table td, .GridPager table td a, .GridPager table td span {
+        min-width: 20px;
+        text-align: center;
+    }
+
+.CustomGrid .Grid {
+    width: 100%;
+}
+
+.CustomGrid table td, .CustomGrid table th {
+    border: 1px solid #eeeeee;
+    border-top: 1px solid #e9ecef;
+    padding: 5px 2px 5px 2px;
+}
+
+.CustomGrid table th {
+    height: 32px;
+}
+
+.Grid .fa {
+    font-size: large;
+}
+
+.Grid .fa-window-restore {
+    font-size: 1.3rem !important;
+}
+
+.SGV_LoadingContainer {
+    display: none;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    padding-bottom: 20px;
+    z-index: 1000;
+}
+
+.SGV_LoadingIcon {
+    margin: auto;
+}
+
+.SGV_TabsContainer, .SGV_GridContent {
+    display: none;
+}
+
+    .SGV_GridContent.SGV_ActiveTabContent {
+        display: unset;
+    }
+
+.SGV_TabsContainer {
+    position: relative;
+    border-bottom: 2px solid #dddddd;
+    margin-bottom: 5px;
+    height: 29px;
+}
+
+.SGV_Tab {
+    background: #dddddd;
+    color: #000000;
+    padding: 5px 10px 5px 20px;
+    float: right;
+    margin: 3px;
+    min-width: 60px;
+    cursor: pointer;
+    text-align: right;
+    font-size: larger;
+    border-top: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    border-left: 1px solid #dddddd;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+    .SGV_Tab:hover {
+        background: gray;
+        color: #ffffff;
+    }
+    .SGV_Tab.SGV_ActiveTabTitle {
+        background: #ffffff;
+        border-bottom: 1px solid #ffffff;
+        border-top: 1px solid #dddddd;
+        border-right: 1px solid #dddddd;
+        border-left: 1px solid #dddddd;
+        cursor: default;
+    }
+        .SGV_Tab.SGV_ActiveTabTitle:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+.SGV_CloseTab {
+    float: right;
+    cursor: pointer;
+    margin-left: -10px;
+    margin-top: 5px;
+    padding: 3px;
+    margin-right: -20px;
+    /*-webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;*/
+}
+    .SGV_CloseTab:hover {
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.35);
+        border-color: #ced4da;
+    }
+/*Grid*Styles*End**************************************************************/
+/*DataTable*Grid*Styles*Start**************************************************/
+div.dataTables_wrapper table td, div.dataTables_wrapper table th, table.dataTable thead th, table.dataTable thead td {
+    border: 1px solid #eeeeee !important;
+    border-top: 1px solid #e9ecef !important;
+}
+
+.dataTables_scrollBody {
+    overflow-y: scroll !important;
+}
+
+.DT_TrThead th, .dataTables_scrollBody td, .DT_TrTfootCalc th, .DT_TrFilters th {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+.DT_TrWidthControl th, .DT_TrWidthControl td, .dataTables_scrollBody table thead tr th, .dataTables_scrollBody table tfoot tr th {
+    height: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+div.dataTables_scrollBody table td, .DT_TrTfootCalc th {
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+}
+
+.DT_TrFilters th {
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+    text-align: center;
+}
+
+.dataTables_scrollHead table th {
+    text-align: center;
+}
+
+.dataTables_scrollHead table th, .dataTables_scrollFoot table th {
+    height: 21px;
+}
+
+div.dataTables_wrapper table {
+    border-collapse: collapse !important;
+}
+
+.dataTables_scrollFoot, .DT_TrFilters {
+    display: none;
+}
+
+.dataTables_scrollHead, .dataTables_scrollFoot {
+    position: relative;
+    z-index: 2;
+}
+
+.dataTables_scroll div, .dataTables_scroll table {
+    padding: 0px !important;
+    margin: 0px !important;
+    min-width: calc(100% - 5px);
+}
+
+div.dataTables_scrollHeadInner, div.dataTables_scrollFootInner {
+    padding-left: 17px !important;
+    min-width: calc(100% - 17px);
+    box-sizing: content-box;
+}
+
+.dataTables_scrollBody tbody tr:nth-child(even) {
+    background: #eeeeee;
+}
+
+table.dataTable tbody tr:hover {
+    background: #cbdcec !important;
+}
+
+.DataTableIcons {
+    font-size: larger !important;
+    margin: 0px 5px 0px 5px;
+}
+
+.DataTableSearchIcon {
+    position: absolute;
+    left: 2px;
+    top: 1px;
+    font-size: larger !important;
+    text-shadow: 3px 1px 10px #666666;
+    color: #000000 !important;
+    padding: 4px;
+    text-decoration: none !important;
+    height: 24px;
+    z-index: 2;
+}
+
+.dt-buttons {
+    display: unset !important;
+    float: unset !important;
+}
+
+    .dt-buttons button {
+        padding: 0px 4px 0px 4px !important;
+        margin-top: 5px;
+    }
+.DTCustomGlobalSearch {
+    width: 150px !important;
+    float: right;
+    height: 17px;
+    margin-bottom: 0.333em;
+    margin-left: 3px;
+    padding: 0px 4px 0px 4px !important;
+    margin-top: 5px !important;
+    border: 1px solid #999 !important;
+}
+.DT_Container {
+    max-width: 100%;
+    overflow: auto;
+}
+.Grid.dataTable.no-footer.fixedHeader-floating {
+    top: 72px !important;
+    direction: rtl;
+    font-family: inherit !important;
+}
+
+.dataTables_filter input {
+    border: 1px solid #dddddd;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+.dataTables_length select {
+    border: 1px solid #dddddd;
+    border-radius: 2px;
+}
+
+.DT_ColumnSearchContainer, .DT_ColumnFilterContainer {
+    display: none;
+}
+
+.DT_ColumnSearch {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 0px;
+    height: 20px;
+    margin: auto;
+}
+
+.DT_ColumnFilter {
+    width: 100%;
+    max-width: 100%;
+    padding: 2px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 0px;
+    margin: auto;
+}
+
+/*
+
+.DatatableHeaderFilters:hover {
+    color: #F5A06B !important;
+}
+*/
+/*DataTable*Grid*Styles*End**************************************************/
