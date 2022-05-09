@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{06792A7D-1DA7-47F0-B46F-967AE5620B03}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebForm", "src\WebForm", "{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_56942"
+		Debug.AspNetCompiler.PhysicalPath = "src\WebForm\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_56942\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_56942"
+		Release.AspNetCompiler.PhysicalPath = "src\WebForm\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_56942\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "56942"
+		SlnRelativePath = "src\WebForm\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45} = {06792A7D-1DA7-47F0-B46F-967AE5620B03}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C155C2DB-284E-4D42-81AF-8D244AF90A09}
+	EndGlobalSection
+EndGlobal

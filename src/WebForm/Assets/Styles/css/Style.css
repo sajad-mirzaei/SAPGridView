@@ -1,0 +1,21 @@
+﻿body {
+    direction: rtl;
+}
+
+.loading {
+    margin: 0;
+    padding: 10% 0 0 0;
+    position: fixed;
+    text-align: center;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(244, 244, 244, 0.1);
+    z-index: 100000;
+}
+
+    .loading > img {
+        /*width: 200px;*/
+    }

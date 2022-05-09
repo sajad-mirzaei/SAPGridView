@@ -1,0 +1,276 @@
+﻿.SGV_GridContent .DT_TrThead,
+.SGV_GridContent .DT_TrTfoot,
+.SGV_GridContent .DT_TrThead:hover,
+.SGV_GridContent .DT_TrTfoot:hover,
+.SGV_GridContent .dataTables_scrollHead table tr,
+.SGV_GridContent .dataTables_scrollFoot table tr,
+.SGV_GridContent .dataTables_scrollHead table tr:hover,
+.SGV_GridContent .dataTables_scrollFoot table tr:hover {
+    background-color: #9cbecb;
+    color: #000000;
+}
+
+.SGV_GridContent .Grid td,
+.SGV_GridContent .Grid th {
+    vertical-align: middle;
+}
+
+.SGV_GridContent .SGV_LoadingContainer {
+    display: none;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    padding-bottom: 20px;
+    z-index: 1000;
+}
+
+.SGV_GridContent .SGV_LoadingIcon {
+    margin: auto;
+}
+
+.SGV_TabsContainer, .SGV_GridContent {
+    display: none;
+}
+
+    .SGV_GridContent.SGV_ActiveTabContent {
+        display: unset;
+    }
+
+.SGV_TabsContainer {
+    position: relative;
+    border-bottom: 2px solid #dddddd;
+    margin-bottom: 5px;
+    height: 29px;
+}
+
+    .SGV_TabsContainer .SGV_Tab {
+        background: #dddddd;
+        color: #000000;
+        padding: 5px 10px 5px 20px;
+        float: right;
+        height: 30px;
+        margin: -1px 3px 3px 3px;
+        min-width: 60px;
+        cursor: pointer;
+        text-align: right;
+        font-size: larger;
+        border-top: 1px solid #dddddd;
+        border-right: 1px solid #dddddd;
+        border-left: 1px solid #dddddd;
+        -webkit-border-top-left-radius: 4px;
+        -webkit-border-top-right-radius: 4px;
+        -moz-border-radius-topleft: 4px;
+        -moz-border-radius-topright: 4px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+
+        .SGV_TabsContainer .SGV_Tab:hover {
+            background: gray;
+            color: #ffffff;
+        }
+
+        .SGV_TabsContainer .SGV_Tab.SGV_ActiveTabTitle {
+            background: #ffffff;
+            border-bottom: 1px solid #ffffff;
+            border-top: 1px solid #dddddd;
+            border-right: 1px solid #dddddd;
+            border-left: 1px solid #dddddd;
+            cursor: default;
+        }
+
+            .SGV_TabsContainer .SGV_Tab.SGV_ActiveTabTitle:hover {
+                background: #ffffff;
+                color: #000000;
+            }
+
+    .SGV_TabsContainer .SGV_CloseTab {
+        float: right;
+        cursor: pointer;
+        margin-left: -10px;
+        margin-top: 5px;
+        padding: 3px;
+        margin-right: -20px;
+        /*-webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;*/
+    }
+
+        .SGV_TabsContainer .SGV_CloseTab:hover {
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.35);
+            border-color: #ced4da;
+        }
+
+
+.SGV_GridContent div.dataTables_wrapper table td,
+.SGV_GridContent div.dataTables_wrapper table th,
+.SGV_GridContent table.dataTable thead th,
+.SGV_GridContent table.dataTable thead td {
+    border: 1px solid #eeeeee !important;
+    border-top: 1px solid #e9ecef !important;
+}
+
+.SGV_GridContent .dataTables_scrollBody {
+    overflow-y: scroll !important;
+}
+
+    .SGV_GridContent .DT_TrThead th,
+    .SGV_GridContent .dataTables_scrollBody td,
+    .SGV_GridContent .DT_TrTfootCalc th,
+    .SGV_GridContent .DT_TrFilters th {
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+    }
+
+    .SGV_GridContent .DT_TrWidthControl th,
+    .SGV_GridContent .DT_TrWidthControl td,
+    .SGV_GridContent .dataTables_scrollBody table thead tr th,
+    .SGV_GridContent .dataTables_scrollBody table tfoot tr th {
+        height: 0px !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
+.SGV_GridContent div.dataTables_scrollBody table td,
+.SGV_GridContent .DT_TrTfootCalc th {
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+}
+
+.SGV_GridContent .DT_TrFilters th {
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+    text-align: center;
+}
+
+.SGV_GridContent .dataTables_scrollHead table th {
+    text-align: center;
+}
+
+.SGV_GridContent .dataTables_scrollHead table th,
+.SGV_GridContent .dataTables_scrollFoot table th {
+    height: 21px;
+}
+
+.SGV_GridContent div.dataTables_wrapper table {
+    border-collapse: collapse !important;
+}
+
+.SGV_GridContent .dataTables_scrollFoot,
+.SGV_GridContent .DT_TrFilters {
+    display: none;
+}
+
+.dataTables_scrollHead, .dataTables_scrollFoot {
+    position: relative;
+    z-index: 2;
+}
+
+.SGV_GridContent .dataTables_scroll div,
+.SGV_GridContent .dataTables_scroll table {
+    padding: 0px !important;
+    margin: 0px !important;
+    min-width: calc(100% - 5px);
+}
+
+.SGV_GridContent div.dataTables_scrollHeadInner,
+.SGV_GridContent div.dataTables_scrollFootInner {
+    padding-left: 17px !important;
+    min-width: calc(100% - 17px);
+    box-sizing: content-box;
+}
+
+.SGV_GridContent .dataTables_scrollBody tbody tr:nth-child(even) {
+    background: #eeeeee;
+}
+
+.SGV_GridContent table.dataTable tbody tr:hover {
+    background: #cbdcec !important;
+}
+
+.SGV_GridContent .DataTableIcons {
+    font-size: larger !important;
+    margin: 0px 5px 0px 5px;
+}
+
+
+.SGV_GridContent .dt-buttons {
+    display: unset !important;
+    float: unset !important;
+}
+
+    .SGV_GridContent .dt-buttons button {
+        padding: 0px 4px 0px 4px !important;
+        margin-top: 0px;
+    }
+
+.SGV_GridContent .DTCustomGlobalSearch {
+    width: 150px !important;
+    float: right;
+    height: 25px;
+    margin-bottom: 0.333em;
+    margin-left: 3px;
+    padding: 0px 4px 0px 4px !important;
+    margin-top: 0px !important;
+    border: 1px solid #999 !important;
+}
+
+.SGV_GridContent .DT_Container {
+    max-width: 100%;
+    overflow: auto;
+}
+
+.SGV_GridContent .Grid.dataTable.no-footer.fixedHeader-floating {
+    top: 72px !important;
+    direction: rtl;
+    font-family: inherit !important;
+}
+
+
+.SGV_GridContent div.dataTables_wrapper {
+    direction: rtl;
+}
+
+
+.SGV_GridContent div.dataTables_wrapper {
+    /*width: 800px;*/
+    margin: 0 auto;
+}
+
+
+.SGV_GridContent .dataTables_filter input {
+    border: 1px solid #dddddd;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+.SGV_GridContent .dataTables_length select {
+    border: 1px solid #dddddd;
+    border-radius: 2px;
+}
+
+.SGV_GridContent .DT_ColumnSearchContainer,
+.SGV_GridContent .DT_ColumnFilterContainer {
+    display: none;
+}
+
+.SGV_GridContent .DT_ColumnSearch {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 0px;
+    height: 20px;
+    margin: auto;
+}
+
+.SGV_GridContent .DT_ColumnFilter {
+    width: 100%;
+    max-width: 100%;
+    padding: 2px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 0px;
+    margin: auto;
+}
