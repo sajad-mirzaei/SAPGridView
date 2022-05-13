@@ -227,7 +227,7 @@ return data.d.data;
 
         var HeaderFiltersThead = SGV_AddGlobalSearch(ThisTable, ThisTableID, TbodyID, DataArray.options);
         if (DataArray.options["dropDownFilterButton"] === true || DataArray.options["columnsSearchButton"] === true) {
-            SGV_AddFilters(TbodyID, TheadID, DataArray.options);
+            SGV_AddFilters(TbodyID, TheadID, DataArray);
         }
         if (DataArray.options["dropDownFilterButton"] === true)
             SGV_FillDropDownFilters(ThisTableAPI, TheadID);
@@ -497,19 +497,25 @@ function SGV_HeaderComplex(DataArray, CellName) {
     return res;
 }
 
-function SGV_AddFilters(TbodyID, TheadID, Options) {
-    $("#" + TheadID).find(".DT_TrFilters th").each(function (columnIndex, obj) {
-        $(this).attr("data-test", columnIndex);
-        var title = $(this).text();
-        var width = parseInt($(this).width()) + 20;
+function SGV_AddFilters(TbodyID, TheadID, DataArray) {
+    var i = 0;
+    $("#" + TheadID).find(".DT_TrFilters th").each(function (k, obj) {
+        if (!DataArray.columns[k].rowGrouping || DataArray.columns[k].rowGrouping == null || DataArray.columns[k].rowGrouping.enable == false) {
+            $(this).attr("data-test", i);
+            var title = $(this).text();
+            var width = parseInt($(this).width()) + 20;
 
-        var selectTag = "";
-        var inputTag = "";
-        if (Options["dropDownFilterButton"] === true)
-            selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter ' data-columnnum='" + columnIndex + "' data-tbodyid='" + TbodyID + "'><option value=''> " + title + " </option></select></span>";
-        if (Options["columnsSearchButton"] === true)
-            inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch' data-columnnum='" + columnIndex + "' data-tbodyid='" + TbodyID + "' placeholder='" + title + "'></span>";
-        $(this).html(selectTag + inputTag);
+            var selectTag = "";
+            var inputTag = "";
+            if (DataArray.options["dropDownFilterButton"] === true) {
+                selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter ' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "'><option value=''> " + title + " </option></select></span>";
+            }
+            if (DataArray.options["columnsSearchButton"] === true) {
+                inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "' placeholder='" + title + "'></span>";
+            }
+            i++;
+            $(this).html(selectTag + inputTag);
+        }
     });
 }
 
