@@ -1,5 +1,5 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_Levels1.aspx.cs" Inherits="Grid_Levels1"
-    Title="گزارش اعلامیه بدهکاری - بستانکاری" %>
+    Title="گزارش تست" %>
 
 <asp:Content ID="Content" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always" OnLoad="Page_Load">
