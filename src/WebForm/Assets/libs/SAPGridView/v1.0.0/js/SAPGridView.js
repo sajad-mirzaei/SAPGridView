@@ -11,6 +11,7 @@ var SGVFunctionList = {
     OnClick: { FuncListBuild: ["createdCell"] },
     TextFeature: { FuncListBuild: ["createdCell"] }
 };
+
 function SapGridViewJSBind(RData, Level, GridTitle) {
     var newRData = JSON.parse(JSON.stringify(RData));
     CustomData = newRData.CustomData;
@@ -536,13 +537,15 @@ function SGV_AddGlobalSearch(ThisTable, ThisTableID, TbodyID, Options) {
         ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tr.DT_TrThead").removeClass("DT_TrThead").addClass("DT_TrWidthControl");
         ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tfoot").remove();
         ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody .DT_TrFilters").remove();
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot tr.DT_TrTfoot").removeClass("DT_TrTfoot").addClass("DT_TrWidthControl").find("th").html("");
+        //ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot tr.DT_TrTfoot").removeClass("DT_TrTfoot").addClass("DT_TrWidthControl").find("th").html("");
+        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot tr.DT_TrTfoot").removeClass("DT_TrTfoot").addClass("DT_TrWidthControl");
         ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot .DT_TrFilters").removeClass("DT_TrFilters").addClass("DT_TrTfootCalc");
     } else {
         var HeaderFiltersThead = ThisTable.find("thead.DT_Thead");
     }
     return HeaderFiltersThead;
 }
+
 function SGV_FillDropDownFilters(ThisTableAPI, TheadID) {
     var sumWidth = 0;
     ThisTableAPI.columns().every(function () {
@@ -922,9 +925,11 @@ function SGV_TheadTfootCalc(TableInfo, ContainerId) {
                 }
             });
             var TempThisVal = ThisDisplayValue !== "" ? ThisVal_OpenTag + ThisDisplayValue + ThisVal_CloseTag : ThisVal_OpenTag + ThisValue + ThisVal_CloseTag;
-            if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false)
+            if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
                 $("#" + TdId).html(TempThisVal);
-            //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); not Work after a column to be visible false
+                ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(TempThisVal);
+                //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); not Work after a column to be visible false
+            }
             if (ItemCss != "") {
                 $("#" + TdId).addClass(ItemCss);
                 //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).addClass(ItemCss); not Work after a column to be visible false
@@ -1113,7 +1118,6 @@ function SGV_CumulativeSum_AfterSortChange(CellIndex, CellFunc, DTOrderChangeFun
 }
 */
 
-
 //-End-of-SapGridViewJSBind--------------------------------------------------------------------------
 
 function SGV_StrToFloat(str) {
@@ -1175,8 +1179,6 @@ function SGV_Base64Encode(str) {
             return String.fromCharCode('0x' + p1);
         }));
 }
-
-
 
 function SGV_ArabicToPersianChar(str) {
     //var c = str.replace(/ى/g,"ی");

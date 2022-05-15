@@ -132,6 +132,10 @@
         padding-bottom: 0px !important;
     }
 
+.DT_TrWidthControl {
+    display: none;
+}
+
 .SGV_GridContent div.dataTables_scrollBody table td,
 .SGV_GridContent .DT_TrTfootCalc th {
     padding-right: 2px !important;
