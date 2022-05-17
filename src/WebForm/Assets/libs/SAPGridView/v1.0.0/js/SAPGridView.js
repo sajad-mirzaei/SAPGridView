@@ -223,7 +223,13 @@ return data.d.data;
             };
         }
         var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
-        ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
+
+        $('#myInput').on('keyup', function () {
+            console.log(this.value);
+            TableObject.search(this.value).draw();
+        });
+
+        /*ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
         var ThisTableAPI = new $.fn.dataTable.Api(TableObject);
 
         var HeaderFiltersThead = SGV_AddGlobalSearch(ThisTable, ThisTableID, TbodyID, DataArray.options);
@@ -258,7 +264,7 @@ return data.d.data;
         SGV_DTOrderChage(TotalFunctionDetails["orderChange"], ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId, TableObject, DataArray.counterColumn, DataArray.columns);
         SGVTableCounter++;
         if (rowGrouping !== null)
-            TableObject.columns([rowGrouping.rowNumber]).visible(false, false).draw();
+            TableObject.columns([rowGrouping.rowNumber]).visible(false, false).draw();*/
 
     });
 }
@@ -579,7 +585,7 @@ function SGV_DefaultOptions(customOptions) {
     var DefaultOptions = {
         orderCellsTop: true,
         //colReorder: true,
-        searching: false,
+        searching: true,
         dom: 'lBfrtip',
         stateSave: true,
         stateSaveParams: function (settings, data) {
