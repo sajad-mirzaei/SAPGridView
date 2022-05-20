@@ -700,7 +700,7 @@ function SGV_DefaultOptions(customOptions) {
     if (customOptions["recycleButton"] === true) DefaultOptions.buttons.push(RecycleButton);
 
     DefaultOptions.buttons.push(RemoveAllFilters);
-    
+
     $.each(customOptions, function (k, v) {
         if (["lengthMenu", "order"].includes(k) && Array.isArray(DefaultOptions[k]) !== true) {
             v = v !== null ? JSON.parse(v.replace(/'/gi, "\"")) : [];
@@ -1067,7 +1067,7 @@ function SGV_SearchCustomized(allInput, ThisTableID, tbodyid, SearchType, TableO
     $.each(dataSearch, function (k, v) {
         //.search("^" + v.inputData + "$", true, false, true) --> for match case
         //.search(v.inputData) --> for smart case
-        if (emptyArray.includes(v.inputData) !== true) { 
+        if (emptyArray.includes(v.inputData) !== true) {
             if (SearchType == "GeneralSearch") {
                 TableObject.search(v.inputData).draw(); //smart search
             }
@@ -1081,6 +1081,10 @@ function SGV_SearchCustomized(allInput, ThisTableID, tbodyid, SearchType, TableO
     });
 }
 
+/*
+ * 
+ * 
+ *
 function OLDDDDDDDDD____SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
                 var dataSearch = [];
                 var i = 0;
@@ -1115,9 +1119,6 @@ function OLDDDDDDDDD____SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
                     });
                 });
             }
-
-/*
- * 
  function EventFired_SGV(TableObject) {
     TableObject.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
         cell.innerHTML = i + 1;
@@ -1158,89 +1159,89 @@ function SGV_CumulativeSum_AfterSortChange(CellIndex, CellFunc, DTOrderChangeFun
 //-End-of-SapGridViewJSBind--------------------------------------------------------------------------
 
 function SGV_StrToFloat(str) {
-                var str = str !== undefined && str != null && str != NaN && $("<span>" + str + "</span>").text().trim() != "" ? $("<span>" + str + "</span>").text().trim() : 0;
-                str = SGV_CustomStrReplace(str.toString(), "/", ".");
-                str = str.replace(/[^\d.-]/g, '');
-                return parseFloat(str);
-            }
+    var str = str !== undefined && str != null && str != NaN && $("<span>" + str + "</span>").text().trim() != "" ? $("<span>" + str + "</span>").text().trim() : 0;
+    str = SGV_CustomStrReplace(str.toString(), "/", ".");
+    str = str.replace(/[^\d.-]/g, '');
+    return parseFloat(str);
+}
 
 function SGV_CustomStrReplace(str, searchValue, replaceValue, matchWholeWord, findAllAndReplace) {
-                var findAllAndReplace = findAllAndReplace ? findAllAndReplace : true;
-                str = (str + " ").trim();
-                if (findAllAndReplace) {
-                    if ([null, NaN, undefined, 'null', 'NaN', 'undefined', ""].includes(str) === false) {
-                        if (matchWholeWord)
-                            str = str.replace(new RegExp("\\b" + searchValue + "\\b", "g"), replaceValue);
-                        else
-                            str = str.replace((new RegExp(searchValue, "g")), replaceValue);
-                    }
-                } else {
-                    str = str.replace(searchValue, replaceValue);
-                }
-                return str;
-            }
+    var findAllAndReplace = findAllAndReplace ? findAllAndReplace : true;
+    str = (str + " ").trim();
+    if (findAllAndReplace) {
+        if ([null, NaN, undefined, 'null', 'NaN', 'undefined', ""].includes(str) === false) {
+            if (matchWholeWord)
+                str = str.replace(new RegExp("\\b" + searchValue + "\\b", "g"), replaceValue);
+            else
+                str = str.replace((new RegExp(searchValue, "g")), replaceValue);
+        }
+    } else {
+        str = str.replace(searchValue, replaceValue);
+    }
+    return str;
+}
 
 function SGV_IsValidDate(dateObject) {
-                return new Date(dateObject).toString() !== 'Invalid Date';
-            }
+    return new Date(dateObject).toString() !== 'Invalid Date';
+}
 
 function SGV_DatatableHeaderFilters(TableId, type) {
-                var ThisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
-                var ThisThead = ThisDataTable.find(".DT_TrFilters");
-                var AllTheadFiltersID = ThisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
-                var ThisTheadFilterID = ThisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
-                var flag = ThisThead.attr("data-flag");
-                if (flag == "hide" || flag != type) {
-                    ThisThead.attr("data-flag", type);
-                    ThisThead.slideDown();
-                    AllTheadFiltersID.hide();
-                    ThisTheadFilterID.fadeIn();
-                } else {
-                    ThisThead.attr("data-flag", "hide");
-                    ThisThead.hide();
-                    AllTheadFiltersID.slideUp();
-                }
-            };
-
-    function SGV_Base64Decode(str) {
-        // Unicode support
-        return decodeURIComponent(atob(str).split('').map(function (c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+    var ThisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
+    var ThisThead = ThisDataTable.find(".DT_TrFilters");
+    var AllTheadFiltersID = ThisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
+    var ThisTheadFilterID = ThisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
+    var flag = ThisThead.attr("data-flag");
+    if (flag == "hide" || flag != type) {
+        ThisThead.attr("data-flag", type);
+        ThisThead.slideDown();
+        AllTheadFiltersID.hide();
+        ThisTheadFilterID.fadeIn();
+    } else {
+        ThisThead.attr("data-flag", "hide");
+        ThisThead.hide();
+        AllTheadFiltersID.slideUp();
     }
+};
 
-    function SGV_Base64Encode(str) {
-        // Unicode support
-        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-            function toSolidBytes(match, p1) {
-                return String.fromCharCode('0x' + p1);
-            }));
-    }
+function SGV_Base64Decode(str) {
+    // Unicode support
+    return decodeURIComponent(atob(str).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+}
 
-    function SGV_ArabicToPersianChar(str) {
-        //var c = str.replace(/ى/g,"ی");
-        var c = str.replace(/ي/g, "ی");
-        var c = c.replace(/ئ/g, "ی");
-        var c = c.replace(/ة/g, "ه");
-        var c = c.replace(/ك/g, "ک");
-        var c = c.replace(/ؤ/g, "و");
-        return c;
-    }
+function SGV_Base64Encode(str) {
+    // Unicode support
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+}
 
-    function SGV_PersianToArabicChar(str) {
-        //var c = str.replace(/ى/g,"ي");
-        //var c = str.replace(/ى/g,"ی");
-        var c = str.replace(/ی/g, "ي");
-        var c = c.replace(/ک/g, "ك");
-        return c;
-    }
+function SGV_ArabicToPersianChar(str) {
+    //var c = str.replace(/ى/g,"ی");
+    var c = str.replace(/ي/g, "ی");
+    var c = c.replace(/ئ/g, "ی");
+    var c = c.replace(/ة/g, "ه");
+    var c = c.replace(/ك/g, "ک");
+    var c = c.replace(/ؤ/g, "و");
+    return c;
+}
 
-    function SGV_ErrorMessage(errorKey) {
-        var errorArray = {
-            CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
-            CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
-            VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
-            TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد"
-        };
-        console.log(errorArray[errorKey]);
-    }
+function SGV_PersianToArabicChar(str) {
+    //var c = str.replace(/ى/g,"ي");
+    //var c = str.replace(/ى/g,"ی");
+    var c = str.replace(/ی/g, "ي");
+    var c = c.replace(/ک/g, "ك");
+    return c;
+}
+
+function SGV_ErrorMessage(errorKey) {
+    var errorArray = {
+        CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
+        CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
+        VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
+        TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد"
+    };
+    console.log(errorArray[errorKey]);
+}
