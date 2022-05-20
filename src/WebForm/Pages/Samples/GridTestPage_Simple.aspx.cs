@@ -35,7 +35,7 @@ public partial class GridTestPage_Simple : System.Web.UI.Page
         oDT.Columns.Add("z", typeof(string));
         oDT.Columns.Add("w", typeof(string));
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
         {
             DataRow Row1 = oDT.NewRow();
             Row1["x"] = i;
