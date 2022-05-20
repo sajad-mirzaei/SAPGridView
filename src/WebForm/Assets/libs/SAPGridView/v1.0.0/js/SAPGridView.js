@@ -161,7 +161,7 @@ function SapGridViewJSBind(RData, Level, GridTitle) {
             $("#" + ContainerId).append(TableHtml);
         }
         var ThisTable = $("#" + ContainerId + " table");
-        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options);
+        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options, ThisTableID);
 
         SGVDefaultOptions["columnDefs"] = ThisColumnDefs;
         SGVDefaultOptions["columns"] = DataArray.columns;
@@ -575,7 +575,7 @@ function SGV_FillDropDownFilters(ThisTableAPI, TheadID) {
     });
 }
 
-function SGV_DefaultOptions(customOptions) {
+function SGV_DefaultOptions(customOptions, ThisTableID) {
     var ariaControls = "";
     var DefaultOptions = {
         orderCellsTop: true,
@@ -688,7 +688,7 @@ function SGV_DefaultOptions(customOptions) {
         text: '<i class="fa fa-ban DataTableIcons"></i>',
         titleAttr: "حذف همه فیلترها و جستجوها",
         action: function (e, dt, node, conf) {
-            dt.search('').columns().search('').draw();
+            SGV_ClearAllFilters(dt, ThisTableID);
         }
     };
 
@@ -1031,7 +1031,10 @@ function SGV_KeepScrolHeight(ThisTable, gridheight) {
     });
 }
 
-function SGV_ClearAllFilters(TableObject) {
+function SGV_ClearAllFilters(TableObject, ThisTableID) {
+    $("." + ThisTableID + "GeneralSearch").val("");
+    $("." + ThisTableID + "ColumnSearch").val("");
+    $("." + ThisTableID + "ColumnFilter").prop("selectedIndex", 0);
     TableObject.search('').columns().search('').draw();
 }
 
