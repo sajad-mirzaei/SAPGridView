@@ -224,22 +224,17 @@ return data.d.data;
         }
         var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
 
-        $('#myInput').on('keyup', function () {
-            console.log(this.value);
-            TableObject.search(this.value).draw();
-        });
-
-        /*ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
+        ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
         var ThisTableAPI = new $.fn.dataTable.Api(TableObject);
 
-        var HeaderFiltersThead = SGV_AddGlobalSearch(ThisTable, ThisTableID, TbodyID, DataArray.options);
+        var HeaderFiltersThead = SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID, DataArray.options, TableObject, ThisTableAPI);
         if (DataArray.options["dropDownFilterButton"] === true || DataArray.options["columnsSearchButton"] === true) {
-            SGV_AddFilters(TbodyID, TheadID, DataArray);
+            SGV_AddFilters(ThisTableID, TbodyID, TheadID, DataArray);
         }
         if (DataArray.options["dropDownFilterButton"] === true)
             SGV_FillDropDownFilters(ThisTableAPI, TheadID);
 
-        SGV_OnChangeFilters();
+        SGV_OnChangeFilters(TableObject, ThisTableAPI, ThisTableID);
         SGV_KeepScrolHeight(ThisTable, DataArray.containerHeight);
         SGVArray[ContainerId] = SGVArray[ContainerId] == undefined ? {} : SGVArray[ContainerId];
         SGVArray[ContainerId][ThisTableID] = { TableId: ThisTableID, TableObject: TableObject, TableAPI: ThisTableAPI };
@@ -264,7 +259,7 @@ return data.d.data;
         SGV_DTOrderChage(TotalFunctionDetails["orderChange"], ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId, TableObject, DataArray.counterColumn, DataArray.columns);
         SGVTableCounter++;
         if (rowGrouping !== null)
-            TableObject.columns([rowGrouping.rowNumber]).visible(false, false).draw();*/
+            TableObject.columns([rowGrouping.rowNumber]).visible(false, false).draw();
 
     });
 }
@@ -504,7 +499,7 @@ function SGV_HeaderComplex(DataArray, CellName) {
     return res;
 }
 
-function SGV_AddFilters(TbodyID, TheadID, DataArray) {
+function SGV_AddFilters(ThisTableID, TbodyID, TheadID, DataArray) {
     var i = 0;
     $("#" + TheadID).find(".DT_TrFilters th").each(function (k, obj) {
         if (!DataArray.columns[k].rowGrouping || DataArray.columns[k].rowGrouping == null || DataArray.columns[k].rowGrouping.enable == false) {
@@ -515,10 +510,10 @@ function SGV_AddFilters(TbodyID, TheadID, DataArray) {
             var selectTag = "";
             var inputTag = "";
             if (DataArray.options["dropDownFilterButton"] === true) {
-                selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter ' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "'><option value=''> " + title + " </option></select></span>";
+                selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter " + ThisTableID + "ColumnFilter' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "'><option value=''> " + title + " </option></select></span>";
             }
             if (DataArray.options["columnsSearchButton"] === true) {
-                inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "' placeholder='" + title + "'></span>";
+                inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch " + ThisTableID + "ColumnSearch' data-columnnum='" + i + "' data-tbodyid='" + TbodyID + "' placeholder='" + title + "'></span>";
             }
             i++;
             $(this).html(selectTag + inputTag);
@@ -526,15 +521,15 @@ function SGV_AddFilters(TbodyID, TheadID, DataArray) {
     });
 }
 
-function SGV_AddGlobalSearch(ThisTable, ThisTableID, TbodyID, Options) {
-    var x = $("#" + ThisTableID).closest(".dataTables_wrapper").find(".dt-buttons").children(".DTCustomGlobalSearch").length;
+function SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID, Options, TableObject, ThisTableAPI) {
+    var x = $("#" + ThisTableID).closest(".dataTables_wrapper").find(".dt-buttons").children(".DTCustomGeneralSearch").length;
     if (x == 0 && Options["gridSearchTextBox"] === true) {
         $("#" + ThisTableID).closest(".dataTables_wrapper")
             .find(".dt-buttons")
-            .prepend("<input type='search' class='form-control form-control-sm DTCustomGlobalSearch' placeholder='جستجو در همه ستون ها' aria-controls='" + ThisTableID + "'>")
-            .children(".DTCustomGlobalSearch")
+            .prepend("<input type='search' class='form-control form-control-sm DTCustomGeneralSearch " + ThisTableID + "GeneralSearch' placeholder='جستجو در همه ستون ها' aria-controls='" + ThisTableID + "'>")
+            .children(".DTCustomGeneralSearch")
             .on("keyup change", function () {
-                SGV_SearchCustomized($(this), TbodyID, 1);
+                SGV_SearchCustomized($(this), ThisTableID, TbodyID, "GeneralSearch", TableObject, ThisTableAPI);
             });
     }
     if (ThisTable.closest(".dataTables_scroll").length) {
@@ -689,6 +684,13 @@ function SGV_DefaultOptions(customOptions) {
             dt.state.clear();
         }
     };
+    var RemoveAllFilters = {
+        text: '<i class="fa fa-ban DataTableIcons"></i>',
+        titleAttr: "حذف همه فیلترها و جستجوها",
+        action: function (e, dt, node, conf) {
+            dt.search('').columns().search('').draw();
+        }
+    };
 
     if (customOptions["copyButton"] === true) DefaultOptions.buttons.push(CopyButton);
     if (customOptions["printButton"] === true) DefaultOptions.buttons.push(PrintButton);
@@ -697,6 +699,8 @@ function SGV_DefaultOptions(customOptions) {
     if (customOptions["dropDownFilterButton"] === true) DefaultOptions.buttons.push(DropDownFilterButton);
     if (customOptions["recycleButton"] === true) DefaultOptions.buttons.push(RecycleButton);
 
+    DefaultOptions.buttons.push(RemoveAllFilters);
+    
     $.each(customOptions, function (k, v) {
         if (["lengthMenu", "order"].includes(k) && Array.isArray(DefaultOptions[k]) !== true) {
             v = v !== null ? JSON.parse(v.replace(/'/gi, "\"")) : [];
@@ -989,45 +993,22 @@ function SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId) {
     $("#" + ThisTabContentID).addClass("SGV_ActiveTabContent").css("display", "");
 }
 
-function SGV_OnChangeFilters() {
+function SGV_OnChangeFilters(TableObject, ThisTableAPI, ThisTableID) {
     $(".DT_ColumnFilter").on('change', function () {
         var allInput = $(this).closest("tr").find("select");
         var tbodyid = $(this).attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, tbodyid, 0);
+        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "ColumnFilter", TableObject, ThisTableAPI);
     });
     $(".DT_ColumnSearch").on('keyup change', function () {
         var allInput = $(this).closest("tr").find("input");
         var tbodyid = $(this).attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, tbodyid, 0);
+        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "ColumnSearch", TableObject, ThisTableAPI);
     });
     $(".dataTables_filter input").on('keyup', function () {
         var allInput = $(this);
         var tbodyid = $(this).closest(".dataTables_wrapper").find("th").attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, tbodyid, 0);
+        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "GeneralSearch", TableObject, ThisTableAPI);
     });
-}
-
-function SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID) {
-    if ($("#" + ThisTableID).closest(".dataTables_wrapper").find(".dt-buttons").children(".DTCustomGlobalSearch").length == 0)
-        $("#" + ThisTableID).closest(".dataTables_wrapper")
-            .find(".dt-buttons")
-            .prepend("<input type='search' class='form-control form-control-sm DTCustomGlobalSearch' placeholder='جستجو در همه ستون ها' aria-controls='" + ThisTableID + "'>")
-            .children(".DTCustomGlobalSearch")
-            .on("keyup change", function () {
-                SGV_SearchCustomized($(this), TbodyID, 1);
-            });
-    if (ThisTable.closest(".dataTables_scroll").length) {
-        var HeaderFiltersThead = ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollHead thead.DT_Thead");
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody thead.DT_Thead").removeClass("DT_Thead").addClass("DT_TheadWidthControl");
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tr.DT_TrThead").removeClass("DT_TrThead").addClass("DT_TrWidthControl");
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tfoot").remove();
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody .DT_TrFilters").remove();
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot tr.DT_TrTfoot").removeClass("DT_TrTfoot").addClass("DT_TrWidthControl").find("th").html("");
-        ThisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot .DT_TrFilters").removeClass("DT_TrFilters").addClass("DT_TrTfootCalc");
-    } else {
-        var HeaderFiltersThead = ThisTable.find("thead.DT_Thead");
-    }
-    return HeaderFiltersThead;
 }
 
 function SGV_KeepScrolHeight(ThisTable, gridheight) {
@@ -1050,40 +1031,90 @@ function SGV_KeepScrolHeight(ThisTable, gridheight) {
     });
 }
 
-function SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
-    var dataSearch = [];
+function SGV_ClearAllFilters(TableObject) {
+    TableObject.search('').columns().search('').draw();
+}
+
+function SGV_SearchCustomized(allInput, ThisTableID, tbodyid, SearchType, TableObject, ThisTableAPI) {
+    var emptyArray = [null, "", NaN, undefined];
+    var dataSearch = {};
     var i = 0;
+    TableObject.search('').columns().search('').draw(); //Clear All Search & Filters
+    var elementsType = "";
     allInput.each(function () {
         var inputData = $(this).val();
         let persianInputData = SGV_ArabicToPersianChar(inputData);
         var columnNum = $(this).attr("data-columnnum");
+        var elementType = $(this).prop("nodeName");
         if (persianInputData.trim() != "" && persianInputData != "undefined") {
-            dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid };
+            dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid, "elementType": elementType };
+            elementsType = elementType.toUpperCase();
             i++;
         }
     });
-    $("#" + tbodyid + " > tr").show();
-    $("#" + tbodyid + " > tr").each(function () {
-        var thisTr = $(this).closest("tr");
-        $.each(dataSearch, function (k, v) {
-            if (SearchInTr === 0)
-                var thisSearchField = thisTr.find("td:eq(" + v.columnNum + ")");
-            else
-                var thisSearchField = thisTr;
-            var text = thisSearchField.text();
-            thisSearchField.find("input, select, button, a, span").each(function () {
-                if ($(this).is("button, a, span")) {
-                    text += $(this).text();
-                } else
-                    text += $(this).val();
-            });
-            let persianText = SGV_ArabicToPersianChar(text);
-            if (persianText.indexOf(v.inputData) < 0) {
-                thisTr.hide();
+
+    if (elementsType == "SELECT") {
+        $("." + ThisTableID + "GeneralSearch").val("");
+        $("." + ThisTableID + "ColumnSearch").val("");
+    } else if (elementsType == "INPUT" && SearchType == "GeneralSearch") {
+        $("." + ThisTableID + "ColumnFilter").prop("selectedIndex", 0);
+        $("." + ThisTableID + "ColumnSearch").val("");
+    } else if (elementsType == "INPUT" && SearchType == "ColumnSearch") {
+        $("." + ThisTableID + "ColumnFilter").prop("selectedIndex", 0);
+        $("." + ThisTableID + "GeneralSearch").val("");
+    }
+
+    $.each(dataSearch, function (k, v) {
+        //.search("^" + v.inputData + "$", true, false, true) --> for match case
+        //.search(v.inputData) --> for smart case
+        if (emptyArray.includes(v.inputData) !== true) { 
+            if (SearchType == "GeneralSearch") {
+                TableObject.search(v.inputData).draw(); //smart search
             }
-        });
+            else if (SearchType == "ColumnSearch") {
+                TableObject.columns(v.columnNum).search(v.inputData).draw(); //smart search
+            }
+            else {
+                TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false).draw(); //match search for dropdown filter
+            }
+        }
     });
 }
+
+function OLDDDDDDDDD____SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
+                var dataSearch = [];
+                var i = 0;
+                allInput.each(function () {
+                    var inputData = $(this).val();
+                    let persianInputData = SGV_ArabicToPersianChar(inputData);
+                    var columnNum = $(this).attr("data-columnnum");
+                    if (persianInputData.trim() != "" && persianInputData != "undefined") {
+                        dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid };
+                        i++;
+                    }
+                });
+                $("#" + tbodyid + " > tr").show();
+                $("#" + tbodyid + " > tr").each(function () {
+                    var thisTr = $(this).closest("tr");
+                    $.each(dataSearch, function (k, v) {
+                        if (SearchInTr === 0)
+                            var thisSearchField = thisTr.find("td:eq(" + v.columnNum + ")");
+                        else
+                            var thisSearchField = thisTr;
+                        var text = thisSearchField.text();
+                        thisSearchField.find("input, select, button, a, span").each(function () {
+                            if ($(this).is("button, a, span")) {
+                                text += $(this).text();
+                            } else
+                                text += $(this).val();
+                        });
+                        let persianText = SGV_ArabicToPersianChar(text);
+                        if (persianText.indexOf(v.inputData) < 0) {
+                            thisTr.hide();
+                        }
+                    });
+                });
+            }
 
 /*
  * 
@@ -1127,89 +1158,89 @@ function SGV_CumulativeSum_AfterSortChange(CellIndex, CellFunc, DTOrderChangeFun
 //-End-of-SapGridViewJSBind--------------------------------------------------------------------------
 
 function SGV_StrToFloat(str) {
-    var str = str !== undefined && str != null && str != NaN && $("<span>" + str + "</span>").text().trim() != "" ? $("<span>" + str + "</span>").text().trim() : 0;
-    str = SGV_CustomStrReplace(str.toString(), "/", ".");
-    str = str.replace(/[^\d.-]/g, '');
-    return parseFloat(str);
-}
+                var str = str !== undefined && str != null && str != NaN && $("<span>" + str + "</span>").text().trim() != "" ? $("<span>" + str + "</span>").text().trim() : 0;
+                str = SGV_CustomStrReplace(str.toString(), "/", ".");
+                str = str.replace(/[^\d.-]/g, '');
+                return parseFloat(str);
+            }
 
 function SGV_CustomStrReplace(str, searchValue, replaceValue, matchWholeWord, findAllAndReplace) {
-    var findAllAndReplace = findAllAndReplace ? findAllAndReplace : true;
-    str = (str + " ").trim();
-    if (findAllAndReplace) {
-        if ([null, NaN, undefined, 'null', 'NaN', 'undefined', ""].includes(str) === false) {
-            if (matchWholeWord)
-                str = str.replace(new RegExp("\\b" + searchValue + "\\b", "g"), replaceValue);
-            else
-                str = str.replace((new RegExp(searchValue, "g")), replaceValue);
-        }
-    } else {
-        str = str.replace(searchValue, replaceValue);
-    }
-    return str;
-}
+                var findAllAndReplace = findAllAndReplace ? findAllAndReplace : true;
+                str = (str + " ").trim();
+                if (findAllAndReplace) {
+                    if ([null, NaN, undefined, 'null', 'NaN', 'undefined', ""].includes(str) === false) {
+                        if (matchWholeWord)
+                            str = str.replace(new RegExp("\\b" + searchValue + "\\b", "g"), replaceValue);
+                        else
+                            str = str.replace((new RegExp(searchValue, "g")), replaceValue);
+                    }
+                } else {
+                    str = str.replace(searchValue, replaceValue);
+                }
+                return str;
+            }
 
 function SGV_IsValidDate(dateObject) {
-    return new Date(dateObject).toString() !== 'Invalid Date';
-}
+                return new Date(dateObject).toString() !== 'Invalid Date';
+            }
 
 function SGV_DatatableHeaderFilters(TableId, type) {
-    var ThisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
-    var ThisThead = ThisDataTable.find(".DT_TrFilters");
-    var AllTheadFiltersID = ThisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
-    var ThisTheadFilterID = ThisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
-    var flag = ThisThead.attr("data-flag");
-    if (flag == "hide" || flag != type) {
-        ThisThead.attr("data-flag", type);
-        ThisThead.slideDown();
-        AllTheadFiltersID.hide();
-        ThisTheadFilterID.fadeIn();
-    } else {
-        ThisThead.attr("data-flag", "hide");
-        ThisThead.hide();
-        AllTheadFiltersID.slideUp();
+                var ThisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
+                var ThisThead = ThisDataTable.find(".DT_TrFilters");
+                var AllTheadFiltersID = ThisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
+                var ThisTheadFilterID = ThisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
+                var flag = ThisThead.attr("data-flag");
+                if (flag == "hide" || flag != type) {
+                    ThisThead.attr("data-flag", type);
+                    ThisThead.slideDown();
+                    AllTheadFiltersID.hide();
+                    ThisTheadFilterID.fadeIn();
+                } else {
+                    ThisThead.attr("data-flag", "hide");
+                    ThisThead.hide();
+                    AllTheadFiltersID.slideUp();
+                }
+            };
+
+    function SGV_Base64Decode(str) {
+        // Unicode support
+        return decodeURIComponent(atob(str).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
     }
-};
 
-function SGV_Base64Decode(str) {
-    // Unicode support
-    return decodeURIComponent(atob(str).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-}
+    function SGV_Base64Encode(str) {
+        // Unicode support
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+            function toSolidBytes(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+    }
 
-function SGV_Base64Encode(str) {
-    // Unicode support
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-        function toSolidBytes(match, p1) {
-            return String.fromCharCode('0x' + p1);
-        }));
-}
+    function SGV_ArabicToPersianChar(str) {
+        //var c = str.replace(/ى/g,"ی");
+        var c = str.replace(/ي/g, "ی");
+        var c = c.replace(/ئ/g, "ی");
+        var c = c.replace(/ة/g, "ه");
+        var c = c.replace(/ك/g, "ک");
+        var c = c.replace(/ؤ/g, "و");
+        return c;
+    }
 
-function SGV_ArabicToPersianChar(str) {
-    //var c = str.replace(/ى/g,"ی");
-    var c = str.replace(/ي/g, "ی");
-    var c = c.replace(/ئ/g, "ی");
-    var c = c.replace(/ة/g, "ه");
-    var c = c.replace(/ك/g, "ک");
-    var c = c.replace(/ؤ/g, "و");
-    return c;
-}
+    function SGV_PersianToArabicChar(str) {
+        //var c = str.replace(/ى/g,"ي");
+        //var c = str.replace(/ى/g,"ی");
+        var c = str.replace(/ی/g, "ي");
+        var c = c.replace(/ک/g, "ك");
+        return c;
+    }
 
-function SGV_PersianToArabicChar(str) {
-    //var c = str.replace(/ى/g,"ي");
-    //var c = str.replace(/ى/g,"ی");
-    var c = str.replace(/ی/g, "ي");
-    var c = c.replace(/ک/g, "ك");
-    return c;
-}
-
-function SGV_ErrorMessage(errorKey) {
-    var errorArray = {
-        CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
-        CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
-        VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
-        TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد"
-    };
-    console.log(errorArray[errorKey]);
-}
+    function SGV_ErrorMessage(errorKey) {
+        var errorArray = {
+            CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
+            CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
+            VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
+            TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد"
+        };
+        console.log(errorArray[errorKey]);
+    }

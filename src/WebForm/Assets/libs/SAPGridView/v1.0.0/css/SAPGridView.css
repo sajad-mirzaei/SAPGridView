@@ -209,7 +209,7 @@
         margin-top: 0px;
     }
 
-.SGV_GridContent .DTCustomGlobalSearch {
+.SGV_GridContent .DTCustomGeneralSearch {
     width: 150px !important;
     float: right;
     height: 25px;
@@ -277,4 +277,9 @@
     border-radius: 3px;
     padding: 0px;
     margin: auto;
+}
+
+/*--Main-general-Search-hidden------------*/
+.dataTables_filter{
+    display: none;
 }
