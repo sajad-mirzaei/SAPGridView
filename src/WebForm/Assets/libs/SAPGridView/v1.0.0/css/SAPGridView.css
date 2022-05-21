@@ -199,6 +199,14 @@
 }
 
 
+.SGV_GridContent .DataTableSmallIcons {
+    font-size: small;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+
 .SGV_GridContent .dt-buttons {
     display: unset !important;
     float: unset !important;

@@ -161,7 +161,7 @@ function SapGridViewJSBind(RData, Level, GridTitle) {
             $("#" + ContainerId).append(TableHtml);
         }
         var ThisTable = $("#" + ContainerId + " table");
-        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options, ThisTableID);
+        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options, DataArray.gridTitle, ThisTableID);
 
         SGVDefaultOptions["columnDefs"] = ThisColumnDefs;
         SGVDefaultOptions["columns"] = DataArray.columns;
@@ -201,7 +201,6 @@ return data.d.data;
 },
 "cache": false
 };*/
-
         //Row Grouping
         if (rowGrouping !== null) {
             var columnsCount = SGVDefaultOptions.columns.length;
@@ -222,19 +221,29 @@ return data.d.data;
                 });
             };
         }
-        var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
 
+        //Bind Table
+        var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
         ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
         var ThisTableAPI = new $.fn.dataTable.Api(TableObject);
 
-        var HeaderFiltersThead = SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID, DataArray.options, TableObject, ThisTableAPI);
+        //Add Extra Settings
+        var TableInfo = {
+            TableId: ThisTableID,
+            TableObject: TableObject,
+            TableAPI: ThisTableAPI,
+            SGVGlobalVariables: SGVGlobalVariables,
+            Columns: DataArray.columns,
+            ContainerId: ContainerId
+        };
+        var HeaderFiltersThead = SGV_AddGeneralSearch(ThisTable, TableInfo, TbodyID, DataArray.options);
         if (DataArray.options["dropDownFilterButton"] === true || DataArray.options["columnsSearchButton"] === true) {
             SGV_AddFilters(ThisTableID, TbodyID, TheadID, DataArray);
         }
         if (DataArray.options["dropDownFilterButton"] === true)
             SGV_FillDropDownFilters(ThisTableAPI, TheadID);
 
-        SGV_OnChangeFilters(TableObject, ThisTableAPI, ThisTableID);
+        SGV_OnChangeFilters(TableInfo);
         SGV_KeepScrolHeight(ThisTable, DataArray.containerHeight);
         SGVArray[ContainerId] = SGVArray[ContainerId] == undefined ? {} : SGVArray[ContainerId];
         SGVArray[ContainerId][ThisTableID] = { TableId: ThisTableID, TableObject: TableObject, TableAPI: ThisTableAPI };
@@ -249,13 +258,7 @@ return data.d.data;
             });
         }
         if (SGVGlobalVariables[ContainerId][ThisTableID].hasThead === 1 || SGVGlobalVariables[ContainerId][ThisTableID].hasTfoot === 1)
-            SGV_TheadTfootCalc({
-                TableId: ThisTableID,
-                TableObject: TableObject,
-                TableAPI: ThisTableAPI,
-                SGVGlobalVariables: SGVGlobalVariables,
-                columns: DataArray.columns
-            }, ContainerId);
+            SGV_TheadTfootCalc(TableInfo);
         SGV_DTOrderChage(TotalFunctionDetails["orderChange"], ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId, TableObject, DataArray.counterColumn, DataArray.columns);
         SGVTableCounter++;
         if (rowGrouping !== null)
@@ -521,7 +524,8 @@ function SGV_AddFilters(ThisTableID, TbodyID, TheadID, DataArray) {
     });
 }
 
-function SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID, Options, TableObject, ThisTableAPI) {
+function SGV_AddGeneralSearch(ThisTable, TableInfo, TbodyID, Options) {
+    var ThisTableID = TableInfo.TableId;
     var x = $("#" + ThisTableID).closest(".dataTables_wrapper").find(".dt-buttons").children(".DTCustomGeneralSearch").length;
     if (x == 0 && Options["gridSearchTextBox"] === true) {
         $("#" + ThisTableID).closest(".dataTables_wrapper")
@@ -529,7 +533,7 @@ function SGV_AddGeneralSearch(ThisTable, ThisTableID, TbodyID, Options, TableObj
             .prepend("<input type='search' class='form-control form-control-sm DTCustomGeneralSearch " + ThisTableID + "GeneralSearch' placeholder='جستجو در همه ستون ها' aria-controls='" + ThisTableID + "'>")
             .children(".DTCustomGeneralSearch")
             .on("keyup change", function () {
-                SGV_SearchCustomized($(this), ThisTableID, TbodyID, "GeneralSearch", TableObject, ThisTableAPI);
+                SGV_SearchCustomized($(this), TbodyID, "GeneralSearch", TableInfo);
             });
     }
     if (ThisTable.closest(".dataTables_scroll").length) {
@@ -575,8 +579,13 @@ function SGV_FillDropDownFilters(ThisTableAPI, TheadID) {
     });
 }
 
-function SGV_DefaultOptions(customOptions, ThisTableID) {
+function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID) {
     var ariaControls = "";
+    var ExportTitle = "";
+    if (customOptions["titleRowInExelExport"] === true) {
+        ExportTitle = [null, undefined, NaN, ""].includes(GridTitle) !== true ? SGV_CustomStrReplace(GridTitle, " ", "-") + "-" : "";
+        ExportTitle += jalali_today() + "-" + (new Date()).getHours() + ":" + (new Date()).getMinutes() + ":" + (new Date()).getSeconds();
+    }
     var DefaultOptions = {
         orderCellsTop: true,
         //colReorder: true,
@@ -660,7 +669,7 @@ function SGV_DefaultOptions(customOptions, ThisTableID) {
         extend: 'excel',
         text: '<i class="fa fa-file-excel-o DataTableIcons"></i>',
         titleAttr: "خروجی اکسل",
-        title: jalali_today() + (new Date()).getHours() + (new Date()).getMinutes() + (new Date()).getSeconds(),
+        title: ExportTitle,
         footer: true
     };
     var ColumnsSearchButton = {
@@ -685,7 +694,7 @@ function SGV_DefaultOptions(customOptions, ThisTableID) {
         }
     };
     var RemoveAllFilters = {
-        text: '<i class="fa fa-ban DataTableIcons"></i>',
+        text: '<i class="fa fa-remove DataTableSmallIcons"></i><i class="fa fa-search DataTableIcons"></i>',
         titleAttr: "حذف همه فیلترها و جستجوها",
         action: function (e, dt, node, conf) {
             SGV_ClearAllFilters(dt, ThisTableID);
@@ -848,21 +857,22 @@ function SGV_AjaxClick(obj) {
     });
 }
 
-function SGV_TheadTfootCalc(TableInfo, ContainerId) {
+function SGV_TheadTfootCalc(TableInfo) {
     var ThisFooter = $("#" + TableInfo["TableId"]).closest(".dataTables_wrapper").find(".dataTables_scrollFoot");
     ThisFooter.find(".DT_TrTfootCalc").find("th").html("");
     var showFooter = false;
+    var ContainerId = TableInfo.ContainerId;
     var ColumnNumberIncludingStatus = 0;
     $.each(TableInfo.SGVGlobalVariables[ContainerId][TableInfo["TableId"]].columns, function (CellIndex, cell) {
-        if (TableInfo.columns[CellIndex].visible === true) {
+        if (TableInfo.Columns[CellIndex].visible === true) {
             var ThisValue = cell.footerValue;
             var ThisDisplayValue = "";
             var ThisVal_OpenTag = "";
             var ThisVal_CloseTag = "";
-            var ItemCss = TableInfo.columns[CellIndex].className;
+            var ItemCss = TableInfo.Columns[CellIndex].className;
             var cellName = cell.name;
             var TdId = "Footer_" + TableInfo.TableId + "_" + cell.name;
-            $.each(TableInfo.columns[CellIndex].functions, function (k, FuncArray) {
+            $.each(TableInfo.Columns[CellIndex].functions, function (k, FuncArray) {
                 if ([2].includes(parseInt(FuncArray.section))) {
 
                     if (FuncArray.funcName == "OnClick") {
@@ -993,21 +1003,21 @@ function SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId) {
     $("#" + ThisTabContentID).addClass("SGV_ActiveTabContent").css("display", "");
 }
 
-function SGV_OnChangeFilters(TableObject, ThisTableAPI, ThisTableID) {
+function SGV_OnChangeFilters(TableInfo) {
     $(".DT_ColumnFilter").on('change', function () {
         var allInput = $(this).closest("tr").find("select");
         var tbodyid = $(this).attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "ColumnFilter", TableObject, ThisTableAPI);
+        SGV_SearchCustomized(allInput, tbodyid, "ColumnFilter", TableInfo);
     });
     $(".DT_ColumnSearch").on('keyup change', function () {
         var allInput = $(this).closest("tr").find("input");
         var tbodyid = $(this).attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "ColumnSearch", TableObject, ThisTableAPI);
+        SGV_SearchCustomized(allInput, tbodyid, "ColumnSearch", TableInfo);
     });
     $(".dataTables_filter input").on('keyup', function () {
         var allInput = $(this);
         var tbodyid = $(this).closest(".dataTables_wrapper").find("th").attr("data-tbodyid");
-        SGV_SearchCustomized(allInput, ThisTableID, tbodyid, "GeneralSearch", TableObject, ThisTableAPI);
+        SGV_SearchCustomized(allInput, tbodyid, "GeneralSearch", TableInfo);
     });
 }
 
@@ -1038,10 +1048,12 @@ function SGV_ClearAllFilters(TableObject, ThisTableID) {
     TableObject.search('').columns().search('').draw();
 }
 
-function SGV_SearchCustomized(allInput, ThisTableID, tbodyid, SearchType, TableObject, ThisTableAPI) {
+function SGV_SearchCustomized(allInput, tbodyid, SearchType, TableInfo) {
     var emptyArray = [null, "", NaN, undefined];
     var dataSearch = {};
     var i = 0;
+    var TableObject = TableInfo.TableObject;
+    var ThisTableID = TableInfo.TableID;
     TableObject.search('').columns().search('').draw(); //Clear All Search & Filters
     var elementsType = "";
     allInput.each(function () {
@@ -1068,20 +1080,23 @@ function SGV_SearchCustomized(allInput, ThisTableID, tbodyid, SearchType, TableO
     }
 
     $.each(dataSearch, function (k, v) {
-        //.search("^" + v.inputData + "$", true, false, true) --> for match case
-        //.search(v.inputData) --> for smart case
         if (emptyArray.includes(v.inputData) !== true) {
+            let persianText = SGV_ArabicToPersianChar(v.inputData);
+            let arabicText = SGV_PersianToArabicChar(v.inputData);
             if (SearchType == "GeneralSearch") {
-                TableObject.search(v.inputData).draw(); //smart search
+                TableObject.search(persianText + '|' + arabicText, true, false).draw(); //smart search
             }
             else if (SearchType == "ColumnSearch") {
-                TableObject.columns(v.columnNum).search(v.inputData).draw(); //smart search
+                TableObject.columns(v.columnNum).search(persianText + '|' + arabicText, true, false).draw(); //smart search
             }
             else {
                 TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false).draw(); //match search for dropdown filter
             }
         }
     });
+
+
+    //SGV_TheadTfootCalc(TableInfo);
 }
 
 /*
