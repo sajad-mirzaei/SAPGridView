@@ -10,9 +10,6 @@
                 </ProgressTemplate>
             </ajax:UpdateProgress>
 
-
-            
-            <span class="btn btn-alert-info" id="Testbtn1">Test 1</span>
             <div class="FormBox">
                 <div class="HeaderBox">
                     Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
@@ -21,7 +18,6 @@
                     <div id="MyGridId"></div>
                 </div>
             </div>
-
 
         </ContentTemplate>
     </ajax:UpdatePanel>

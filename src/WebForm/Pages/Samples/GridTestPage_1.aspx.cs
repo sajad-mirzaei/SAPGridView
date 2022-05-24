@@ -15,17 +15,34 @@ public partial class GridTestPage_1 : System.Web.UI.Page
             ContainerId = "MyGridId",
             ContainerHeight = 400,
             Data = dt,
-            Options = new Option() { DropDownFilterButton = true },
+            GridTitle = "گزارش تست 1",
+            Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
             Columns = new List<Column>() {
+                new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
                 new Column { Data = "a", Title = "aa",
+                    Functions = {
+                        new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
+                        new Separator { Section = Function.SectionValue.Tfoot }
+                    }
+                },
+                new Column { Data = "v2", Title = "vv2", DefaultContent = "vv2", Visible = false },
+                new Column { Data = "CumulativeTest1", Title = "CumulativeSum(aa)", DefaultContent = "", CssClass = "ltr",
+                    Functions = {
+                        new CumulativeSum { Section = Function.SectionValue.Tbody, SourceField = "a" }
+                    }
+                },
+                new Column { Data = "b", Title = "bb" },
+                new Column { Data = "c", Title = "cc",
                     Functions = {
                         new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
                     }
                 },
-                new Column { Data = "b", Title = "bb" },
-                new Column { Data = "c", Title = "cc" },
                 new Column { Data = "d", Title = "dd" },
-                new Column { Data = "e", Title = "ee" },
+                new Column { Data = "e", Title = "ee",
+                    Functions = {
+                        new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
+                    }
+                },
                 new Column { Data = "f", Title = "ff" }
             }
         };
@@ -47,10 +64,15 @@ public partial class GridTestPage_1 : System.Web.UI.Page
         for (int i = 0; i < 100; i++)
         {
             DataRow Row1 = oDT.NewRow();
-            Row1["a"] = i;
+            Row1["a"] = i + 1000;
             Row1["b"] = "bb " + i;
             Row1["c"] = i + 1;
-            Row1["d"] = i % 2;
+
+            if(i % 2 == 0)
+                Row1["d"] = "آریا اکبری";
+            else
+                Row1["d"] = "آريا اكبري";
+
             if (i < 3) Row1["e"] = 3;
             else if (i < 6) Row1["e"] = 6;
             else if (i < 9) Row1["e"] = 9;
