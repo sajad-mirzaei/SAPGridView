@@ -171,12 +171,14 @@ namespace SAP.WebControls
         [JsonProperty("orderable")] public Boolean Orderable { get; set; }
         [JsonProperty("width")] public string Width { get; set; }
         [JsonProperty("visible")] public bool Visible { get; set; }
+        [JsonProperty("dropDownFilter")] public bool DropDownFilter { get; set; }
         [JsonProperty("rowGrouping")] public RowGrouping RowGrouping { get; set; }
         [JsonProperty("functions")] public List<Function> Functions { get; set; }
         public Column()
         {
             Visible = true;
             Orderable = true;
+            DropDownFilter = true;
             Functions = new List<Function>();
             RowGrouping = null;
         }
