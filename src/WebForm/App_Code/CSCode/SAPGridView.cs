@@ -21,7 +21,6 @@ namespace SAP.WebControls
         {
             Grids = new Dictionary<string, Grid>();
             DefaultParameters = new Dictionary<string, string>();
-            //CustomData = new List<CustomData>();
         }
         public void GridBind(params string[] GridNameList)
         {
@@ -335,8 +334,10 @@ namespace SAP.WebControls
         [JsonProperty("enable")] public Boolean Enable { get; set; }
         [JsonProperty("webMethodName")] public string WebMethodName { get; set; }
         [JsonProperty("javaScriptMethodName")] public string JavaScriptMethodName { get; set; }
+        /// <summary>yourTitle - {clickedItem} : انتخاب نام برای تب، یک کلمه یا رشته می پذیرد می توان بصورت ترکیبی کلمه - گزینه ای که کلیک شده تعریف کرد مثال </summary>
+        /// <summary>   </summary>
+        [JsonProperty("nextTabTitle")] public string NextTabTitle { get; set; }
         public List<string> DataKeys { get; set; }
-        //public List<string> SetDefaultKeys { get; set; }
         public string NextGrid { get; set; }
         public string Level { get; set; }
         public enum HttpRequestTypeValue
@@ -356,14 +357,13 @@ namespace SAP.WebControls
             WebMethodName = "SapGridEvent";
             HttpRequestType = HttpRequestTypeValue.Ajax;
             DataKeys = new List<string>();
-            //SetDefaultKeys = new List<string>();
             Section = SectionValue.Tbody;
+            NextTabTitle = "{clickedItem}";
         }
         public override object DeepCopy()
         {
             OnClick o = (OnClick)this.MemberwiseClone();
             o.DataKeys = new List<string>(o.DataKeys);
-            //o.SetDefaultKeys = new List<string>(o.SetDefaultKeys);
             return o;
         }
     }

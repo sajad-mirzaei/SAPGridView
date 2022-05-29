@@ -12,7 +12,7 @@ var SGVFunctionList = {
     TextFeature: { FuncListBuild: ["createdCell"] }
 };
 
-function SapGridViewJSBind(RData, Level, GridTitle) {
+function SapGridViewJSBind(RData, Level, GridFirstText) {
     var newRData = JSON.parse(JSON.stringify(RData));
     CustomData = newRData.CustomData;
     $.each(newRData["Grids"], function (GridName, DataArray) {
@@ -35,7 +35,8 @@ function SapGridViewJSBind(RData, Level, GridTitle) {
         var ExtraPostfix = "";
         var JoinContainerAndGridName = ContainerId + "_" + GridName;
         var ThisTabID = JoinContainerAndGridName + "_ThisTab" + "_Level" + Level + ExtraPostfix;
-        var ThisTabTitle = Level + "- " + GridTitle;
+        //GridFirstText = [null, undefined, NaN, ""].includes(DataArray.gridTitle) === false ? DataArray.gridTitle : GridFirstText;
+        var ThisTabTitle = Level + "- " + GridFirstText;
         var ThisTabContentID = JoinContainerAndGridName + "_ThisTabContent" + "_Level" + Level + ExtraPostfix;
         var TabsContainerID = "SGV_" + ContainerId + "Tabs";
         var AllTitleTh = "";
@@ -45,16 +46,6 @@ function SapGridViewJSBind(RData, Level, GridTitle) {
         var ThisTableID = JoinContainerAndGridName + "_Level" + Level + ExtraPostfix;
         var TbodyID = JoinContainerAndGridName + "_Level" + Level + "GridTbody" + "_Level" + Level + ExtraPostfix;
         var TheadID = ThisTableID + "Thead";
-        /*console.log({
-            ContainerId: ContainerId,
-            GridName: GridName,
-            ThisTabID: ThisTabID,
-            ThisTabTitle: ThisTabTitle,
-            ThisTabContentID: ThisTabContentID,
-            TabsContainerID: TabsContainerID,
-            ThisTableID: ThisTableID,
-            TbodyID: TbodyID
-        });*/
         if (SGVGlobalVariables[ContainerId] == undefined)
             SGVGlobalVariables[ContainerId] = {};
         SGVGlobalVariables[ContainerId][ThisTableID] = { hasThead: 0, hasTfoot: 0, columns: {}, columnsName: {} };
@@ -157,7 +148,7 @@ function SapGridViewJSBind(RData, Level, GridTitle) {
         TableHtml += "<tfoot class='DT_Tfoot' >" + TfootTr + "</tfoot>";
         TableHtml += "</table>";
         var GridContentHtml_End = "</div>";
-        var ThisTab = SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, GridTitle, ThisTabTitle, ContainerId);
+        var ThisTab = SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId);
 
         if (Level == "1" && ThisTab != "Exist") {
             var TableHtml = "<div class='SGV_TabsContainer sortableSection " + ContainerId + "TabsContainer' id='" + TabsContainerID + "'>" + ThisTab + "</div>" + GridContentHtml_Start + TableHtml + GridContentHtml_End;
@@ -447,13 +438,14 @@ function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVaria
     var webMethodName = FuncArray.webMethodName ? FuncArray.webMethodName : "SapGridEvent";
     var hrefLink = FuncArray.hrefLink ? FuncArray.hrefLink : "javascript:void(0)";
     var javaScriptMethodName = FuncArray.javaScriptMethodName ? FuncArray.javaScriptMethodName : null;
+    var nextTabTitle = FuncArray.nextTabTitle ? FuncArray.nextTabTitle : "";
     var httpRequestType = FuncArray.httpRequestType ? parseInt(FuncArray.httpRequestType) : 0;
     var ThisCellNewData = cellData;
     if (parseInt(FuncArray.section) == 1 && FuncArray.enable == true) {
         switch (httpRequestType) {
             case 0:
                 //Ajax
-                ThisCellNewData = "<a class='" + cssClass + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SGV_AjaxClick(this)'>" + cellData + "</a>";
+                ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SGV_AjaxClick(this)'>" + cellData + "</a>";
                 break;
             case 1:
                 //PageLink
@@ -464,7 +456,7 @@ function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVaria
                 ThisCellNewData = "<a class='" + cssClass + "' data-javascriptmethod='" + javaScriptMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SGV_CallJavaScriptMethodClick(this)'>" + cellData + "</a>";
                 break;
             default:
-                ThisCellNewData = "<a class='" + cssClass + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SGV_AjaxClick(this)'>" + cellData + "</a>";
+                ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SGV_AjaxClick(this)'>" + cellData + "</a>";
             /*ThisCellNewData = cellData;
             //PostBack type
             //ThisCellNewData = '<a id="cphMain_SapGrid" href="javascript:__doPostBack(\'ctl00$cphMain$SapGrid\',\'\')">ssssssss</a>';
@@ -867,7 +859,7 @@ function SGV_CallJavaScriptMethodClick(obj) {
 }
 
 function SGV_AjaxClick(obj) {
-    var GridTitle = obj.text ? obj.text : "untitled";
+    var objText = obj.text ? obj.text : "untitled";
     $(".SGV_LoadingContainer").show();
     var CallBackData = SGV_Base64Decode(obj.dataset.row);
     var CallBackData = JSON.parse(CallBackData);
@@ -875,6 +867,8 @@ function SGV_AjaxClick(obj) {
     var ContainerId = obj.dataset.containerid;
     var cellName = obj.dataset.cellname;
     var ThisWebMethodName = obj.dataset.webmethodname;
+    var GridFirstText = [null, undefined, NaN, ""].includes(obj.dataset.nexttabtitle) === false ? obj.dataset.nexttabtitle : GridFirstText;
+    GridFirstText = SGV_CustomStrReplace(GridFirstText, "{clickedItem}", objText, false, true);
     var gridParameters = $("#" + ThisTableID).attr("data-gridparameters");
     var gridParameters = SGV_Base64Decode(gridParameters);
     CallBackData["GridParameters"] = JSON.parse(gridParameters);
@@ -889,7 +883,7 @@ function SGV_AjaxClick(obj) {
         success: function (data) {
             if (ThisWebMethodName == "SapGridEvent") {
                 var d = JSON.parse(data.d);
-                SapGridViewJSBind(d, JSON.parse(CallBackData).FuncArray.Level, GridTitle);
+                SapGridViewJSBind(d, JSON.parse(CallBackData).FuncArray.Level, GridFirstText);
             }
             else {
                 var fn = window[ThisWebMethodName];
@@ -1041,9 +1035,10 @@ function SGV_TheadTfootCalc(TableInfo) {
                         var cssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
                         var cellText = FuncArray.footerText != null ? FuncArray.footerText : ThisValue;
                         var webMethodName = FuncArray.webMethodName ? FuncArray.webMethodName : "SapGridEvent";
+                        var nextTabTitle = FuncArray.nextTabTitle ? FuncArray.nextTabTitle : "";
                         ThisValue = cellText;
                         if (FuncArray.enable == true) {
-                            ThisVal_OpenTag += "<a class='" + cssClass + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + TableInfo["TableId"] + "' onclick='SGV_AjaxClick(this)'>"
+                            ThisVal_OpenTag += "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + TableInfo["TableId"] + "' onclick='SGV_AjaxClick(this)'>"
                             ThisValue = cellText;
                             ThisVal_CloseTag += "</a>";
                         }
@@ -1119,7 +1114,7 @@ function SGV_TheadTfootCalc(TableInfo) {
         ThisFooter.show();
 }
 
-function SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, GridTitle, ThisTabTitle, ContainerId) {
+function SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId) {
     if ($("#" + ThisTabID).length > 0) {
         ThisTab = "Exist";
     } else {
