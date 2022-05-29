@@ -132,7 +132,14 @@
         padding-bottom: 0px !important;
     }
 
-.DT_TrWidthControl {
+
+.SGV_GridContent .DT_TrWidthControl {
+    /*این نباید مخفی باشد وگرنه در حالتی که گرید مرحله ای است در برگشت به مراحل عرض هر ستون بهم میخورد
+        display: none;
+    */
+}
+
+.SGV_GridContent .dataTables_scrollFoot .DT_TrWidthControl {
     display: none;
 }
 
@@ -166,7 +173,8 @@
     display: none;
 }
 
-.dataTables_scrollHead, .dataTables_scrollFoot {
+.SGV_GridContent .dataTables_scrollHead,
+.SGV_GridContent .dataTables_scrollFoot {
     position: relative;
     z-index: 2;
 }
@@ -288,6 +296,6 @@
 }
 
 /*--Main-general-Search-hidden------------*/
-.dataTables_filter{
+.SGV_GridContent .dataTables_filter {
     display: none;
 }

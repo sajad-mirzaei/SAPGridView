@@ -949,10 +949,14 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
                             .reduce(function (a, b) {
                                 return SGV_StrToFloat(a) + SGV_StrToFloat(b);
                             }, 0);
-                        tdTitle += "جمع کل: ";
-                        tdTitle += total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-                        tdTitle += "\nجمع این صفحه: ";
+
+
+                        tdTitle += "جمع این صفحه: ";
                         tdTitle += pageTotal.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+                        tdTitle += "\nجمع فیلتر شده ها: ";
+                        tdTitle += pageFilter.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+                        tdTitle += "\nجمع کل: ";
+                        tdTitle += total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
                         ThisValue = pageFilter;
                         //$(TableInfo.TableAPI.column(CellIndex).footer()).html('$' + pageTotal + ' ( $' + total + ' total)');
                     }
