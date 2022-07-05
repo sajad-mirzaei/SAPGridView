@@ -1210,11 +1210,11 @@ function SGV_SearchCustomized(allInput, tbodyid, SearchType, TableInfo) {
     var elementsType = "";
     allInput.each(function () {
         var inputData = $(this).val();
-        let persianInputData = SGV_ArabicToPersianChar(inputData);
+        //let inputData = SGV_ArabicToPersianChar(inputData); نباید تبدیل به فارسی شود، چراکه جایی
         var columnNum = $(this).attr("data-columnnum");
         var elementType = $(this).prop("nodeName");
-        if (persianInputData.trim() != "" && persianInputData != "undefined") {
-            dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid, "elementType": elementType };
+        if (inputData.trim() != "" && inputData != "undefined") {
+            dataSearch[i] = { "inputData": inputData, "columnNum": columnNum, "tbodyid": tbodyid, "elementType": elementType };
             elementsType = elementType.toUpperCase();
             i++;
         }
