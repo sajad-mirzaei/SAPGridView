@@ -16,7 +16,7 @@ namespace SAP.WebControls
     {
         public Dictionary<string, string> DefaultParameters = new Dictionary<string, string>();
         public Dictionary<string, Grid> Grids = new Dictionary<string, Grid>();
-        public object CustomData ;
+        public object CustomData;
         public SAPGridView()
         {
             Grids = new Dictionary<string, Grid>();
@@ -65,8 +65,11 @@ namespace SAP.WebControls
         [JsonProperty("dataName")] public string DataName { get; set; }
         [JsonProperty("dataKey")] public string DataKey;
         [JsonProperty("dataValue")] public string DataValue;
-        [JsonProperty("Data")] public object Data { 
-            get { 
+        [JsonProperty("Data")]
+        public object Data
+        {
+            get
+            {
                 return ((DataTable)DicData)
                     //if DataKey doesn't unique, make it unique
                     .AsEnumerable().GroupBy(r => r.Field<dynamic>(DataKey)).Select(g => g.First()).CopyToDataTable()
@@ -89,6 +92,7 @@ namespace SAP.WebControls
         [JsonProperty("counterColumn")] public Boolean CounterColumn { get; set; }
         [JsonProperty("columns")] public List<Column> Columns { get; set; }
         [JsonProperty("options")] public Option Options { get; set; }
+        [JsonProperty("customizeButtons")] public List<CustomizeButton> CustomizeButtons { get; set; }
         [JsonProperty("gridParameters")] public Dictionary<string, string> GridParameters = new Dictionary<string, string>();
         [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }
         [JsonProperty("serverSidePagination")] public ServerSidePagination ServerSidePagination { get; set; }
@@ -97,6 +101,7 @@ namespace SAP.WebControls
             CounterColumn = true;
             Columns = new List<Column>();
             HeaderComplex = new List<HeaderComplexRow>();
+            CustomizeButtons = new List<CustomizeButton>();
             Options = new Option();
         }
         public Grid DeepCopy()
@@ -159,6 +164,25 @@ namespace SAP.WebControls
             GridSearchTextBox = true;
             TitleRowInExelExport = true;
         }
+    }
+    public class CustomizeButton
+    {
+        [JsonProperty("buttonName")] public ButtonNames ButtonName { get; set; }
+        [JsonProperty("javascriptMethodName")] public string JavascriptMethodName { get; set; }
+        [JsonProperty("data")] public Dictionary<string, string> Data { get; set; }
+        public CustomizeButton()
+        {
+            Data = new Dictionary<string, string>();
+        }
+    }
+    public enum ButtonNames
+    {
+        Copy = 1,
+        Print = 2,
+        Excel = 3,
+        ColumnsSearch = 4,
+        Recycle = 5,
+        DropDownFilter = 6
     }
     public class Column
     {
@@ -249,11 +273,15 @@ namespace SAP.WebControls
     public class Separator : Function
     {
         /// <summary> تعداد اعداد بعد از ممیز، پیشفرض 3 می باشد </summary>
-        [JsonProperty("decimalPlaces")] public int DecimalPlaces {
-            get { 
-                return this.MaximumFractionDigits; 
+        [JsonProperty("decimalPlaces")]
+        public int DecimalPlaces
+        {
+            get
+            {
+                return this.MaximumFractionDigits;
             }
-            set {
+            set
+            {
                 this.MaximumFractionDigits = value;
             }
         }

@@ -161,7 +161,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             $("#" + ContainerId).append(TableHtml);
         }
         var ThisTable = $("#" + ContainerId + " table");
-        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options, DataArray.gridTitle, ThisTableID);
+        var SGVDefaultOptions = SGV_DefaultOptions(DataArray.options, DataArray.gridTitle, ThisTableID, DataArray.customizeButtons);
 
         SGVDefaultOptions["columnDefs"] = ThisColumnDefs;
         SGVDefaultOptions["columns"] = DataArray.columns;
@@ -596,7 +596,7 @@ function SGV_FillDropDownFilters(ThisTableAPI, TheadID, DataArrayColumns) {
     });
 }
 
-function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID) {
+function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID, customizeButtons) {
     var ariaControls = "";
     var ExportTitle = "";
     if (customOptions["titleRowInExelExport"] === true) {
@@ -669,6 +669,7 @@ function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID) {
             }
         }
     };
+
     var CopyButton = {
         extend: 'copy',
         titleAttr: "کپی کل جدول",
@@ -726,6 +727,44 @@ function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID) {
             SGV_ClearAllFilters(dt, ThisTableID);
         }
     };
+
+
+    //-Start---customizeButtons-------
+    if (customizeButtons) {
+        for (const [k, btnArray] of Object.entries(customizeButtons)) {
+            if (btnArray.javascriptMethodName == null || btnArray.javascriptMethodName.trim() == "") {
+                SGV_ErrorMessage("CustomizeButtonJsUnDefine", btnArray.javascriptMethodName);
+            } else if (btnArray.buttonName == null || btnArray.buttonName == 0) {
+                SGV_ErrorMessage("CustomizeButtonNameUnDefine", btnArray.buttonName);
+            } else {
+                customButton(btnArray);
+            }
+        }
+    }
+    function customButton(btnArray) {
+        var fn = window[btnArray.javascriptMethodName];
+        if (typeof fn === "function") {
+            var btnOptions = fn.apply(window, [{ YourData: btnArray.data }]);
+
+            if (btnArray.buttonName == 1) { //Copy
+                CopyButton = btnOptions;
+            } else if (btnArray.buttonName == 2) { //Print
+                PrintButton = btnOptions;
+            } else if (btnArray.buttonName == 3) { //Excel
+                ExcelButton = btnOptions;
+            } else if (btnArray.buttonName == 4) { //ColumnsSearch
+                ColumnsSearchButton = btnOptions;
+            } else if (btnArray.buttonName == 5) { //Recycle
+                DropDownFilterButton = btnOptions;
+            } else if (btnArray.buttonName == 6) { //DropDownFilter
+                RecycleButton = btnOptions;
+            }
+
+        } else {
+            SGV_ErrorMessage("CustomizeButtonJsFunNotFound", btnArray.javascriptMethodName);
+        }
+    }
+    //-End---customizeButtons-------
 
     if (customOptions["copyButton"] === true) DefaultOptions.buttons.push(CopyButton);
     if (customOptions["printButton"] === true) DefaultOptions.buttons.push(PrintButton);
@@ -1328,14 +1367,20 @@ function SGV_PersianToArabicChar(str) {
     return c;
 }
 
-function SGV_ErrorMessage(errorKey) {
+function SGV_ErrorMessage(errorKey, otherInfo = null) {
     var errorArray = {
         CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
         CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
         VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
-        TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد"
+        TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد",
+        CustomizeButtonJsFunNotFound: "در قسمت سفارشی سازی دکمه های گرید یک متد جاوااسکریپت با یک نام تعریف شده که در صفحه شما وجود ندارد",
+        CustomizeButtonJsUnDefine: "در قسمت سفارشی سازی دکمه های گرید متد جاوااسکریپت بدون مقدار تعریف شده",
+        CustomizeButtonNameUnDefine: "در قسمت سفارشی سازی دکمه های گرید نام دکمه بدون مقدار تعریف شده"
     };
-    console.log(errorArray[errorKey]);
+    if (otherInfo)
+        console.log(errorArray[errorKey], otherInfo);
+    else
+        console.log(errorArray[errorKey]);
 }
 
 /*
