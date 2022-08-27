@@ -908,6 +908,9 @@ function SGV_AjaxClick(obj) {
     var ThisWebMethodName = obj.dataset.webmethodname;
     var GridFirstText = [null, undefined, NaN, ""].includes(obj.dataset.nexttabtitle) === false ? obj.dataset.nexttabtitle : GridFirstText;
     GridFirstText = SGV_CustomStrReplace(GridFirstText, "{clickedItem}", objText, false, true);
+    $.each(CallBackData.RowData, function (key, val) {
+        GridFirstText = SGV_CustomStrReplace(GridFirstText, key, val);
+    });
     var gridParameters = $("#" + ThisTableID).attr("data-gridparameters");
     var gridParameters = SGV_Base64Decode(gridParameters);
     CallBackData["GridParameters"] = JSON.parse(gridParameters);

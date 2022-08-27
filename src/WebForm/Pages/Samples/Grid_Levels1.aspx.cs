@@ -74,7 +74,13 @@ public partial class Grid_Levels1 : Page
                     Functions =
                     {
                         new MiladiToJalali {Section = Calc.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate },
-                        new OnClick { Section = Function.SectionValue.Tbody, NextTabTitle = "testTab - {clickedItem}", Level = "2", NextGrid = "Grid2", DataKeys = { "Id" } }
+                        new OnClick { 
+                            Section = Function.SectionValue.Tbody, 
+                            NextTabTitle = "Tarikh - {clickedItem}", 
+                            Level = "2", 
+                            NextGrid = "Grid2", 
+                            DataKeys = { "Id" } 
+                        }
                     }
                 },
                 new Column { Title ="ستون 1", Data="Col1",
