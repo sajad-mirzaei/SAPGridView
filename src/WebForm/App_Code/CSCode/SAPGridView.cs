@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -94,7 +95,26 @@ namespace SAP.WebControls
         [JsonProperty("options")] public Option Options { get; set; }
         [JsonProperty("customizeButtons")] public List<CustomizeButton> CustomizeButtons { get; set; }
         [JsonProperty("gridParameters")] public Dictionary<string, string> GridParameters = new Dictionary<string, string>();
-        [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }
+        [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }        
+        private RowComplex _rowComplex { get; set; }
+        [JsonProperty("rowComplex")]
+        public RowComplex RowComplex
+        {
+            get
+            {
+                return _rowComplex;
+            }
+            set
+            {
+                if (value != null && value.FlatDataForPivot != null)
+                {
+                    Columns = value.AddColumns(Columns, value.FlatDataForPivot);
+                    Data = value.BuildPivotData(value.FlatDataForPivot);
+                }
+                _rowComplex = value;
+            }
+        }
+
         [JsonProperty("serverSidePagination")] public ServerSidePagination ServerSidePagination { get; set; }
         public Grid()
         {
@@ -103,6 +123,7 @@ namespace SAP.WebControls
             HeaderComplex = new List<HeaderComplexRow>();
             CustomizeButtons = new List<CustomizeButton>();
             Options = new Option();
+            RowComplex = new RowComplex();
         }
         public Grid DeepCopy()
         {
@@ -443,5 +464,168 @@ namespace SAP.WebControls
     public class ServerSidePagination
     {
     }
+    public class RowComplex
+    {
+        public string PrimaryKeyId { get; set; }
+        public string GroupBy { get; set; }
+        public string ColumnToPivot { get; set; }
+        public string FirstComplexedColumnTitle { get; set; }
+        public string FirstComplexedColumn { get; set; }
+        public int DefaultValueType { get; set; }
+        public string DefaultRefType { get; set; }
+        public string TrOddCssClass { get; set; }
+        public string TrEvenCssClass { get; set; }
+        public string TableHeight { get; set; }
+        public string TrHeight { get; set; }
+        public string TableCssClass { get; set; }
+        public string GridName { get; set; }
+        public List<ComplexColumn> ComplexColumns { get; set; }
 
+        private List<string> ColumnsToComplex { get; set; }
+        private List<string> ColumnsToComplexTitle { get; set; }
+
+        /// <summary>
+        /// تعیین این پارامتر یعنی نیاز به پیوت دیتا می باشد
+        /// در صورت تعیین این مورد دیگر نیازی به تعیین دیتا برای گرید نیست
+        /// </summary>
+        public DataTable FlatDataForPivot { get; set; }
+
+        public RowComplex()
+        {
+            FirstComplexedColumn = "DataOfComplexedColumn";
+            FirstComplexedColumnTitle = "";
+            PrimaryKeyId = "Id";
+            DefaultValueType = 0;
+            DefaultRefType = "-";
+            TrOddCssClass = "table-info";
+            TrEvenCssClass = "table-warning";
+            TrHeight = "20px";
+            TableHeight = "40px";
+            TableCssClass = "table";
+            FlatDataForPivot = null;
+        }
+        private void SetComplexColumns()
+        {
+            ColumnsToComplex = new List<string>();
+            ColumnsToComplexTitle = new List<string>();
+            foreach (ComplexColumn item in ComplexColumns)
+            {
+                ColumnsToComplex.Add(item.Data);
+                ColumnsToComplexTitle.Add(item.Title);
+            }
+        }
+        public DataTable BuildPivotData(DataTable rawData)
+        {
+            SetComplexColumns();
+            DataTable pivotDataTable = new DataTable();
+            pivotDataTable.Columns.Add(GroupBy, typeof(int));
+            pivotDataTable.PrimaryKey = new DataColumn[] { pivotDataTable.Columns[GroupBy] };
+
+            string[] temp = new string[] { GroupBy, ColumnToPivot };
+            List<string> anotherColumns = new List<string>();
+            foreach (DataColumn column in rawData.Columns)
+            {
+                if (temp.Contains(column.ColumnName) == false && ColumnsToComplex.Contains(column.ColumnName) == false)
+                {
+                    pivotDataTable.Columns.Add(column.ColumnName, column.DataType);
+                    anotherColumns.Add(column.ColumnName);
+                }
+            }
+
+            var checkDuplicateRows = new List<int>();
+            foreach (DataRow rawDataItem in rawData.Rows)
+            {
+                var PivotColumnName = ColumnToPivot + rawDataItem[PrimaryKeyId].ToString();
+
+                if (checkDuplicateRows.Contains(int.Parse(rawDataItem[GroupBy].ToString())) == false)
+                {
+                    checkDuplicateRows.Add(int.Parse(rawDataItem[GroupBy].ToString()));
+                    DataRow row1 = pivotDataTable.NewRow();
+                    row1[GroupBy] = rawDataItem[GroupBy];
+                    foreach (string anotherColumnItem in anotherColumns)
+                    {
+                        row1[anotherColumnItem] = rawDataItem[anotherColumnItem];
+                    }
+                    pivotDataTable.Rows.Add(row1);
+                }
+                DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivot].DataType);
+                newColumn1.DefaultValue = DefaultRefType;
+                pivotDataTable.Columns.Add(newColumn1);
+                DataRow row = pivotDataTable.Rows.Find(rawDataItem[GroupBy]);
+                row[PivotColumnName] = rawDataItem[ColumnToPivot];
+
+                foreach (string columnsToComplexItem in ColumnsToComplex)
+                {
+                    var colName = columnsToComplexItem + rawDataItem[PrimaryKeyId].ToString();
+                    var colType = rawData.Columns[columnsToComplexItem].DataType;
+                    DataColumn newColumn = new DataColumn(colName, colType);
+                    if (colType.IsValueType)
+                        newColumn.DefaultValue = Convert.ChangeType(DefaultValueType, colType);
+                    else
+                        newColumn.DefaultValue = DefaultRefType;
+                    pivotDataTable.Columns.Add(newColumn);
+
+
+                    row[colName] = rawDataItem[columnsToComplexItem];
+                }
+            }
+            return pivotDataTable;
+        }
+
+        public List<Column> AddColumns(List<Column> columns, DataTable rawData)
+        {
+            SetComplexColumns();
+            string titleRow, bodyRow, bodyRowsSample, cssClass;
+            titleRow = "<table class='" + TableCssClass + ";' style='height:" + TableHeight + ";'>";
+            bodyRowsSample = "<table class='" + TableCssClass + "' style='height:" + TableHeight + ";'>";
+            var i = 0;
+            foreach (string columnToComplexTitleItem in ColumnsToComplexTitle)
+            {
+                //titleRow
+                cssClass = i % 2 == 0 ? TrEvenCssClass : TrOddCssClass;
+                titleRow += "<tr style='height:" + TrHeight + ";' class='" + cssClass + "'><td>" + columnToComplexTitleItem + "</td></tr>";
+
+                //bodyRow
+                var colName = ColumnsToComplex[i] + "PrimaryKeyIdMustBeReplaced";
+                var colType = rawData.Columns[ColumnsToComplex[i]].DataType;
+                cssClass = i % 2 == 0 ? TrEvenCssClass : TrOddCssClass;
+                bodyRowsSample += "<tr style='height:" + TrHeight + ";' class='" + cssClass + "'><td> " + colName + " </td></tr>";
+
+                i++;
+            }
+            titleRow += "</table>";
+            bodyRowsSample += "</table>";
+
+            columns.Add(new Column { Data = FirstComplexedColumn, Title = FirstComplexedColumnTitle, DefaultContent = titleRow });
+
+            foreach (DataRow rawDataItem in rawData.Rows)
+            {
+                var PivotColumnName = ColumnToPivot + rawDataItem[PrimaryKeyId].ToString();
+                DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivot].DataType);
+                newColumn1.DefaultValue = DefaultRefType;
+
+                bodyRow = bodyRowsSample.Replace("PrimaryKeyIdMustBeReplaced", rawDataItem[PrimaryKeyId].ToString());
+                columns.Add(new Column
+                {
+                    Data = PivotColumnName,
+                    Title = rawDataItem[ColumnToPivot].ToString(),
+                    DefaultContent = "",
+                    Functions = {
+                        new TextFeature {
+                            Section = Function.SectionValue.Tbody,
+                            ChangeOriginalData = true,
+                            Condition = "1==1",
+                            IsTrueText = bodyRow
+                        }
+                    }
+                });
+            }
+            return columns;
+        }
+    }
+    public class ComplexColumn
+    {
+        public string Title { get; set; }
+        public string Data { get; set; }
+    }
 }
