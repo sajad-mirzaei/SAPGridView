@@ -14,10 +14,7 @@ public partial class Grid_AutoGenerate_1 : System.Web.UI.Page
         {
             ContainerId = "MyGridId",
             ContainerHeight = 400,
-            Data = dt,
-            Columns = { 
-                new Column { Data = "a" }
-            }
+            Data = dt
         };
 
         oSGV.GridBind("MyGrid1");
