@@ -28,7 +28,19 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             dropDownFilter: true,
             rowGrouping: false
         };
-        DataArray.columns.unshift(counterForColumns);
+        if (DataArray.columns.length == 0 && DataArray["data"] != null && DataArray["data"].length > 0) {
+            DataArray.columns.push(counterForColumns);
+            $.each(DataArray["data"][0], function (k, v) {
+                DataArray.columns.push({
+                    title: k,
+                    defaultContent: "",
+                    data: k,
+                    orderable: true
+                });
+            });
+        } else {
+            DataArray.columns.unshift(counterForColumns);
+        }
         var ContainerId = DataArray.containerId;
         var TextGridParameters = SGV_Base64Encode(JSON.stringify(DataArray.gridParameters));
         //var ExtraPostfix = "-" + SGVTableCounter;
@@ -70,6 +82,9 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
         var numberOfUnVisibleCells = 0;
         for (var j = 0; j < DataArray.columns.length; j++) {
             var TempColumn = DataArray.columns[j];
+            if ([undefined, NaN, "", null].includes(TempColumn.title)) {
+                TempColumn.title =TempColumn.data;
+            }
             if (TempColumn != null && TempColumn.rowGrouping !== undefined && TempColumn.rowGrouping !== null && TempColumn.rowGrouping.enable === true) {
                 rowGrouping = { rowNumber: j, cssClass: TempColumn.rowGrouping.cssClass };
             }
