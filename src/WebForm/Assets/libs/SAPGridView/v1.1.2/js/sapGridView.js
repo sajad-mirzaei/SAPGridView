@@ -82,9 +82,6 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
         var numberOfUnVisibleCells = 0;
         for (var j = 0; j < DataArray.columns.length; j++) {
             var TempColumn = DataArray.columns[j];
-            if ([undefined, NaN, "", null].includes(TempColumn.title)) {
-                TempColumn.title =TempColumn.data;
-            }
             if (TempColumn != null && TempColumn.rowGrouping !== undefined && TempColumn.rowGrouping !== null && TempColumn.rowGrouping.enable === true) {
                 rowGrouping = { rowNumber: j, cssClass: TempColumn.rowGrouping.cssClass };
             }
