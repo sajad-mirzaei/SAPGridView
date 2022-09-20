@@ -95,7 +95,7 @@ namespace SAP.WebControls
         [JsonProperty("options")] public Option Options { get; set; }
         [JsonProperty("customizeButtons")] public List<CustomizeButton> CustomizeButtons { get; set; }
         [JsonProperty("gridParameters")] public Dictionary<string, string> GridParameters = new Dictionary<string, string>();
-        [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }        
+        [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }
         private RowComplex _rowComplex { get; set; }
         [JsonProperty("rowComplex")]
         public RowComplex RowComplex
@@ -468,7 +468,9 @@ namespace SAP.WebControls
     {
         public string PrimaryKeyId { get; set; }
         public string GroupBy { get; set; }
-        public string ColumnToPivot { get; set; }
+        public string ColumnToPivotName { get; set; }
+        public string ColumnToPivotId { get; set; }
+        //public bool AllowDuplicateColumnToPivot { get; set; }
         public string FirstComplexedColumnTitle { get; set; }
         public string FirstComplexedColumn { get; set; }
         public int DefaultValueType { get; set; }
@@ -502,6 +504,7 @@ namespace SAP.WebControls
             TrHeight = "20px";
             TableHeight = "40px";
             TableCssClass = "table";
+            //AllowDuplicateColumnToPivot = true;
             FlatDataForPivot = null;
         }
         private void SetComplexColumns()
@@ -514,14 +517,20 @@ namespace SAP.WebControls
                 ColumnsToComplexTitle.Add(item.Title);
             }
         }
+
         public DataTable BuildPivotData(DataTable rawData)
         {
+            #region Add first columns & define variables
             SetComplexColumns();
+            var checkDuplicateRows = new List<int>();
+            var checkDuplicateColumns = new List<int>();
+            var checkDuplicatePivotColumns = new List<int>();
             DataTable pivotDataTable = new DataTable();
+
             pivotDataTable.Columns.Add(GroupBy, typeof(int));
             pivotDataTable.PrimaryKey = new DataColumn[] { pivotDataTable.Columns[GroupBy] };
 
-            string[] temp = new string[] { GroupBy, ColumnToPivot };
+            string[] temp = new string[] { GroupBy, ColumnToPivotName };
             List<string> anotherColumns = new List<string>();
             foreach (DataColumn column in rawData.Columns)
             {
@@ -531,12 +540,17 @@ namespace SAP.WebControls
                     anotherColumns.Add(column.ColumnName);
                 }
             }
+            #endregion
 
-            var checkDuplicateRows = new List<int>();
+
+            #region Add pivot columns
             foreach (DataRow rawDataItem in rawData.Rows)
             {
-                var PivotColumnName = ColumnToPivot + rawDataItem[PrimaryKeyId].ToString();
+                var PivotColumnName = ColumnToPivotName + rawDataItem[PrimaryKeyId].ToString();
+                var primaryKeyValue = int.Parse(rawDataItem[PrimaryKeyId].ToString());
+                var columnToPivotValue = int.Parse(rawDataItem[ColumnToPivotId].ToString());
 
+                #region Add rows & set value to first columns-rows
                 if (checkDuplicateRows.Contains(int.Parse(rawDataItem[GroupBy].ToString())) == false)
                 {
                     checkDuplicateRows.Add(int.Parse(rawDataItem[GroupBy].ToString()));
@@ -548,27 +562,39 @@ namespace SAP.WebControls
                     }
                     pivotDataTable.Rows.Add(row1);
                 }
-                DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivot].DataType);
+                #endregion
+
+                DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivotName].DataType);
                 newColumn1.DefaultValue = DefaultRefType;
-                pivotDataTable.Columns.Add(newColumn1);
                 DataRow row = pivotDataTable.Rows.Find(rawDataItem[GroupBy]);
-                row[PivotColumnName] = rawDataItem[ColumnToPivot];
+                if (checkDuplicateColumns.Contains(primaryKeyValue) == false && checkDuplicatePivotColumns.Contains(columnToPivotValue) == false)
+                {
+                    checkDuplicateColumns.Add(primaryKeyValue);
+                    checkDuplicatePivotColumns.Add(columnToPivotValue);
+                    pivotDataTable.Columns.Add(newColumn1);
+                    row[PivotColumnName] = rawDataItem[ColumnToPivotName];
+                }
 
                 foreach (string columnsToComplexItem in ColumnsToComplex)
                 {
-                    var colName = columnsToComplexItem + rawDataItem[PrimaryKeyId].ToString();
+                    var colName = columnsToComplexItem + rawDataItem[ColumnToPivotId].ToString();
                     var colType = rawData.Columns[columnsToComplexItem].DataType;
-                    DataColumn newColumn = new DataColumn(colName, colType);
-                    if (colType.IsValueType)
-                        newColumn.DefaultValue = Convert.ChangeType(DefaultValueType, colType);
-                    else
-                        newColumn.DefaultValue = DefaultRefType;
-                    pivotDataTable.Columns.Add(newColumn);
 
+                    if (pivotDataTable.Columns.Contains(colName) == false)
+                    {
+                        DataColumn newColumn = new DataColumn(colName, colType);
+                        if (colType.IsValueType)
+                            newColumn.DefaultValue = Convert.ChangeType(DefaultValueType, colType);
+                        else
+                            newColumn.DefaultValue = DefaultRefType;
+                        pivotDataTable.Columns.Add(newColumn);
+                    }
 
                     row[colName] = rawDataItem[columnsToComplexItem];
                 }
             }
+            #endregion
+
             return pivotDataTable;
         }
 
@@ -586,7 +612,7 @@ namespace SAP.WebControls
                 titleRow += "<tr style='height:" + TrHeight + ";' class='" + cssClass + "'><td>" + columnToComplexTitleItem + "</td></tr>";
 
                 //bodyRow
-                var colName = ColumnsToComplex[i] + "PrimaryKeyIdMustBeReplaced";
+                var colName = ColumnsToComplex[i] + "ColumnToPivotIdMustBeReplaced";
                 var colType = rawData.Columns[ColumnsToComplex[i]].DataType;
                 cssClass = i % 2 == 0 ? TrEvenCssClass : TrOddCssClass;
                 bodyRowsSample += "<tr style='height:" + TrHeight + ";' class='" + cssClass + "'><td> " + colName + " </td></tr>";
@@ -597,28 +623,31 @@ namespace SAP.WebControls
             bodyRowsSample += "</table>";
 
             columns.Add(new Column { Data = FirstComplexedColumn, Title = FirstComplexedColumnTitle, DefaultContent = titleRow });
-
+            List<string> duplicatedColumns = new List<string>();
             foreach (DataRow rawDataItem in rawData.Rows)
             {
-                var PivotColumnName = ColumnToPivot + rawDataItem[PrimaryKeyId].ToString();
-                DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivot].DataType);
-                newColumn1.DefaultValue = DefaultRefType;
-
-                bodyRow = bodyRowsSample.Replace("PrimaryKeyIdMustBeReplaced", rawDataItem[PrimaryKeyId].ToString());
-                columns.Add(new Column
+                var PivotColumnName = ColumnToPivotName + rawDataItem[ColumnToPivotId].ToString();
+                if (duplicatedColumns.Contains(PivotColumnName) == false)
                 {
-                    Data = PivotColumnName,
-                    Title = rawDataItem[ColumnToPivot].ToString(),
-                    DefaultContent = "",
-                    Functions = {
-                        new TextFeature {
-                            Section = Function.SectionValue.Tbody,
-                            ChangeOriginalData = true,
-                            Condition = "1==1",
-                            IsTrueText = bodyRow
+                    duplicatedColumns.Add(PivotColumnName);
+                    DataColumn newColumn1 = new DataColumn(PivotColumnName, rawData.Columns[ColumnToPivotName].DataType);
+                    newColumn1.DefaultValue = DefaultRefType;
+                    bodyRow = bodyRowsSample.Replace("ColumnToPivotIdMustBeReplaced", rawDataItem[ColumnToPivotId].ToString());
+                    columns.Add(new Column
+                    {
+                        Data = PivotColumnName,
+                        Title = rawDataItem[ColumnToPivotName].ToString(),
+                        DefaultContent = "",
+                        Functions = {
+                            new TextFeature {
+                                Section = Function.SectionValue.Tbody,
+                                ChangeOriginalData = true,
+                                Condition = "1==1",
+                                IsTrueText = bodyRow
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
             return columns;
         }

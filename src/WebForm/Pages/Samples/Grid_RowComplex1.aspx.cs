@@ -22,7 +22,8 @@ public partial class Grid_RowComplex1 : System.Web.UI.Page
                 FlatDataForPivot = dt,
 
                 PrimaryKeyId = "Id",
-                ColumnToPivot = "SupplierName",
+                ColumnToPivotId = "SupplierId",
+                ColumnToPivotName = "SupplierName",
                 GroupBy = "ProductId",
                 FirstComplexedColumnTitle = "ComplexTitle1",
                 ComplexColumns = new List<ComplexColumn> {

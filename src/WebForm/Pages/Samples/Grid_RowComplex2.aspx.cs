@@ -21,13 +21,13 @@ public partial class Grid_RowComplex2 : System.Web.UI.Page
         var rowComplex = new RowComplex()
         {
             PrimaryKeyId = "Id",
-            ColumnToPivot = "SupplierName",
+            ColumnToPivotName = "SupplierName",
             GroupBy = "ProductId",
             FirstComplexedColumnTitle = "ComplexTitle1",
             ComplexColumns = new List<ComplexColumn> {
-                        new ComplexColumn { Data = "Amount", Title = "AmountTitle" },
-                        new ComplexColumn { Data = "Count", Title = "CountTitle" }
-                    }
+                new ComplexColumn { Data = "Amount", Title = "AmountTitle" },
+                new ComplexColumn { Data = "Count", Title = "CountTitle" }
+            }
         };
 
         oSGV.Grids["MyGrid1"].Columns = rowComplex.AddColumns(oSGV.Grids["MyGrid1"].Columns, dt);
