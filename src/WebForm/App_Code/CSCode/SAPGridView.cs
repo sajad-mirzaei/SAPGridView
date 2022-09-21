@@ -643,7 +643,8 @@ namespace SAP.WebControls
                                 Section = Function.SectionValue.Tbody,
                                 ChangeOriginalData = true,
                                 Condition = "1==1",
-                                IsTrueText = bodyRow
+                                IsTrueText = bodyRow,
+                                NumericCheckInText = false
                             }
                         }
                     });
