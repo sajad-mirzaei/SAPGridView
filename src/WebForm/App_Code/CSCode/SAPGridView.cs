@@ -40,7 +40,7 @@ namespace SAP.WebControls
                 { "CustomData", CustomData }
             };
             var JsonData = JsonConvert.SerializeObject(AllData);
-            ScriptManager.RegisterStartupScript(ThisPage, ThisPage.GetType(), "", "<script>SapGridViewJSBind(" + JsonData + ", 1, '1')</script>", false);
+            ScriptManager.RegisterStartupScript(ThisPage, ThisPage.GetType(), Guid.NewGuid().ToString(), "<script>SapGridViewJSBind(" + JsonData + ", 1, '1')</script>", false);
         }
         public string AjaxBind(params string[] GridNameList)
         {
