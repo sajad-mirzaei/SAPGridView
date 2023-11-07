@@ -5,9 +5,10 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{06792A7D-1DA7-47F0-B46F-967AE5620B03}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebForm", "src\WebForm", "{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebForm", "src\WebForm\", "{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		ProjectReferences = ""
 		Debug.AspNetCompiler.VirtualPath = "/localhost_56942"
 		Debug.AspNetCompiler.PhysicalPath = "src\WebForm\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_56942\"
@@ -26,19 +27,36 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebForm", "src\WebForm", "{
 		SlnRelativePath = "src\WebForm\"
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspDotNetCoreRazor", "src\AspDotNetCoreRazor\AspDotNetCoreRazor.csproj", "{4D50D06C-E268-4522-9CC9-A947AF88DF83}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WWWPGrids", "src\WWWPGrids\WWWPGrids.csproj", "{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{4D50D06C-E268-4522-9CC9-A947AF88DF83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D50D06C-E268-4522-9CC9-A947AF88DF83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D50D06C-E268-4522-9CC9-A947AF88DF83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D50D06C-E268-4522-9CC9-A947AF88DF83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{047B71EE-8D43-41D3-A9F3-E1DFCDF6DA45} = {06792A7D-1DA7-47F0-B46F-967AE5620B03}
+		{4D50D06C-E268-4522-9CC9-A947AF88DF83} = {06792A7D-1DA7-47F0-B46F-967AE5620B03}
+		{9FA84B5A-1EAD-42B7-B5D0-DA9EA4B5464D} = {06792A7D-1DA7-47F0-B46F-967AE5620B03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C155C2DB-284E-4D42-81AF-8D244AF90A09}

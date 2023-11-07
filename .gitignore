@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs
+/src/AspDotNetCoreRazor/bin
+/src/AspDotNetCoreRazor/obj
+/src/WWWPGrids/bin
+/src/WWWPGrids/obj

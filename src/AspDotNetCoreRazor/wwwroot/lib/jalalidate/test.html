@@ -1,0 +1,21 @@
+<script src="jalali.js" type="text/javascript"></script>
+<script>
+function test1(dateTime){
+	var date = sqlDateToJalali(dateTime);
+	alert(date);
+}
+function test2(dateTime){
+	var date = jalali_to_gregorian(dateTime);
+	alert(date);
+}
+</script>
+<a href="#" onclick="test1()">test1</a>
+<a href="#" onclick="test2('1396/02/23')">test2</a>
+<div class="test" id="test1">2017-05-01 15:22:11.241</div>
+<div class="test" id="test1">2017-05-02 15:22:11.241</div>
+<div class="test" id="test1">2017-05-03 15:22:11.241</div>
+<div class="test" id="test1">2017-05-04 15:22:11.241</div>
+<div class="test" id="test1">2017-05-05 15:22:11.241</div>
+<div class="test" id="test1">2017-05-06 15:22:11.241</div>
+<div class="test" id="test1">2017-05-07 15:22:11.241</div>
+<div class="test" id="test1">2017-05-08 15:22:11.241</div>

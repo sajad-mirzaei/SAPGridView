@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SAP.WebControls;
+using System;
 using System.Collections.Generic;
-using SAP.WebControls;
 using System.Data;
 
 public partial class GridTestPage_1 : System.Web.UI.Page
@@ -68,7 +68,7 @@ public partial class GridTestPage_1 : System.Web.UI.Page
             Row1["b"] = "bb " + i;
             Row1["c"] = i + 1;
 
-            if(i % 2 == 0)
+            if (i % 2 == 0)
                 Row1["d"] = "آریا اکبری";
             else
                 Row1["d"] = "آريا اكبري";
