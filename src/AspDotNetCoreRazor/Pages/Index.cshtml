@@ -10,3 +10,66 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+
+<hr /><a href="#" class="btn btn-dark" onclick="RandomNumber1();">RandomNumber1 - @Model.Level1</a>
+<hr /><a href="#" class="btn btn-dark" onclick="RandomNumber2();">RandomNumber2</a>
+<script>
+    function RandomNumber1() {
+        var min = 1;
+        var max = 11;
+        $.ajax({
+            type: 'POST',
+            url: "/?handler=RandomNumber1",
+            data: JSON.stringify({ Min: min, Max: max }),
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            }
+        }).done(function (data) {
+            console.log(data);
+            //$("#lblRandomNumber").text(data);
+        })
+            .fail(function (error) {
+                console.log(error);
+                //$("#lblRandomNumber").text(error.responseText);
+            });
+    }
+    function RandomNumber2() {
+        var min = 1;
+        var max = 11;
+        $.ajax({
+            type: 'GET',
+            url: "/?handler=RandomNumber1",
+            data: JSON.stringify({ Min: min, Max: max }),
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            }
+        }).done(function (data) {
+            console.log(data);
+            //$("#lblRandomNumber").text(data);
+        })
+            .fail(function (error) {
+                console.log(error);
+                //$("#lblRandomNumber").text(error.responseText);
+            });
+    }
+    //$.ajax({
+    //    type: "GET",
+    //    url: '/GridSamples/GridLevel1', // مسیر متد
+    //    data: { CallBackData: 'aaaaaaa' }, // اگر باید داده ارسال کنید
+    //    success: function (response) {
+    //        console.log(response); // پاسخ متد در اینجا قرار می‌گیرد
+    //    },
+    //    error: function (e) {
+    //        console.log(e);
+    //        console.log("خطا در درخواست");
+    //    }
+    //});
+
+</script>
