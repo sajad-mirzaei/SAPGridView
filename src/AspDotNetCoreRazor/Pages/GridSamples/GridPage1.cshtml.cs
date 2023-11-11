@@ -11,7 +11,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
             _logger = logger;
         }
 
-        public void OnGet()
+        public void OnGet(string CallBackData)
         {
             SAPGridView oSGV = LoadGrid();
             TempData["SAPGridView"] = oSGV.GridBind("MyGrid1");

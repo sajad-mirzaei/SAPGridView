@@ -1,0 +1,55 @@
+﻿@page
+@model GridLevel1
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+
+<div id="MyGridId"></div>
+@TempData["SAPGridView"]
+
+
+
+<hr /><a href="#" class="btn btn-dark" onclick="RandomNumber1();">RandomNumber1</a>
+<script>
+    function RandomNumber1() {
+        var min = 1;
+        var max = 11;
+        $.ajax({
+            type: 'POST',
+            url: "/GridSamples/GridLevel1?handler=RandomNumber1",
+            data: JSON.stringify({ Min: min, Max: max }),
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            error: function (status, ex) {
+                console.log(status);
+                console.log(ex);
+            }
+        })
+        .done(function (data) {
+            console.log(data);
+            //$("#lblRandomNumber").text(data);
+        })
+        .fail(function (error) {
+            console.log(error);
+            console.log(error.responseText);
+            //$("#lblRandomNumber").text(error.responseText);
+        });
+    }
+        //$.ajax({
+        //    type: "GET",
+        //    url: '/GridSamples/GridLevel1', // مسیر متد
+        //    data: { CallBackData: 'aaaaaaa' }, // اگر باید داده ارسال کنید
+        //    success: function (response) {
+        //        console.log(response); // پاسخ متد در اینجا قرار می‌گیرد
+        //    },
+        //    error: function (e) {
+        //        console.log(e);
+        //        console.log("خطا در درخواست");
+        //    }
+        //});
+
+</script>

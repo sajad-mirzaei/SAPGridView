@@ -912,37 +912,45 @@ function SGV_CallJavaScriptMethodClick(obj) {
 function SGV_AjaxClick(obj) {
     var objText = obj.text ? obj.text : "untitled";
     $(".SGV_LoadingContainer").show();
-    var CallBackData = SGV_Base64Decode(obj.dataset.row);
-    var CallBackData = JSON.parse(CallBackData);
     var ThisTableID = obj.dataset.tableid;
     var ContainerId = obj.dataset.containerid;
     var cellName = obj.dataset.cellname;
     var ThisWebMethodName = obj.dataset.webmethodname;
     var GridFirstText = [null, undefined, NaN, ""].includes(obj.dataset.nexttabtitle) === false ? obj.dataset.nexttabtitle : GridFirstText;
     GridFirstText = SGV_CustomStrReplace(GridFirstText, "{clickedItem}", objText, false, true);
-    $.each(CallBackData.RowData, function (key, val) {
+    var cData = JSON.parse(SGV_Base64Decode(obj.dataset.row));
+    var rowData = {};
+    $.each(cData.RowData, function (key, val) {
         GridFirstText = SGV_CustomStrReplace(GridFirstText, key, val);
+        rowData[key] = val.toString();
     });
-    var gridParameters = $("#" + ThisTableID).attr("data-gridparameters");
-    var gridParameters = SGV_Base64Decode(gridParameters);
-    CallBackData["GridParameters"] = JSON.parse(gridParameters);
-    CallBackData["TableDetails"] = { ContainerId: ContainerId, TableID: ThisTableID, CellName: cellName };
-    var CallBackData = JSON.stringify(CallBackData);
+    var gridParameters = SGV_Base64Decode($("#" + ThisTableID).attr("data-gridparameters"));
+    var callBackData = {
+        GridParameters: JSON.parse(gridParameters),
+        TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, CellName: cellName },
+        RowData: rowData,
+        FuncArray: cData.FuncArray
+    };
+
     $.ajax({
         type: "POST",
-        url: document.location.origin + document.location.pathname + "/" + ThisWebMethodName,
-        data: "{ CallBackData: '" + CallBackData + "'}",
+        url: document.location.origin + document.location.pathname + "?handler=" + ThisWebMethodName,
+        data: JSON.stringify(callBackData),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        headers: {
+            RequestVerificationToken:
+                $('input:hidden[name="__RequestVerificationToken"]').val()
+        },
         success: function (data) {
+            var d = JSON.parse(data);
             if (ThisWebMethodName == "SapGridEvent") {
-                var d = JSON.parse(data.d);
-                SapGridViewJSBind(d, JSON.parse(CallBackData).FuncArray.Level, GridFirstText);
+                SapGridViewJSBind(d, cData.FuncArray.Level, GridFirstText);
             }
             else {
                 var fn = window[ThisWebMethodName];
                 if (typeof fn === "function") {
-                    fn.apply(window, [data.d, obj, SGVArray[ContainerId][ThisTableID]]);
+                    fn.apply(window, [d, obj, SGVArray[ContainerId][ThisTableID]]);
                 }
             }
             $(".SGV_LoadingContainer").hide();
