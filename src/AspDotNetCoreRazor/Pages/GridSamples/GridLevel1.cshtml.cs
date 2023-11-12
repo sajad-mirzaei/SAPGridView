@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using WWWPGrids;
+using WWWPGrids.Models;
 
 namespace AspDotNetCoreRazor.Pages.GridSamples;
 
@@ -130,31 +131,29 @@ public class GridLevel1 : PageModel
         return dt;
     }
 
-    public IActionResult OnPostSapGridEvent([FromBody] SAPGridCallBackEvent oData)
+    public IActionResult OnPostSapGridEvent([FromBody] SAPGridEventInputModel inputs)
     {
         var oSGV = CreateStaticGrids();
         //--clicked row data-------------------------------------
-        var RowData = oData.RowData;
-        List<string> DataKeys = oData.FuncArray.DataKeys;
-        string NextGrid = oData.FuncArray.NextGrid;
-        string Clicked_CellName = oData.TableDetails["CellName"];
-        int Level = int.Parse(oData.FuncArray.Level);
+        var rowData = inputs.RowData;
+        List<string> dataKeys = inputs.FuncArray.DataKeys;
+        string nextGrid = inputs.FuncArray.NextGrid;
+        string clicked_CellName = inputs.TableDetails["CellName"];
+        int level = int.Parse(inputs.FuncArray.Level);
 
         //--copy last grid parameters into new grid parameters---
-        oSGV.Grids[NextGrid].GridParameters = new Dictionary<string, string>(oData.GridParameters);
+        oSGV.Grids[nextGrid].GridParameters = new Dictionary<string, string>(inputs.GridParameters);
 
         //--change new grid parameters with new values-----------
-        oSGV.Grids[NextGrid].GridParameters["Level"] = oData.FuncArray.Level;
-        foreach (string DataKey in DataKeys)
+        oSGV.Grids[nextGrid].GridParameters["Level"] = inputs.FuncArray.Level;
+        foreach (string DataKey in dataKeys)
         {
-            if (RowData.Count != 0)
-                oSGV.Grids[NextGrid].GridParameters[DataKey] = RowData[DataKey];
+            if (rowData.Count != 0)
+                oSGV.Grids[nextGrid].GridParameters[DataKey] = rowData[DataKey];
         }
-        oSGV.Grids[NextGrid].Data = Get_DataTable2(oSGV.Grids[NextGrid].GridParameters);
-        return new JsonResult(oSGV.AjaxBind(NextGrid));
+        oSGV.Grids[nextGrid].Data = Get_DataTable2(oSGV.Grids[nextGrid].GridParameters);
+        return new JsonResult(oSGV.AjaxBind(nextGrid));
     }
-
-
 
     public static SAPGridView CreateStaticGrids()
     {
