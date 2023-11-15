@@ -6,6 +6,8 @@ namespace WWWPGrids
 {
     public class Grid
     {
+        [JsonProperty("processing")] public bool Processing { get; set; } = false;
+        [JsonProperty("serverSide")] public bool ServerSide { get; set; } = false;
         [JsonProperty("containerId")] public string ContainerId { get; set; }
         [JsonProperty("containerHeight")] public int ContainerHeight { get; set; }
         [JsonProperty("data")] public object Data { get; set; }

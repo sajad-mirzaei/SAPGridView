@@ -7,12 +7,12 @@ using WWWPGrids.Models;
 namespace AspDotNetCoreRazor.Pages.GridSamples;
 
 [IgnoreAntiforgeryToken]
-public class GridLevel1 : PageModel
+public class GridLevelServerSide2 : PageModel
 {
-    private readonly ILogger<GridLevel1> _logger;
+    private readonly ILogger<GridLevelServerSide2> _logger;
     DateTime dtbAzTarikh = DateTime.Now.AddMonths(-20);
     DateTime dtbTaTarikh = DateTime.Now;
-    public GridLevel1(ILogger<GridLevel1> logger)
+    public GridLevelServerSide2(ILogger<GridLevelServerSide2> logger)
     {
         _logger = logger;
     }
@@ -22,25 +22,39 @@ public class GridLevel1 : PageModel
         SAPGridView oSGV = CreateFirstGrid();
         TempData["SAPGridView"] = oSGV.GridBind("Grid1");
     }
+    public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
+    {
+        List<GridLevelServerSide2Model> data = Get_DataTable1();
+        List<GridLevelServerSide2Model> dt = data.OrderBy(c => c.Id).Skip(filters.Start).Take(filters.Length).ToList();
+
+        var oDatatablesModel = new DatatablesModel<GridLevelServerSide2Model>()
+        {
+            Draw = filters.Draw,
+            RecordsFiltered = data.Count(),
+            RecordsTotal = data.Count(),
+            Data = dt
+        };
+        return new JsonResult(oDatatablesModel);
+    }
 
     public SAPGridView CreateFirstGrid()
     {
         SAPGridView oSGV = new();
-        oSGV.DefaultParameters = new Dictionary<string, string>()
+        oSGV.DefaultParameters = new()
         {
             { "Level", "1" },
             { "AzTarikh", dtbAzTarikh.ToString() },
             { "TaTarikh", dtbTaTarikh.ToString() },
             { "Id", "" }
         };
-        List<GridLevel1L1Model> dt = Get_DataTable1();
         //-----------------------Grid1------------------------
         oSGV.Grids["Grid1"] = new Grid()
         {
+            ServerSide = true,
+            Processing = true,
             ContainerId = "MyGridId",
             ContainerHeight = 300,
             GridTitle = "aaaa",
-            Data = dt,
             GridParameters = new Dictionary<string, string>(oSGV.DefaultParameters),
             Options = new Option
             {
@@ -83,14 +97,14 @@ public class GridLevel1 : PageModel
         return oSGV;
     }
 
-    public List<GridLevel1L1Model> Get_DataTable1()
+    public List<GridLevelServerSide2Model> Get_DataTable1()
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<GridLevel1L1Model> dt = new();
+        List<GridLevelServerSide2Model> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            GridLevel1L1Model row = new()
+            GridLevelServerSide2Model row = new()
             {
                 Id = i,
                 Col1 = i + 10000,
@@ -104,14 +118,14 @@ public class GridLevel1 : PageModel
         return result;
     }
 
-    public static List<GridLevel1L2Model> Get_DataTable2(Dictionary<string, string> param)
+    public static List<GridLevelServerSide2L2Model> Get_DataTable2(Dictionary<string, string> param)
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<GridLevel1L2Model> dt = new();
+        List<GridLevelServerSide2L2Model> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            GridLevel1L2Model row = new()
+            GridLevelServerSide2L2Model row = new()
             {
                 Id = i,
                 property1 = i + 10000 * int.Parse(param["Id"]),
@@ -184,7 +198,7 @@ public class GridLevel1 : PageModel
     }
 }
 
-public class GridLevel1L1Model
+public class GridLevelServerSide2Model
 {
     public int Id { get; set; }
     public int Col1 { get; set; }
@@ -193,7 +207,7 @@ public class GridLevel1L1Model
     public DateTime Tarikh { get; set; }
 }
 
-public class GridLevel1L2Model
+public class GridLevelServerSide2L2Model
 {
     public int Id { get; set; }
     public DateTime Tarikh { get; set; }

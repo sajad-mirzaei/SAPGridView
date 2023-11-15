@@ -11,7 +11,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
             _logger = logger;
         }
 
-        public void OnGet(string CallBackData)
+        public void OnGet()
         {
             SAPGridView oSGV = LoadGrid();
             TempData["SAPGridView"] = oSGV.GridBind("MyGrid1");
@@ -19,7 +19,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
 
         protected SAPGridView LoadGrid()
         {
-            List<MyModel> dt = MakeList();
+            List<GridPage1Model> dt = MakeList();
             SAPGridView oSGV = new();
 
             oSGV.Grids["MyGrid1"] = new Grid()
@@ -61,13 +61,13 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
             return oSGV;
         }
 
-        public List<MyModel> MakeList()
+        public List<GridPage1Model> MakeList()
         {
-            List<MyModel> oDT = new();
+            List<GridPage1Model> oDT = new();
 
             for (int i = 0; i < 100; i++)
             {
-                MyModel Row1 = new();
+                GridPage1Model Row1 = new();
                 Row1.a = i + 1000;
                 Row1.b = "bb " + i.ToString();
                 Row1.c = i + 1;
@@ -102,7 +102,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
         }
     }
 
-    public class MyModel
+    public class GridPage1Model
     {
         public int a { get; set; }
         public string b { get; set; }
