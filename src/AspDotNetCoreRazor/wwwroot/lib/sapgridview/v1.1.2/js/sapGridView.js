@@ -214,7 +214,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                 });
             };
         }
-        SGVDefaultOptions = SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns);
+        SGVDefaultOptions = SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, CustomData);
         //Bind Table
         var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
         ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
@@ -270,7 +270,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
     });
 }
 
-function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns) {
+function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, customData) {
     if (DataArray.serverSide == true && DataArray.processing == true) {
         var ThisWebMethodName = "SapGridServerSide";
         SGVDefaultOptions["ajax"] = {
@@ -278,7 +278,8 @@ function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseC
             type: 'POST',
             data: function (d) {
                 //console.log(d);
-                d.myKey = 'myValue';
+                console.log(customData);
+                d.customData = JSON.stringify(customData);
                 //delete d.columns;
                 // d.custom = $('#myInput').val();
             }
