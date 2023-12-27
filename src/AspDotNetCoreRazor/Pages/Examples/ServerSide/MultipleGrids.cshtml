@@ -1,0 +1,16 @@
+﻿@page
+@model MultipleGrids
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+
+<div id="MyGridId1"></div>
+<div id="MyGridId2"></div>
+@TempData["SAPGridView"]
+
+<script>
+    //optional
+    function DataTableCallBackData(oData) {
+        console.log(oData);
+    }
+</script>

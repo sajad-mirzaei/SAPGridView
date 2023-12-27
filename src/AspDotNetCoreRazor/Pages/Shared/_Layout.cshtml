@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject IWebHostEnvironment hostingEnvironment
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,19 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AspDotNetCoreRazor.styles.css" asp-append-version="true" />
 
-
-
-    @* <link href="/Assets/Styles/css/Style.css" rel="stylesheet" />
-    <script src="/Assets/Scripts/Script.js" type="text/javascript"></script>*@
-
-    @*<link href="/Assets/libs/Jquery/ui/1.12.1/jquery-ui.css" rel="stylesheet" type="text/css" />*@
-    @*<script type="text/javascript" src="/Assets/libs/Jquery/v3.2.1/jquery-3.2.1.js"></script>*@
-    @*<script type="text/javascript" src="/Assets/libs/Jquery/popper.min.js"></script>*@
-    @*<script type="text/javascript" src="/Assets/libs/Jquery/ui/1.12.1/jquery-ui.js"></script>*@
-
-    @*<link href="/Assets/libs/Bootstrap/v4.0.0/dist/css/bootstrap.min.css" rel="stylesheet" />*@
-    @*<script type="text/javascript" src="/Assets/libs/Bootstrap/v4.0.0/dist/js/bootstrap.min.js"></script>*@
-    <link href="~/lib/sapgridview/v1.1.2/css/sapgridview.css" rel="stylesheet" />
+    <link href="~/lib/sapgridview/v1.1.3/css/sapgridview.css" rel="stylesheet" />
     <link href="~/lib/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
     <link href="~/lib/datatables/1.10.20/DataTables-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -45,7 +34,7 @@
     <script src="~/lib/datatables/1.10.20/ColReorder-1.5.2/js/dataTables.colReorder.min.js"></script>
     <script src="~/lib/datatables/1.10.20/Responsive-2.2.3/js/dataTables.responsive.min.js"></script>
     <script src="~/lib/datatables/1.10.20/FixedHeader-3.1.6/js/dataTables.fixedHeader.min.js"></script>
-    <script src="~/lib/sapgridview/v1.1.2/js/sapgridview.js"></script>
+    <script src="~/lib/sapgridview/v1.1.3/js/sapgridview.js"></script>
     <script src="~/lib/jalalidate/jalali.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
@@ -64,12 +53,44 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="Home/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/GridSamples/GridPage1">GridPage1</a>
+                        @{
+                            string folderPath = hostingEnvironment.ContentRootPath + "/Pages/Examples";
+                            var clientSideFilesList = new DirectoryInfo(folderPath + "/ClientSide").GetFiles("*.cshtml");
+                            var serverSideFilesList = new DirectoryInfo(folderPath + "/ServerSide").GetFiles("*.cshtml");
+                        }
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                ClientSide
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var file1 in clientSideFilesList)
+                                {
+                                    string fileName = System.IO.Path.GetFileNameWithoutExtension(file1.Name);
+                                    string pagePath = $"/Examples/ClientSide/{fileName}";
+
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="@pagePath">@fileName</a>
+                                    </li>
+                                }
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/GridSamples/GridLevel1">GridLevel1</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                ServerSide
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var file2 in serverSideFilesList)
+                                {
+                                    string fileName = System.IO.Path.GetFileNameWithoutExtension(file2.Name);
+                                    string pagePath = $"/Examples/ServerSide/{fileName}";
+
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="@pagePath">@fileName</a>
+                                    </li>
+                                }
+                            </ul>
                         </li>
+
                     </ul>
                 </div>
             </div>

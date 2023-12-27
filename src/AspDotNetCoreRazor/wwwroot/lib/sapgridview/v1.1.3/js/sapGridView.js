@@ -22,7 +22,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
         var counterForColumns = {
             title: "#",
             defaultContent: "",
-            data: "SGVRadifCounter",
+            data: "SGVRadifCounter", //must be camelCase
             orderable: false,
             visible: DataArray.counterColumn,
             dropDownFilter: true,
@@ -76,7 +76,9 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             orderChange: []
         };
         var CellIndex = 0;
+        var mainColumnsName = {};
         var AllColumns = [];
+        var AllCamelCaseColumns = [];
         var rowGrouping = null;
         var cellsToBeMerged = [];
         var numberOfUnVisibleCells = 0;
@@ -114,7 +116,10 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                 }
                 CellIndex++;
                 AllColumns.push(TempColumn);
-
+                var t = { ...TempColumn };
+                t.data = SGV_ToCamelCase(t.data);
+                AllCamelCaseColumns.push(t);
+                mainColumnsName[CellName] = "";
                 //-start-headerComplex------------------
                 if (TempColumn.visible == false)
                     numberOfUnVisibleCells++;
@@ -143,7 +148,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             return el != null;
         });
         if (TotalFunctionDetails["createdCell"].length > 0) {
-            var tmp = SGV_DTCreatedCell(TotalFunctionDetails["createdCell"], ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId);
+            var tmp = SGV_DTCreatedCell(TotalFunctionDetails["createdCell"], ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId, mainColumnsName);
             ThisColumnDefs = tmp[0];
             SGVGlobalVariables = tmp[1];
         }
@@ -189,30 +194,6 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             $("#" + ThisTabID).html(ThisTabTitle);
         }
 
-
-        /*Ajax Paganation---
-         * 
-         * SGVDefaultOptions["processing"] = true;
-        SGVDefaultOptions["serverSide"] = true,
-            SGVDefaultOptions["ajax"] = {
-                "type": "POST",
-                "contentType": "application/json; charset=utf-8",
-                "url": document.location.origin + document.location.pathname + "/TestMethod",
-                "data": function (d) {
-                    *//*console.log(d);*//*
-return "{ CallBackData:'" + JSON.stringify(d) + "' }";
-},
-"dataType": "text",
-"dataSrc": function (data) {
-if (Array.isArray(data) !== true) {
-data = JSON.parse(data);
-if (Array.isArray(data.d) !== true)
-data.d = JSON.parse(data.d);
-}
-return data.d.data;
-},
-"cache": false
-};*/
         //Row Grouping
         if (rowGrouping !== null) {
             var columnsCount = SGVDefaultOptions.columns.length;
@@ -233,7 +214,7 @@ return data.d.data;
                 });
             };
         }
-
+        SGVDefaultOptions = SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, CustomData, GridName);
         //Bind Table
         var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
         ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
@@ -255,7 +236,9 @@ return data.d.data;
             Columns: DataArray.columns,
             ContainerId: ContainerId
         };
-        var HeaderFiltersThead = SGV_AddGeneralSearch(ThisTable, TableInfo, TbodyID, DataArray.options);
+        if (DataArray.serverSide == false && DataArray.processing == false) {
+            var HeaderFiltersThead = SGV_AddGeneralSearch(ThisTable, TableInfo, TbodyID, DataArray.options);
+        }
         if (DataArray.options["dropDownFilterButton"] === true || DataArray.options["columnsSearchButton"] === true) {
             SGV_AddFilters(ThisTableID, TbodyID, TheadID, DataArray);
         }
@@ -287,7 +270,35 @@ return data.d.data;
     });
 }
 
-function Separator_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, customData, GridName) {
+    if (DataArray.serverSide == true && DataArray.processing == true) {
+        var ThisWebMethodName = "SapGridServerSide";
+        SGVDefaultOptions["ajax"] = {
+            url: document.location.origin + document.location.pathname + "?handler=" + ThisWebMethodName,
+            type: 'POST',
+            data: function (d) {
+                //console.log(d);
+                d.gridInfo = {
+                    containerId: DataArray.containerId,
+                    serverSide: DataArray.serverSide,
+                    processing: DataArray.processing,
+                    gridTitle: DataArray.gridTitle,
+                    gridName: GridName
+                }
+                d.customData = customData;
+                //delete d.columns;
+                // d.custom = $('#myInput').val();
+            }
+        };
+        //SGVDefaultOptions["order"] = [[0, 'desc']];
+        SGVDefaultOptions["processing"] = true;
+        SGVDefaultOptions["serverSide"] = true;
+        SGVDefaultOptions["columns"] = AllCamelCaseColumns;
+    }
+    return SGVDefaultOptions;
+}
+
+function Separator_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var ThisCellNewData = cellData;
     if ([0, null, 'null', '0', '', ' ', undefined, NaN, 'undefined', 'NaN'].includes(ThisCellNewData) === false) {
         var ThisCellNewData = SGV_StrToFloat(ThisCellNewData);
@@ -316,7 +327,7 @@ function Separator_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVar
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
 
-function TextFeature_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function TextFeature_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var ThisCellNewData = cellData;
     var ThisTDNewData = td;
     if (FuncArray.condition !== null) {
@@ -366,7 +377,7 @@ function TextFeature_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalV
     return [ThisCellNewData, SGVGlobalVariables, ThisTDNewData];
 }
 
-function MiladiToJalali_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function MiladiToJalali_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var ThisCellNewData = cellData;
     if (["", " ", undefined, NaN, null, 'undefined', 'NaN', 'null', "-"].includes(ThisCellNewData) === false) {
         var ThisCellNewData = ThisCellNewData.toString();
@@ -407,7 +418,7 @@ function MiladiToJalali_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlob
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
 
-function Calc_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function Calc_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var ThisCellNewData = cellData;
     var tmpFormula = FuncArray.formula;
     var tmpOperator = FuncArray.operator;
@@ -440,10 +451,11 @@ function Calc_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariable
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
 
-function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var rowAllData = {};
     rowAllData["FuncArray"] = FuncArray;
     rowAllData["RowData"] = rowData;
+    rowAllData["MainColumnsName"] = mainColumnsName;
     var ThisRowData = JSON.stringify(rowAllData);
     var ThisRowData = SGV_Base64Encode(ThisRowData);
     var cssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
@@ -479,7 +491,7 @@ function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVaria
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
 
-function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var rowAllData = {};
     rowAllData["FuncArray"] = FuncArray;
     rowAllData["RowData"] = rowData;
@@ -494,7 +506,7 @@ function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalV
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
 
-function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
+function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId, mainColumnsName) {
     var ThisCellNewData = cellData;
     var CellIndex = SGVGlobalVariables[ContainerId][ThisTableID]["columnsName"][cellName];
     if (FuncArray.sourceField && FuncArray.sourceField !== null) {
@@ -795,6 +807,7 @@ function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID, customizeButt
             DefaultOptions[k] = v;
         }
     });
+
     return DefaultOptions;
 }
 
@@ -843,7 +856,7 @@ function SGV_CumulativeSum_AfterDraw(CellIndex, CellFunc, DTOrderChangeFunctions
     });
 }
 
-function SGV_DTCreatedCell(DTCreatedCellFunctions, ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId) {
+function SGV_DTCreatedCell(DTCreatedCellFunctions, ThisColumnDefs, SGVGlobalVariables, ThisTableID, ContainerId, mainColumnsName) {
     var UniqueFunctionCallCheckArray = []; /*اگر این آرایه نباشد هر تابع محاسبه دوبار خوانده میشود*/
     $.each(DTCreatedCellFunctions, function (CellIndex0, DTCreatedCell) {
         var CellIndex = SGVGlobalVariables[ContainerId][ThisTableID]["columnsName"][DTCreatedCell.CellName];
@@ -868,7 +881,7 @@ function SGV_DTCreatedCell(DTCreatedCellFunctions, ThisColumnDefs, SGVGlobalVari
 
                                 if ((tbodyCheck === true && section == 1) || tbodyCheck === false) {
 
-                                    var tmp = fn.apply(window, [td, ThisCellNewData, rowData, FuncArray, SGVGlobalVariables, DTCreatedCell.CellName, ThisTableID, ContainerId]);
+                                    var tmp = fn.apply(window, [td, ThisCellNewData, rowData, FuncArray, SGVGlobalVariables, DTCreatedCell.CellName, ThisTableID, ContainerId, mainColumnsName]);
                                     ThisCellNewData = tmp[0];
                                     SGVGlobalVariables = tmp[1];
                                     var ThisTDNewData = tmp[2];
@@ -928,10 +941,9 @@ function SGV_AjaxClick(obj) {
     var callBackData = {
         GridParameters: JSON.parse(gridParameters),
         TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, CellName: cellName },
-        RowData: rowData,
+        RowData: SGV_CopyAndCamelCaseIgnore(rowData, cData.MainColumnsName),
         FuncArray: cData.FuncArray
     };
-
     $.ajax({
         type: "POST",
         url: document.location.origin + document.location.pathname + "?handler=" + ThisWebMethodName,
@@ -1310,6 +1322,28 @@ function SGV_SearchCustomized(allInput, tbodyid, SearchType, TableInfo) {
     });
 }
 
+//-SapGridView-ClientPage-Reference-----------------------------------------------------------
+function SapGridViewChangeData(methodName, callBackData) {
+    $(".SGV_LoadingContainer").show();
+    $.ajax({
+        type: "POST",
+        url: document.location.origin + document.location.pathname + "?handler=" + methodName,
+        data: JSON.stringify(callBackData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            var d = JSON.parse(data);
+            SapGridViewJSBind(d, 1, "1");
+            $(".SGV_LoadingContainer").hide();
+        },
+        error: function (error) {
+            console.log(error);
+            $(".SGV_LoadingContainer").hide();
+            alert("خطایی در ارتباط با سرور وجود دارد");
+        }
+    });
+}
+
 //-SapGridView-Tools--------------------------------------------------------------------------
 
 function SGV_StrToFloat(str) {
@@ -1406,62 +1440,28 @@ function SGV_ErrorMessage(errorKey, otherInfo = null) {
         console.log(errorArray[errorKey]);
 }
 
-/*
- *
- *
- *
-function OLDDDDDDDDD____SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
-                var dataSearch = [];
-                var i = 0;
-                allInput.each(function () {
-                    var inputData = $(this).val();
-                    let persianInputData = SGV_ArabicToPersianChar(inputData);
-                    var columnNum = $(this).attr("data-columnnum");
-                    if (persianInputData.trim() != "" && persianInputData != "undefined") {
-                        dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid };
-                        i++;
-                    }
-                });
-                $("#" + tbodyid + " > tr").show();
-                $("#" + tbodyid + " > tr").each(function () {
-                    var thisTr = $(this).closest("tr");
-                    $.each(dataSearch, function (k, v) {
-                        if (SearchInTr === 0)
-                            var thisSearchField = thisTr.find("td:eq(" + v.columnNum + ")");
-                        else
-                            var thisSearchField = thisTr;
-                        var text = thisSearchField.text();
-                        thisSearchField.find("input, select, button, a, span").each(function () {
-                            if ($(this).is("button, a, span")) {
-                                text += $(this).text();
-                            } else
-                                text += $(this).val();
-                        });
-                        let persianText = SGV_ArabicToPersianChar(text);
-                        if (persianText.indexOf(v.inputData) < 0) {
-                            thisTr.hide();
-                        }
-                    });
-                });
-            }
- function EventFired_SGV(TableObject) {
-    TableObject.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-        cell.innerHTML = i + 1;
-    });
-}*
----------------------------------------------------------
- *
- * function Options_SGV(DataArray, options) {
-    if (options !== null) {
-        options["lengthMenu"] = JSON.parse(options["lengthMenu"].replace(/'/gi, "\""));
-        $.each(options, function (k, v) {
-            DataArray[k] = v;
-        });
+function SGV_ToCamelCase(str) {
+    if (typeof str !== 'string' || str.length === 0) {
+        return str;
     }
-    return DataArray;
+    return str.charAt(0).toLowerCase() + str.slice(1);
 }
- *
- *
----------------------------------------------------------
----------------------------------------------------------
-*/
+
+function SGV_IsKeyExist(array, k) {
+    if (array[k] != undefined && array[k] != NaN && k != null) {
+        return true;
+    }
+    return false;
+}
+
+function SGV_CopyAndCamelCaseIgnore(source, destination) {
+    Object.keys(destination).forEach(key => {
+        const lowerKey = key.toLowerCase();
+        if (source.hasOwnProperty(lowerKey)) {
+            destination[key] = source[lowerKey];
+        } else if (source.hasOwnProperty(key)) {
+            destination[key] = source[key];
+        }
+    });
+    return destination;
+}
