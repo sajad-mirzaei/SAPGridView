@@ -214,7 +214,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                 });
             };
         }
-        SGVDefaultOptions = SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, CustomData);
+        SGVDefaultOptions = SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, CustomData, GridName);
         //Bind Table
         var TableObject = $("#" + ThisTableID).DataTable(SGVDefaultOptions);
         ThisTable.closest(".dataTables_wrapper").addClass("DT_Container");
@@ -270,7 +270,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
     });
 }
 
-function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, customData) {
+function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseColumns, customData, GridName) {
     if (DataArray.serverSide == true && DataArray.processing == true) {
         var ThisWebMethodName = "SapGridServerSide";
         SGVDefaultOptions["ajax"] = {
@@ -278,8 +278,14 @@ function SGV_AddServerSideProcessing(SGVDefaultOptions, DataArray, AllCamelCaseC
             type: 'POST',
             data: function (d) {
                 //console.log(d);
-                console.log(customData);
-                d.customData = JSON.stringify(customData);
+                d.gridInfo = {
+                    containerId: DataArray.containerId,
+                    serverSide: DataArray.serverSide,
+                    processing: DataArray.processing,
+                    gridTitle: DataArray.gridTitle,
+                    gridName: GridName
+                }
+                d.customData = customData;
                 //delete d.columns;
                 // d.custom = $('#myInput').val();
             }
@@ -1312,6 +1318,28 @@ function SGV_SearchCustomized(allInput, tbodyid, SearchType, TableInfo) {
             else {
                 TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false).draw(); //match search for dropdown filter
             }
+        }
+    });
+}
+
+//-SapGridView-ClientPage-Reference-----------------------------------------------------------
+function SapGridViewChangeData(methodName, callBackData) {
+    $(".SGV_LoadingContainer").show();
+    $.ajax({
+        type: "POST",
+        url: document.location.origin + document.location.pathname + "?handler=" + methodName,
+        data: JSON.stringify(callBackData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            var d = JSON.parse(data);
+            SapGridViewJSBind(d, 1, "1");
+            $(".SGV_LoadingContainer").hide();
+        },
+        error: function (error) {
+            console.log(error);
+            $(".SGV_LoadingContainer").hide();
+            alert("خطایی در ارتباط با سرور وجود دارد");
         }
     });
 }

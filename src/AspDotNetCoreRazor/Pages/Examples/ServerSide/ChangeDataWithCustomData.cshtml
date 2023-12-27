@@ -1,0 +1,61 @@
+﻿@page
+@model ChangeDataWithCustomData
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+<div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+        <button class="btn btn-dark btn-sm" id="changeToFirst" onclick="change('ChangeToFirst')">ChangeToFirst</button>
+        |
+        <button class="btn btn-primary btn-sm" id="changeToSecond" onclick="change('ChangeToSecond')">ChangeToSecond</button>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+        <select onchange="selectOnChange(this)">
+            <option value="">Please select...</option>
+            <option class="text-dark" value="ChangeToFirst">ChangeToFirst</option>
+            <option class="text-primary" value="ChangeToSecond">ChangeToSecond</option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+        <input type="radio" id="ChangeToFirst" name="changeToGrid" value="ChangeToFirst" onchange="radioOnChange(this);" checked="checked">
+        <label for="ChangeToFirst" class="text-dark">ChangeToFirst</label>
+        <input type="radio" id="ChangeToSecond" name="changeToGrid" value="ChangeToSecond" onchange="radioOnChange(this);">
+        <label for="ChangeToSecond" class="text-primary">ChangeToSecond</label>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-12" id="MyGridsContainer">
+        <div id="MyGridId"></div>
+    </div>
+</div>
+
+
+@section scripts {
+    @TempData["SAPGridView"]
+    <script>
+        callBackData = {
+            param1: 1,
+            param2: 1.1,
+            param3: "1",
+            param4: {
+                param41: 1,
+                param42: 2,
+                param43: "1"
+            }
+        };
+
+        function change(methodName) {
+            SapGridViewChangeData(methodName, callBackData)
+        }
+
+        function selectOnChange(obj) {
+            if (obj.value)
+                change(obj.value)
+        }
+
+        function radioOnChange(obj) {
+            if (obj.value)
+                change(obj.value)
+        }
+    </script>
+}

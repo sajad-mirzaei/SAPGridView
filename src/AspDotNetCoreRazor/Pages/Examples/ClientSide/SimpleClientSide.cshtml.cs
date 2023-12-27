@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using WWWPGrids;
 
-namespace AspDotNetCoreRazor.Pages.GridSamples
+namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
 {
-    public class GridPage1 : PageModel
+    public class SimpleClientSide : PageModel
     {
-        private readonly ILogger<GridPage1> _logger;
-        public GridPage1(ILogger<GridPage1> logger)
+        private readonly ILogger<SimpleClientSide> _logger;
+        public SimpleClientSide(ILogger<SimpleClientSide> logger)
         {
             _logger = logger;
         }
@@ -19,7 +19,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
 
         protected SAPGridView LoadGrid()
         {
-            List<GridPage1Model> dt = MakeList();
+            List<SimpleClientSideModel> dt = MakeList();
             SAPGridView oSGV = new();
 
             oSGV.Grids["MyGrid1"] = new Grid()
@@ -61,13 +61,13 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
             return oSGV;
         }
 
-        public List<GridPage1Model> MakeList()
+        public List<SimpleClientSideModel> MakeList()
         {
-            List<GridPage1Model> oDT = new();
+            List<SimpleClientSideModel> oDT = new();
 
             for (int i = 0; i < 100; i++)
             {
-                GridPage1Model Row1 = new();
+                SimpleClientSideModel Row1 = new();
                 Row1.a = i + 1000;
                 Row1.b = "bb " + i.ToString();
                 Row1.c = i + 1;
@@ -102,7 +102,7 @@ namespace AspDotNetCoreRazor.Pages.GridSamples
         }
     }
 
-    public class GridPage1Model
+    public class SimpleClientSideModel
     {
         public int a { get; set; }
         public string b { get; set; }

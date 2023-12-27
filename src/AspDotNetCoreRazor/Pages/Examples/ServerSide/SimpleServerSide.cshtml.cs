@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using WWWPGrids;
 using WWWPGrids.Models;
 
-namespace AspDotNetCoreRazor.Pages.GridSamples;
+namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
 [IgnoreAntiforgeryToken]
-public class ServerSide1 : PageModel
+public class SimpleServerSide : PageModel
 {
-    private readonly ILogger<ServerSide1> _logger;
-    public ServerSide1(ILogger<ServerSide1> logger)
+    private readonly ILogger<SimpleServerSide> _logger;
+    public SimpleServerSide(ILogger<SimpleServerSide> logger)
     {
         _logger = logger;
     }
@@ -21,10 +21,10 @@ public class ServerSide1 : PageModel
     }
     public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
     {
-        List<ServerSide1Model> data = MakeList();
-        List<ServerSide1Model> dt = data.OrderBy(c => c.a).Skip(filters.Start).Take(filters.Length).ToList();
+        var data = MakeList();
+        List<SimpleServerSideModel> dt = data.OrderBy(c => c.a).Skip(filters.Start).Take(filters.Length).ToList();
 
-        var oDatatablesModel = new DatatablesModel<ServerSide1Model>()
+        var oDatatablesModel = new DatatablesModel<SimpleServerSideModel>()
         {
             Draw = filters.Draw,
             RecordsFiltered = data.Count(),
@@ -78,13 +78,13 @@ public class ServerSide1 : PageModel
         return oSGV;
     }
 
-    public List<ServerSide1Model> MakeList()
+    public List<SimpleServerSideModel> MakeList()
     {
-        List<ServerSide1Model> oDT = new();
+        List<SimpleServerSideModel> oDT = new();
 
         for (int i = 100; i < 200; i++)
         {
-            ServerSide1Model Row1 = new();
+            SimpleServerSideModel Row1 = new();
             Row1.a = i + 1000;
             Row1.b = "bb " + i.ToString();
             Row1.c = i + 1;
@@ -119,7 +119,7 @@ public class ServerSide1 : PageModel
     }
 }
 
-public class ServerSide1Model
+public class SimpleServerSideModel
 {
     public int a { get; set; }
     public string b { get; set; }

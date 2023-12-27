@@ -4,15 +4,15 @@ using System.Data;
 using WWWPGrids;
 using WWWPGrids.Models;
 
-namespace AspDotNetCoreRazor.Pages.GridSamples;
+namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
 [IgnoreAntiforgeryToken]
-public class GridLevel1 : PageModel
+public class NestedLevels : PageModel
 {
-    private readonly ILogger<GridLevel1> _logger;
+    private readonly ILogger<NestedLevels> _logger;
     DateTime dtbAzTarikh = DateTime.Now.AddMonths(-20);
     DateTime dtbTaTarikh = DateTime.Now;
-    public GridLevel1(ILogger<GridLevel1> logger)
+    public NestedLevels(ILogger<NestedLevels> logger)
     {
         _logger = logger;
     }
@@ -22,25 +22,39 @@ public class GridLevel1 : PageModel
         SAPGridView oSGV = CreateFirstGrid();
         TempData["SAPGridView"] = oSGV.GridBind("Grid1");
     }
+    public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
+    {
+        List<NestedLevelsModel> data = Get_DataTable1();
+        List<NestedLevelsModel> dt = data.OrderBy(c => c.Id).Skip(filters.Start).Take(filters.Length).ToList();
+
+        var oDatatablesModel = new DatatablesModel<NestedLevelsModel>()
+        {
+            Draw = filters.Draw,
+            RecordsFiltered = data.Count(),
+            RecordsTotal = data.Count(),
+            Data = dt
+        };
+        return new JsonResult(oDatatablesModel);
+    }
 
     public SAPGridView CreateFirstGrid()
     {
         SAPGridView oSGV = new();
-        oSGV.DefaultParameters = new Dictionary<string, string>()
+        oSGV.DefaultParameters = new()
         {
             { "Level", "1" },
             { "AzTarikh", dtbAzTarikh.ToString() },
             { "TaTarikh", dtbTaTarikh.ToString() },
             { "Id", "" }
         };
-        List<GridLevel1L1Model> dt = Get_DataTable1();
         //-----------------------Grid1------------------------
         oSGV.Grids["Grid1"] = new Grid()
         {
+            ServerSide = true,
+            Processing = true,
             ContainerId = "MyGridId",
             ContainerHeight = 300,
             GridTitle = "aaaa",
-            Data = dt,
             GridParameters = new Dictionary<string, string>(oSGV.DefaultParameters),
             Options = new Option
             {
@@ -58,7 +72,7 @@ public class GridLevel1 : PageModel
                 new Column { Title ="تاریخ", Data="Tarikh",
                     Functions =
                     {
-                        new MiladiToJalali {Section = Calc.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate },
+                        new MiladiToJalali {Section = Function.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate },
                         new OnClick {
                             Section = Function.SectionValue.Tbody,
                             NextTabTitle = "Tarikh - {clickedItem}",
@@ -71,9 +85,9 @@ public class GridLevel1 : PageModel
                 new Column { Title ="ستون 1", Data="Col1",
                     Functions =
                     {
-                        new Calc {Section = Calc.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
-                        new Separator { Section = Separator.SectionValue.Tbody, DecimalPlaces = 0 },
-                        new Separator { Section = Separator.SectionValue.Tfoot, DecimalPlaces = 0 }
+                        new Calc {Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
+                        new Separator { Section = Function.SectionValue.Tbody, DecimalPlaces = 0 },
+                        new Separator { Section = Function.SectionValue.Tfoot, DecimalPlaces = 0 }
                     }
                 },
                 new Column { Title ="ستون 2", Data="Col2" },
@@ -83,14 +97,14 @@ public class GridLevel1 : PageModel
         return oSGV;
     }
 
-    public List<GridLevel1L1Model> Get_DataTable1()
+    public List<NestedLevelsModel> Get_DataTable1()
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<GridLevel1L1Model> dt = new();
+        List<NestedLevelsModel> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            GridLevel1L1Model row = new()
+            NestedLevelsModel row = new()
             {
                 Id = i,
                 Col1 = i + 10000,
@@ -104,14 +118,14 @@ public class GridLevel1 : PageModel
         return result;
     }
 
-    public static List<GridLevel1L2Model> Get_DataTable2(Dictionary<string, string> param)
+    public List<NestedLevelsL2Model> Get_DataTable2(Dictionary<string, string> param)
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<GridLevel1L2Model> dt = new();
+        List<NestedLevelsL2Model> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            GridLevel1L2Model row = new()
+            NestedLevelsL2Model row = new()
             {
                 Id = i,
                 property1 = i + 10000 * int.Parse(param["Id"]),
@@ -152,7 +166,7 @@ public class GridLevel1 : PageModel
         return new JsonResult(oSGV.AjaxBind(nextGrid));
     }
 
-    public static SAPGridView CreateStaticGrids()
+    public SAPGridView CreateStaticGrids()
     {
         SAPGridView oSGV = new();
         //-----------------------Grid2------------------------
@@ -165,15 +179,15 @@ public class GridLevel1 : PageModel
                 new Column { Title ="تاریخ", Data="Tarikh",
                     Functions =
                     {
-                        new MiladiToJalali {Section = Calc.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate }
+                        new MiladiToJalali {Section = Function.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate }
                     }
                 },
                 new Column { Title ="مشخصه 1", Data="property1",
                     Functions =
                     {
-                        new Calc {Section = Calc.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
-                        new Separator { Section = Separator.SectionValue.Tbody, DecimalPlaces = 0 },
-                        new Separator { Section = Separator.SectionValue.Tfoot, DecimalPlaces = 0 }
+                        new Calc {Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
+                        new Separator { Section = Function.SectionValue.Tbody, DecimalPlaces = 0 },
+                        new Separator { Section = Function.SectionValue.Tfoot, DecimalPlaces = 0 }
                     }
                 },
                 new Column { Title ="مشخصه 2", Data="property2" },
@@ -184,7 +198,7 @@ public class GridLevel1 : PageModel
     }
 }
 
-public class GridLevel1L1Model
+public class NestedLevelsModel
 {
     public int Id { get; set; }
     public int Col1 { get; set; }
@@ -193,7 +207,7 @@ public class GridLevel1L1Model
     public DateTime Tarikh { get; set; }
 }
 
-public class GridLevel1L2Model
+public class NestedLevelsL2Model
 {
     public int Id { get; set; }
     public DateTime Tarikh { get; set; }

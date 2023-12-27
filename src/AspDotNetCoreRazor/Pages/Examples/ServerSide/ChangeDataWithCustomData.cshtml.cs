@@ -4,15 +4,15 @@ using System.Data;
 using WWWPGrids;
 using WWWPGrids.Models;
 
-namespace AspDotNetCoreRazor.Pages.GridSamples;
+namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
 [IgnoreAntiforgeryToken]
-public class GridSwapData1_ServerSide : PageModel
+public class ChangeDataWithCustomData : PageModel
 {
-    private readonly ILogger<GridSwapData1> _logger;
+    private readonly ILogger<ChangeDataWithCustomData> _logger;
     DateTime dtbAzTarikh = DateTime.Now.AddMonths(-20);
     DateTime dtbTaTarikh = DateTime.Now;
-    public GridSwapData1_ServerSide(ILogger<GridSwapData1> logger)
+    public ChangeDataWithCustomData(ILogger<ChangeDataWithCustomData> logger)
     {
         _logger = logger;
     }
@@ -23,15 +23,16 @@ public class GridSwapData1_ServerSide : PageModel
         TempData["SAPGridView"] = oSGV.GridBind("Grid1");
     }
 
-    public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
+    public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel<ChangeDataWithCustomDataParams> filters)
     {
-        List<GridSwapData1ServerSideModel> data = Get_DataTable1();
-        List<GridSwapData1ServerSideModel> dt = data
+        //var customData = JsonConvert.DeserializeObject<ChangeDataWithCustomDataInputModel>(filters.CustomData);
+        List<ChangeDataWithCustomDataModel> data = Get_DataTable1();
+        List<ChangeDataWithCustomDataModel> dt = data
             .OrderBy(c => c.Tarikh)
             .Skip(filters.Start)
             .Take(filters.Length).ToList();
 
-        var oDatatablesModel = new DatatablesModel<GridSwapData1ServerSideModel>()
+        var oDatatablesModel = new DatatablesModel<ChangeDataWithCustomDataModel>()
         {
             Draw = filters.Draw,
             RecordsFiltered = data.Count(),
@@ -77,9 +78,9 @@ public class GridSwapData1_ServerSide : PageModel
                 new Column { Title ="ستون 1", Data="Col1",
                     Functions =
                     {
-                        new Calc {Section = Calc.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
-                        new Separator { Section = Separator.SectionValue.Tbody, DecimalPlaces = 0 },
-                        new Separator { Section = Separator.SectionValue.Tfoot, DecimalPlaces = 0 }
+                        new Calc {Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
+                        new Separator { Section = Function.SectionValue.Tbody, DecimalPlaces = 0 },
+                        new Separator { Section = Function.SectionValue.Tfoot, DecimalPlaces = 0 }
                     }
                 },
                 new Column { Title ="ستون 2", Data="Col2" },
@@ -89,14 +90,14 @@ public class GridSwapData1_ServerSide : PageModel
         return oSGV;
     }
 
-    public List<GridSwapData1ServerSideModel> Get_DataTable1()
+    public List<ChangeDataWithCustomDataModel> Get_DataTable1()
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<GridSwapData1ServerSideModel> dt = new();
+        List<ChangeDataWithCustomDataModel> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            GridSwapData1ServerSideModel row = new()
+            ChangeDataWithCustomDataModel row = new()
             {
                 Id = i,
                 Col1 = i + 10000,
@@ -110,21 +111,23 @@ public class GridSwapData1_ServerSide : PageModel
         return result;
     }
 
-    public IActionResult OnPostSwapToFirst([FromBody] ClassInputModel inputModel)
+    public IActionResult OnPostChangeToFirst([FromBody] ChangeDataWithCustomDataParams inputModel)
     {
         var oSGV = CreateFirstGrid("First Data");
+        oSGV.CustomData = inputModel;
         return new JsonResult(oSGV.AjaxBind("Grid1"));
     }
 
-    public IActionResult OnPostSwapToSecond([FromBody] ClassInputModel inputModel)
+    public IActionResult OnPostChangeToSecond([FromBody] ChangeDataWithCustomDataParams inputModel)
     {
         var oSGV = CreateFirstGrid("Second Data", "text-primary");
+        oSGV.CustomData = inputModel;
         return new JsonResult(oSGV.AjaxBind("Grid1"));
     }
 
 }
 
-public class GridSwapData1ServerSideModel
+public class ChangeDataWithCustomDataModel
 {
     public int Id { get; set; }
     public int Col1 { get; set; }
@@ -133,15 +136,15 @@ public class GridSwapData1ServerSideModel
     public DateTime Tarikh { get; set; }
 }
 
-public class ClassInputModel
+public class ChangeDataWithCustomDataParams
 {
     public int Param1 { get; set; }
     public double Param2 { get; set; }
     public string Param3 { get; set; }
-    public ClassParam4Model Param4 { get; set; }
+    public ChangeDataWithCustomDataParamsParam4 Param4 { get; set; }
 }
 
-public class ClassParam4Model
+public class ChangeDataWithCustomDataParamsParam4
 {
     public int Param41 { get; set; }
     public int Param42 { get; set; }
