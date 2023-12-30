@@ -1,5 +1,7 @@
 ﻿<%@ Master Language="VB" CodeFile="MainBoard.master.vb" Inherits="MainBoard" %>
 
+<%@ Import Namespace="System.IO" %>
+
 <!DOCTYPE html>
 <html lang="fa">
 <head runat="server" id="MasterHeader">
@@ -13,10 +15,10 @@
     <script type="text/javascript" src="/Assets/libs/Jquery/v3.2.1/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="/Assets/libs/Jquery/popper.min.js"></script>
     <script type="text/javascript" src="/Assets/libs/Jquery/ui/1.12.1/jquery-ui.js"></script>
-    
+
     <link href="/Assets/libs/Bootstrap/v4.0.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script type="text/javascript" src="/Assets/libs/Bootstrap/v4.0.0/dist/js/bootstrap.min.js"></script>
-    
+
     <link href="/Assets/libs/SAPGridView/v1.1.2/css/sapGridView.css" rel="stylesheet" />
     <script src="/Assets/libs/SAPGridView/v1.1.2/js/sapGridView.js" type="text/javascript"></script>
 
@@ -44,6 +46,43 @@
 </head>
 <body>
     <form id="frmMainBoard" runat="server" class="mainContainer">
+
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container">
+                    <a class="navbar-brand" runat="server" href="/Index.aspx">AspDotNetWebForms</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" runat="server" href="~">Home</a>
+                            </li>
+                            <% 
+                                Dim folderPath As String = Server.MapPath("~/Pages/Examples")
+                                Dim clientSideFilesList() As FileInfo = New DirectoryInfo(folderPath + "/ClientSide").GetFiles("*.aspx")
+                            %>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ClientSide
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <%For Each file1 As FileInfo In clientSideFilesList
+                                            Dim fileName As String = System.IO.Path.GetFileNameWithoutExtension(file1.Name)
+                                            Dim pagePath As String = "/Pages/Examples/ClientSide/" + fileName + ".aspx"
+                                            Response.Write("<li>")
+                                            Response.Write("<a href=""" + pagePath + """>" + fileName + "</a>")
+                                            Response.Write("</li>")
+                                        Next
+                                        %>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
         <div role="main" class="main container">
             <ajax:ScriptManager ID="ScriptManager" runat="server" EnablePartialRendering="true" AsyncPostBackTimeout="600">
             </ajax:ScriptManager>
