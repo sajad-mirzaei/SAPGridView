@@ -55,7 +55,13 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                         new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
                     }
                 },
-                new Column { Data = "f", Title = "ff" }
+                new Column { Data = "f", Title = "ff",
+                    Functions =
+                    {
+                        new TextFeature(){ Section = Function.SectionValue.Tbody, Condition = "1==1", IsTrueCssClass = "text-info"}
+                    }
+
+                }
             }
             };
             return oSGV;

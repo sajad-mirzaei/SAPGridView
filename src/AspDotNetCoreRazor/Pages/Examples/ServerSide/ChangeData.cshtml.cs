@@ -73,7 +73,14 @@ public class ChangeData : PageModel
                     DefaultContent = firstColName,
                     CssClass = cssClass
                 },
-                new Column { Title ="تاریخ", Data="Tarikh" },
+                new Column
+                {
+                    Title ="تاریخ", Data="Tarikh",
+                    Functions =
+                    {
+                        new MiladiToJalali(){ Section = Function.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate }
+                    }
+                },
                 new Column { Title ="ستون 1", Data="Col1",
                     Functions =
                     {

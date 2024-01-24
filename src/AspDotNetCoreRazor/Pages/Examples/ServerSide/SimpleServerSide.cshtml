@@ -11,6 +11,12 @@
 <script>
     //optional
     function DataTableCallBackData(oData) {
-        console.log(oData);
+        //console.log(oData);
+        $(".checkbox").on("click", function () { 
+            console.log(this);
+        });
+    }
+    function func1(obj) {
+        console.log(obj);
     }
 </script>
