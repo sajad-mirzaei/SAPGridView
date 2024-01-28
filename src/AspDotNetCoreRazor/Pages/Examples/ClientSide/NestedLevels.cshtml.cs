@@ -61,7 +61,7 @@ public class NestedLevels : PageModel
                         new MiladiToJalali {Section = Function.SectionValue.Tbody, Output = MiladiToJalali.DateValue.FullDate },
                         new OnClick {
                             Section = Function.SectionValue.Tbody,
-                            NextTabTitle = "Tarikh - {clickedItem}",
+                            NextTabTitle = "Id - {clickedItem}",
                             Level = "2",
                             NextGrid = "Grid2",
                             DataKeys = { "Id" }
