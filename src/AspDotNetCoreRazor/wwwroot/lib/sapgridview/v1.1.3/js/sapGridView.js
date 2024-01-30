@@ -377,10 +377,10 @@ class gridBind {
                     isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, val);
                 });
                 $(cellInfo.td).addClass(isTrueCssClass);
-                let ThisTDNewData = isTrueText;
+                ThisTDNewData = isTrueText;
             } else {
                 $(cellInfo.td).addClass(isFalseCssClass);
-                let ThisTDNewData = isFalseText;
+                ThisTDNewData = isFalseText;
             }
         } else {
             self.errorMessage("TextFeatureConditionNotFound");
@@ -815,7 +815,7 @@ class gridBind {
                             if (CellFunc) {
                                 let fnName = CellFunc.funcName + "AfterDraw";
                                 if (typeof self[fnName] === "function") {
-                                    self[fnName](CellIndex, CellFunc, m.totalFunctionDetails["orderChange"], m.thisColumnDefs, m.tableInfo);                                    
+                                    self[fnName](CellIndex, CellFunc, m.totalFunctionDetails["orderChange"], m.thisColumnDefs, m.tableInfo);
                                 }
                             }
                         });
@@ -825,7 +825,7 @@ class gridBind {
             //CumulativeSumAfterDraw
             //console.log(m.footerFields);
             self.setFooter();
-        }).draw();
+        });//.draw();
         /*let t = 0
         m.tableObject.on("draw", function () {
             //console.log("onDraw init");
