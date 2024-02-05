@@ -101,12 +101,12 @@ class gridBind {
                 rowGrouping = { rowNumber: j, cssClass: TempColumn.rowGrouping.cssClass };
             }
             if (TempColumn != null /*&& TempColumn.visible == true*/) {
-                let CellName = TempColumn["data"] ? TempColumn["data"].trim() : "";
+                let cellName = TempColumn["data"] ? TempColumn["data"].trim() : "";
                 m.allTitleTh += "<th data-tbodyid='" + m.tbodyId + "'>" + TempColumn.title + "</th>";
-                m.allFooterTh += "<th data-tbodyid='" + m.tbodyId + "' id='Footer_" + m.thisTableId + "_" + CellName + "'>" + TempColumn.title + "</th>";
+                m.allFooterTh += "<th data-tbodyid='" + m.tbodyId + "' id='Footer_" + m.thisTableId + "_" + cellName + "'>" + TempColumn.title + "</th>";
                 if (TempColumn["functions"] && TempColumn["functions"] !== null && TempColumn["functions"].length > 0) {
-                    //self.globalVariables[m.containerId][m.thisTableId].columnsName[CellName] = m.cellIndex;
-                    m.footerFields[m.containerId][m.thisTableId].columnsName[CellName] = m.cellIndex;
+                    //self.globalVariables[m.containerId][m.thisTableId].columnsName[cellName] = m.cellIndex;
+                    m.footerFields[m.containerId][m.thisTableId].columnsName[cellName] = m.cellIndex;
                     $.each(TempColumn["functions"], function (k, FuncArray) {
                         //if (self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex] == undefined)
                         //    self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex] = {};
@@ -117,37 +117,39 @@ class gridBind {
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["cumulative"] = 0;
                         } else if (["OnClick", "Calc"].includes(FuncArray.funcName) && [0, 2].includes(parseInt(FuncArray.section))) {
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["footerValue"] = 0;
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = CellName;
+                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = cellName;
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["tfootOnClick"] = true;
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["footerText"] = FuncArray.footerText !== undefined ? FuncArray.footerText : null;
 
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["footerValue"] = 0;
-                            m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = CellName;
+                            m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = cellName;
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["tfootOnClick"] = true;
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["footerText"] = FuncArray.footerText !== undefined ? FuncArray.footerText : null;
                         }
                         if (m.functionsList[FuncArray.funcName]["FuncListBuild"]) {
                             $.each(m.functionsList[FuncArray.funcName]["FuncListBuild"], function (k, DTMethodName) {
                                 if (m.totalFunctionDetails[DTMethodName][m.cellIndex] == undefined) {
-                                    m.totalFunctionDetails[DTMethodName][m.cellIndex] = { CellName: CellName, CellFuncArray: [] }
+                                    m.totalFunctionDetails[DTMethodName][m.cellIndex] = { cellName: cellName, functions: [] }
                                 }
-                                m.totalFunctionDetails[DTMethodName][m.cellIndex]["CellFuncArray"].push(FuncArray);
+                                m.totalFunctionDetails[DTMethodName][m.cellIndex]["functions"].push(FuncArray);
+                                console.log(DTMethodName);
                             });
                         }
                     });
                 }
+                console.log(m.totalFunctionDetails);
                 m.cellIndex++;
                 m.allColumns.push(TempColumn);
                 let t = { ...TempColumn };
                 t.data = sapGridViewTools.toCamelCase(t.data);
                 m.allCamelCaseColumns.push(t);
-                m.mainColumnsName[CellName] = "";
+                m.mainColumnsName[cellName] = "";
                 //-start-headerComplex------------------
                 if (TempColumn.visible == false)
                     m.numberOfUnVisibleCells++;
                 if (m.grid.headerComplex != null && m.grid.headerComplex.length > 0) {
-                    let temp = self.headerComplex(m.grid, CellName);
-                    if (cellsToBeMerged.includes(CellName)) {
+                    let temp = self.headerComplex(m.grid, cellName);
+                    if (cellsToBeMerged.includes(cellName)) {
                     }
                     else if (temp.title != "") {
                         cellsToBeMerged = temp.columnsToBeMerged;
@@ -167,10 +169,10 @@ class gridBind {
 
     removeNullsFromTotalFunctionDetails(self = this, m = this.model) {
         //Remove null elements
-        m.totalFunctionDetails["createdCell"] = m.totalFunctionDetails["createdCell"].filter(function (el) {
+        m.totalFunctionDetails["forRender"] = m.totalFunctionDetails["forRender"].filter(function (el) {
             return el != null;
         });
-        m.totalFunctionDetails["orderChange"] = m.totalFunctionDetails["orderChange"].filter(function (el) {
+        m.totalFunctionDetails["forAfterDraw"] = m.totalFunctionDetails["forAfterDraw"].filter(function (el) {
             return el != null;
         });
     }
@@ -205,7 +207,10 @@ class gridBind {
     }
 
     setDefaultOptions(self = this, m = this.model) {
-        m.thisColumnDefs = self.addFunctionsToColumns();
+        //console.log([m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName]);
+        console.log(m.footerFields[m.containerId][m.thisTableId].columns);
+        console.log("-------------------");
+        m.thisColumnDefs = new sapGridViewFunctions().add(m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName);
         m.defaultOptions = self.getDefaultOptions();
 
         m.defaultOptions["columnDefs"] = m.thisColumnDefs;
@@ -264,6 +269,7 @@ class gridBind {
                         gridName: m.gridName
                     }
                     d.customData = self.customData;
+
                     //delete d.columns;
                     // d.custom = $('#myInput').val();
                 }
@@ -272,6 +278,12 @@ class gridBind {
             m.defaultOptions["processing"] = true;
             m.defaultOptions["serverSide"] = true;
             m.defaultOptions["columns"] = m.allCamelCaseColumns;
+
+
+            //let columnDefs = self.addFunctionsToColumns();
+            //m.defaultOptions["columnDefs"] = columnDefs;
+            //m.defaultOptions["columnDefs"] = d["columnDefs"];
+            //m.defaultOptions["columnDefs"] = self.addFunctionsToColumns();
         }
     }
 
@@ -313,250 +325,6 @@ class gridBind {
             t = 1;
         });
     }*/
-    //#endregion
-
-    //#region functions in columns -> use for addFunctionsToColumns method
-    Separator(cellInfo, self = this, m = this.model) {
-        let ThisCellNewData = cellInfo.cellData;
-        if ([0, null, 'null', '0', '', ' ', undefined, NaN, 'undefined', 'NaN'].includes(ThisCellNewData) === false) {
-            ThisCellNewData = sapGridViewTools.strToFloat(ThisCellNewData);
-            if ([null, 0, 2].includes(parseInt(cellInfo.funcArray.section)) == false) {
-                let minFraction = 0;
-                let maxFraction = 0;
-                if (!Number.isInteger(ThisCellNewData)) {
-                    /*مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد*/
-                    minFraction = cellInfo.funcArray.minimumFractionDigits > cellInfo.funcArray.maximumFractionDigits ? cellInfo.funcArray.maximumFractionDigits : cellInfo.funcArray.minimumFractionDigits;
-                    maxFraction = cellInfo.funcArray.maximumFractionDigits;
-                    if (maxFraction > 1 && minFraction < 1) {
-                        minFraction = 2;
-                    }
-                    else if (maxFraction == 1) {
-                        ThisCellNewData = sapGridViewTools.strToFloat(Number(ThisCellNewData).toFixed(1));
-                        minFraction = 2;
-                        maxFraction = 2;
-                    }
-                }
-                ThisCellNewData = ThisCellNewData.toLocaleString(cellInfo.funcArray.locales, {
-                    minimumFractionDigits: minFraction,
-                    maximumFractionDigits: maxFraction
-                });
-            }
-        }
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    TextFeature(cellInfo, self = this, m = this.model) {
-        let ThisCellNewData = cellInfo.cellData;
-        let ThisTDNewData = cellInfo.td;
-        if (cellInfo.funcArray.condition !== null) {
-            ThisTDNewData = cellInfo.cellData;
-            let condition = cellInfo.funcArray.condition;
-            let isTrueCssClass = cellInfo.funcArray.isTrueCssClass;
-            let isFalseCssClass = cellInfo.funcArray.isFalseCssClass;
-            let isTrueText = cellInfo.funcArray.isTrueText;
-            let isFalseText = cellInfo.funcArray.isFalseText;
-            let strReplace = cellInfo.funcArray.strReplace;
-            let numericCheckInText = cellInfo.funcArray.numericCheckInText;
-            let numericCheckInCondition = cellInfo.funcArray.numericCheckInCondition;
-            isTrueText = cellInfo.funcArray.isTrueText != null ? sapGridViewTools.customStrReplace(isTrueText, cellInfo.cellName, ThisCellNewData, true) : ThisCellNewData;
-            isFalseText = cellInfo.funcArray.isFalseText != null ? sapGridViewTools.customStrReplace(isFalseText, cellInfo.cellName, ThisCellNewData, true) : ThisCellNewData;
-            $.each(cellInfo.rowData, function (key, val) {
-                let valNumber = ["", undefined, NaN, null, 'undefined', 'NaN', 'null'].includes(sapGridViewTools.strToFloat(val)) == false && sapGridViewTools.strToFloat(val) ? sapGridViewTools.strToFloat(val) : val;
-                let vTest = numericCheckInText ? valNumber : val;
-                let vCondition = numericCheckInCondition ? valNumber : val;
-
-
-                if (cellInfo.funcArray.isTrueText !== null)
-                    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, vTest, true);
-                if (cellInfo.funcArray.isFalseText !== null)
-                    isFalseText = sapGridViewTools.customStrReplace(isFalseText, key, vTest, true);
-                condition = sapGridViewTools.customStrReplace(condition, key, vCondition, true);
-            });
-            if (eval(condition)) {
-                $.each(strReplace, function (key, val) {
-                    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, val);
-                });
-                $(cellInfo.td).addClass(isTrueCssClass);
-                ThisTDNewData = isTrueText;
-            } else {
-                $(cellInfo.td).addClass(isFalseCssClass);
-                ThisTDNewData = isFalseText;
-            }
-        } else {
-            self.errorMessage("TextFeatureConditionNotFound");
-        }
-        /*
-         * ThisCellNewData ممکن است با تغییر دیتای اصلی
-         *مشکلی ایجاد شود مثلا  برای اعداد منفی
-         * پرانتز بگذاریم یا متن را تبدیل به تگ اچ تی ام ال کنیم
-         */
-        if (cellInfo.funcArray.changeOriginalData == true)
-            ThisCellNewData = ThisTDNewData;
-        return [ThisCellNewData, ThisTDNewData];
-    }
-
-    MiladiToJalali(cellInfo, self = this, m = this.model) {
-        let ThisCellNewData = cellInfo.cellData;
-        if (["", " ", undefined, NaN, null, 'undefined', 'NaN', 'null', "-"].includes(ThisCellNewData) === false) {
-            ThisCellNewData = ThisCellNewData.toString();
-            let ThisDate = ThisCellNewData ? ThisCellNewData.trim() : "";
-            ThisDate = ThisDate.replace(/-/g, "/").split('.')[0];
-            ThisDate = ThisDate.replace("T", " ");
-            if (sapGridViewTools.isValidDate(ThisDate)) {
-                let dateTime = new Date(Date.parse(ThisDate));
-                let j = jalaliConvert.gregorianToJalali(new Array(
-                    dateTime.getFullYear(),
-                    dateTime.getMonth() + 1,
-                    dateTime.getDate()
-                ));
-                let hour = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getHours()).slice(-2) : dateTime.getHours();
-                let minute = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getMinutes()).slice(-2) : dateTime.getMinutes();
-                let second = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getSeconds()).slice(-2) : dateTime.getSeconds();
-                switch (cellInfo.funcArray.outPut) {
-                    case 0: //TimeOnly
-                        ThisCellNewData = hour + ":" + minute;
-                        break;
-                    case 1: //DateOnly
-                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2];
-                        break;
-                    case 2: //FullDate
-                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute;
-                        break;
-                    case 3: //TimeOnlyWithSecond
-                        ThisCellNewData = hour + ":" + minute + ":" + second;
-                        break;
-                    case 4: //FullDateWithSecond
-                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute + ":" + second;
-                        break;
-                    default:
-                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute + ":" + second;
-                }
-            }
-        }
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    Calc(cellInfo, self = this, m = this.model) {
-        let ThisCellNewData = cellInfo.cellData;
-        let tmpFormula = cellInfo.funcArray.formula;
-        let tmpOperator = cellInfo.funcArray.operator;
-        let CellIndex = m.footerFields[m.containerId][m.thisTableId]["columnsName"][cellInfo.cellName];
-        m.footerFields[m.containerId][m.thisTableId].hasThead = parseInt(cellInfo.funcArray.section) === 0 && m.footerFields[m.containerId][m.thisTableId].hasThead === 0 ? 1 : m.footerFields[m.containerId][m.thisTableId].hasThead;
-        m.footerFields[m.containerId][m.thisTableId].hasTfoot = parseInt(cellInfo.funcArray.section) === 2 && m.footerFields[m.containerId][m.thisTableId].hasTfoot === 0 ? 1 : m.footerFields[m.containerId][m.thisTableId].hasTfoot;
-        if (parseInt(cellInfo.funcArray.section) === 1) {
-            $.each(cellInfo.rowData, function (key, val) {
-                valNumber = val;
-                if (cellInfo.funcArray.numericCheck == true)
-                    valNumber = sapGridViewTools.strToFloat(val);
-                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
-            });
-            try {
-                ThisCellNewData = eval(tmpFormula);
-            } catch (e) {
-                if (e instanceof SyntaxError) {
-                    console.log(e.message);
-                    console.log("-------------------------");
-                }
-            }
-        }
-        if ([0, 2].includes(parseInt(cellInfo.funcArray.section)) == true && tmpOperator == 0 && cellInfo.funcArray.formula == null) {//verticalSum
-            m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["name"] = cellInfo.cellName;
-            m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["footerValue"] = sapGridViewTools.strToFloat(m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["footerValue"]);
-            m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["footerValue"] += sapGridViewTools.strToFloat(ThisCellNewData);
-        } else if ([0, 2].includes(parseInt(cellInfo.funcArray.section)) == false && tmpOperator == 0 && cellInfo.funcArray.formula == null) {
-            self.errorMessage("VerticalSumWithoutSelectFooterSection");
-        }
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    OnClick(cellInfo, self = this, m = this.model) {
-        let rowAllData = {};
-        rowAllData["FuncArray"] = cellInfo.funcArray;
-        rowAllData["RowData"] = cellInfo.rowData;
-        rowAllData["MainColumnsName"] = m.mainColumnsName;
-        let ThisRowData = JSON.stringify(rowAllData);
-        ThisRowData = sapGridViewTools.base64Encode(ThisRowData);
-        let cssClass = cellInfo.funcArray.cssClass ? cellInfo.funcArray.cssClass : "btn btn-link text-danger p-0 m-0";
-        let webMethodName = cellInfo.funcArray.webMethodName ? cellInfo.funcArray.webMethodName : "SapGridEvent";
-        let hrefLink = cellInfo.funcArray.hrefLink ? cellInfo.funcArray.hrefLink : "javascript:void(0)";
-        let javaScriptMethodName = cellInfo.funcArray.javaScriptMethodName ? cellInfo.funcArray.javaScriptMethodName : null;
-        let nextTabTitle = cellInfo.funcArray.nextTabTitle ? cellInfo.funcArray.nextTabTitle : "";
-        let httpRequestType = cellInfo.funcArray.httpRequestType ? parseInt(cellInfo.funcArray.httpRequestType) : 0;
-        let ThisCellNewData = cellInfo.cellData;
-        if (parseInt(cellInfo.funcArray.section) == 1 && cellInfo.funcArray.enable == true) {
-            switch (httpRequestType) {
-                case 0:
-                    //Ajax
-                    ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellInfo.cellName + "' data-containerid='" + m.containerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "' onclick='sapGridViewOnClick.ajaxClick(this)'>" + cellInfo.cellData + "</a>";
-                    break;
-                case 1:
-                    //PageLink
-                    ThisCellNewData = "<a class='" + cssClass + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "' href='" + hrefLink + "'>" + cellInfo.cellData + "</a>";
-                    break;
-                case 2:
-                    //CallJavaScriptMethod
-                    ThisCellNewData = "<a class='" + cssClass + "' data-javascriptmethod='" + javaScriptMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "' onclick='sapGridViewOnClick.callJavaScriptMethodClick(this)'>" + cellInfo.cellData + "</a>";
-                    break;
-                default:
-                    ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellInfo.cellName + "' data-containerid='" + m.containerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "' onclick='sapGridViewOnClick.ajaxClick(this)'>" + cellInfo.cellData + "</a>";
-                /*ThisCellNewData = cellInfo.cellData;
-                //PostBack type
-                //ThisCellNewData = '<a id="cphMain_SapGrid" href="javascript:__doPostBack(\'ctl00$cphMain$SapGrid\',\'\')">ssssssss</a>';
-                ThisCellNewData = "<a class='" + cssClass + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "'  onclick='sapGridViewOnClick.postBackClick(this)'>" + cellInfo.cellData + "</a>";
-                break;*/
-            }
-        }
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    SAPCheckBox(cellInfo, self = this, m = this.model) {
-        let rowAllData = {};
-        rowAllData["FuncArray"] = cellInfo.funcArray;
-        rowAllData["RowData"] = cellInfo.rowData;
-        let ThisRowData = JSON.stringify(rowAllData);
-        ThisRowData = sapGridViewTools.base64Encode(ThisRowData);
-        let cssClass = cellInfo.funcArray.cssClass ? cellInfo.funcArray.cssClass : "btn btn-link text-danger p-0 m-0";
-        let webMethodName = cellInfo.funcArray.webMethodName ? cellInfo.funcArray.webMethodName : "SapGridEvent";
-        let ThisCellNewData = cellInfo.cellData;
-        if (cellInfo.funcArray.enable == true) {
-            ThisCellNewData = "<input type='checkbox' class='" + cssClass + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.thisTableId + "' onclick='SAPCheckBoxClick_SGV(this)' >" + cellInfo.cellData;
-        }
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    CumulativeSum(cellInfo, self = this, m = this.model) {
-        let ThisCellNewData = cellInfo.cellData;
-        let CellIndex = m.footerFields[m.containerId][m.thisTableId]["columnsName"][cellInfo.cellName];
-        if (cellInfo.funcArray.sourceField && cellInfo.funcArray.sourceField !== null) {
-            let tmpFormula = cellInfo.funcArray.sourceField;
-            $.each(cellInfo.rowData, function (key, val) {
-                let valNumber = sapGridViewTools.strToFloat(val);
-                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
-            });
-            m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["cumulative"] += eval(tmpFormula);
-            ThisCellNewData = m.footerFields[m.containerId][m.thisTableId].columns[CellIndex]["cumulative"];
-        } else
-            self.errorMessage("CumulativeSumSourceFieldNotFound");
-        return [ThisCellNewData, ThisCellNewData];
-    }
-
-    //--AfterDraw-----------------------
-    CumulativeSumAfterDraw(CellIndex, CellFunc, DTOrderChangeFunctions, ThisColumnDefs, TableInfo) {
-        var sum = 0;
-        TableInfo.TableObject.column(CellIndex).rows({ order: 'applied', filter: 'applied', search: 'applied' }).indexes().each(function (rowIndex, i, allFilteredIndexes) {
-            var tmpFormula = CellFunc.sourceField;
-            $.each(TableInfo.Columns, function (cIndex, cArray) {
-                var cName = cArray.data;
-                var cValue = TableInfo.TableObject.cell(rowIndex, cIndex).data();
-                cValue = sapGridViewTools.strToFloat(cValue);
-                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, cName, cValue, true);
-            });
-            var v = eval(tmpFormula);
-            sum += v;
-            TableInfo.TableObject.cell(rowIndex, CellIndex).data(sum.toLocaleString(undefined, { maximumFractionDigits: 3 }));
-        });
-    }
-
     //#endregion
 
     //#region refactor old functions
@@ -807,21 +575,25 @@ class gridBind {
         m.tableObject.on("draw", function (changeEvent) {
             if (m.grid.counterColumn == true)
                 self.counterColumn(m.tableInfo.TableObject);
-            if (m.totalFunctionDetails["orderChange"].length > 0) {
-                $.each(m.totalFunctionDetails["orderChange"], function (c, DTOrderChange) {
-                    let CellIndex = m.footerFields[m.containerId][m.tableInfo.TableId]["columnsName"][DTOrderChange.CellName];
+            /*
+            
+            
+            if (m.totalFunctionDetails["forAfterDraw"].length > 0) {
+                $.each(m.totalFunctionDetails["forAfterDraw"], function (c, DTOrderChange) {
+                    let CellIndex = m.footerFields[m.containerId][m.tableInfo.TableId]["columnsName"][DTOrderChange.cellName];
                     if (DTOrderChange) {
-                        $.each(DTOrderChange["CellFuncArray"], function (kf, CellFunc) {
+                        $.each(DTOrderChange["functions"], function (kf, CellFunc) {
                             if (CellFunc) {
                                 let fnName = CellFunc.funcName + "AfterDraw";
                                 if (typeof self[fnName] === "function") {
-                                    self[fnName](CellIndex, CellFunc, m.totalFunctionDetails["orderChange"], m.thisColumnDefs, m.tableInfo);
+                                    self[fnName](CellIndex, CellFunc, m.totalFunctionDetails["forAfterDraw"], m.thisColumnDefs, m.tableInfo);
                                 }
                             }
                         });
                     }
                 });
-            }
+            }*/
+
             //CumulativeSumAfterDraw
             //console.log(m.footerFields);
             self.setFooter();
@@ -866,13 +638,13 @@ class gridBind {
             m.tableObject.columns([m.rowGrouping.rowNumber]).visible(false, false).draw(); //TO DO draw in serverSide re-call data..
     }
 
-    headerComplex(grid, CellName) {
+    headerComplex(grid, cellName) {
         let self = this, m = this.model;
         let res = { title: "", columnsToBeMerged: [] };
         $.each(grid.headerComplex, function (k, headerComplexData) {
             let columnsToBeMerged = headerComplexData.columnsToBeMerged;
             let title = headerComplexData.title;
-            if (columnsToBeMerged.includes(CellName)) {
+            if (columnsToBeMerged.includes(cellName)) {
                 res = { title: title, columnsToBeMerged: columnsToBeMerged };
                 return false;
             }
@@ -907,55 +679,6 @@ class gridBind {
         $("." + m.containerId + "GridContent").removeClass("SGV_ActiveTabContent");
         $("#" + m.thisTabId).addClass("SGV_ActiveTabTitle").css("display", "").html(m.thisTabTitle);
         $("#" + m.thisTabContentId).addClass("SGV_ActiveTabContent").css("display", "");
-    }
-
-    addFunctionsToColumns(self = this, m = this.model) {
-        if (m.totalFunctionDetails["createdCell"].length > 0) {
-            let UniqueFunctionCallCheckArray = []; //اگر این آرایه نباشد هر تابع محاسبه دوبار خوانده میشود
-            $.each(m.totalFunctionDetails["createdCell"], function (k, v) {
-                let cellIndex = m.footerFields[m.containerId][m.thisTableId]["columnsName"][v.CellName];
-                if (v) {
-                    m.thisColumnDefs.push({
-                        targets: cellIndex,
-                        createdCell: function (td, cellData, rowData, RowIndex, c) {
-                            let ThisCellNewData = cellData;
-                            $.each(v["CellFuncArray"], function (kf, FuncArray) {
-                                let fnName = FuncArray.funcName //+ "_ServerCall_SGV";
-                                //let UniqueFunctionCallCheck = m.containerId + m.thisTableId + v.CellName + tmp + RowIndex + cellIndex + "-" + kf;
-                                let UniqueFunctionCallCheck = m.containerId + m.thisTableId + v.CellName + RowIndex + cellIndex + "-" + kf;
-                                UniqueFunctionCallCheckArray = UniqueFunctionCallCheckArray == null ? [] : UniqueFunctionCallCheckArray;;
-                                if (UniqueFunctionCallCheckArray.includes(UniqueFunctionCallCheck) == false) {
-                                    UniqueFunctionCallCheckArray.push(UniqueFunctionCallCheck);
-
-                                    let tbodyCheck = ["TextFeature", "Separator"].includes(FuncArray.funcName);
-                                    let section = parseInt(FuncArray.section);
-
-                                    if (typeof self[fnName] === "function") {
-                                        if ((tbodyCheck === true && section == 1) || tbodyCheck === false) {
-                                            let cellInfo = {
-                                                td: td,
-                                                cellData: ThisCellNewData,
-                                                rowData: rowData,
-                                                funcArray: FuncArray,
-                                                cellName: v.CellName
-                                            };
-                                            let tmp = self[fnName](cellInfo);
-                                            ThisCellNewData = tmp[0];
-                                            let ThisTDNewData = tmp[1];
-
-                                            $(td).html(ThisTDNewData);
-                                        }
-                                    }
-                                    rowData[v.CellName] = $("<span>" + ThisCellNewData + "</span>").text();
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-            UniqueFunctionCallCheckArray = null;
-        }
-        return m.thisColumnDefs;
     }
 
     getDefaultOptions(self = this, m = this.model) {
@@ -1095,9 +818,9 @@ class gridBind {
         if (m.grid.customizeButtons) {
             for (const [k, btnArray] of Object.entries(m.grid.customizeButtons)) {
                 if (btnArray.javascriptMethodName == null || btnArray.javascriptMethodName.trim() == "") {
-                    self.errorMessage("CustomizeButtonJsUnDefine", btnArray.javascriptMethodName);
+                    errorLogs.log("CustomizeButtonJsUnDefine", btnArray.javascriptMethodName);
                 } else if (btnArray.buttonName == null || btnArray.buttonName == 0) {
-                    self.errorMessage("CustomizeButtonNameUnDefine", btnArray.buttonName);
+                    errorLogs.log("CustomizeButtonNameUnDefine", btnArray.buttonName);
                 } else {
                     customButton(btnArray);
                 }
@@ -1123,7 +846,7 @@ class gridBind {
                 }
 
             } else {
-                self.errorMessage("CustomizeButtonJsFunNotFound", btnArray.javascriptMethodName);
+                errorLogs.log("CustomizeButtonJsFunNotFound", btnArray.javascriptMethodName);
             }
         }
         //-End---customizeButtons-------
@@ -1318,22 +1041,403 @@ class gridBind {
         });
     }
 
-    static errorMessage(errorKey, otherInfo = null) {
-        let errorArray = {
-            CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
-            CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
-            VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
-            TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد",
-            CustomizeButtonJsFunNotFound: "در قسمت سفارشی سازی دکمه های گرید یک متد جاوااسکریپت با یک نام تعریف شده که در صفحه شما وجود ندارد",
-            CustomizeButtonJsUnDefine: "در قسمت سفارشی سازی دکمه های گرید متد جاوااسکریپت بدون مقدار تعریف شده",
-            CustomizeButtonNameUnDefine: "در قسمت سفارشی سازی دکمه های گرید نام دکمه بدون مقدار تعریف شده"
-        };
-        if (otherInfo)
-            console.log(errorArray[errorKey], otherInfo);
-        else
-            console.log(errorArray[errorKey]);
-    }
     //#endregion
+}
+
+class sapGridViewFunctions {
+    totalFunctionDetails = null;
+    footerFields = null;
+    containerId = null;
+    thisTableId = null;
+    mainColumnsName = null;
+    //thisColumnDefs = null;
+    //#region functions in columns -> use for addFunctionsToColumns method
+
+    add(totalFunctionDetails, footerFields, containerId, thisTableId, mainColumnsName) {
+        self = this;
+        self.totalFunctionDetails = totalFunctionDetails;
+        self.footerFields = footerFields;
+        self.containerId = containerId;
+        self.thisTableId = thisTableId;
+        self.mainColumnsName = mainColumnsName;
+
+        let thisColumnDefs = [];
+        console.log("addFunctionsToColumns start");
+
+        if (self.totalFunctionDetails["forRender"].length > 0) {
+
+            $.each(self.totalFunctionDetails["forRender"], function (k, v) {
+                //console.log(v);
+                if (v) {
+                    let cellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][v.cellName];
+                    thisColumnDefs.push({
+                            targets: [cellIndex],
+                            render: function (cellData, type, rowData, meta) {
+                                let rowIndex = meta.row;
+                                let colIndex = meta.col;
+                                let thisCellNewData = cellData;
+                                let uniqueKeyArray = []; //اگر این آرایه نباشد هر تابع محاسبه دوبار خوانده میشود
+                                $.each(v["functions"], function (kf, func) {
+                                    let fnName = func.funcName;
+                                    let uniqueKey = self.containerId + self.thisTableId + v.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
+                                    uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;
+                                    if (uniqueKeyArray.includes(uniqueKey) == false) {
+                                        uniqueKeyArray.push(uniqueKey);
+                                        let tbodyCheck = ["TextFeature", "Separator"].includes(func.funcName);
+                                        let section = parseInt(func.section);
+                                        if (typeof self[fnName] === "function") {
+                                            if ((tbodyCheck === true && section == 1) || tbodyCheck === false) {
+                                                let cellInfo = {
+                                                    td: thisCellNewData, //td,
+                                                    cellData: thisCellNewData,
+                                                    rowData: rowData,
+                                                    funcArray: func,
+                                                    cellName: v.cellName
+                                                };
+                                                cellData = self[fnName](cellInfo);
+
+                                                //let ThisTDNewData = tmp[1];
+                                                //$(td).html(ThisTDNewData);
+                                            }
+                                        }
+                                        rowData[v.cellName] = $("<span>" + cellData + "</span>").text();
+
+                                    }
+                                });
+                                return cellData;
+                            }
+                        }
+                    );
+                }
+            });
+
+        }
+        return thisColumnDefs;
+    }
+
+    /*addFunctionsToColumns2(self = this) {
+        console.log("addFunctionsToColumns2 start");
+        let d = [{
+            targets: [2],
+            render: function (cellData, type, rowData, meta) {
+                let rowIndex = meta.row;
+                let colIndex = meta.col;
+                console.log(rowIndex + "-" + colIndex)
+                return cellData;
+            }
+        }];
+
+        return d;
+    }
+
+    addFunctionsToColumns(self = this) {
+        console.log("addFunctionsToColumns start");
+        if (self.totalFunctionDetails["forRender"].length > 0) {
+            let uniqueKeyArray = []; //اگر این آرایه نباشد هر تابع محاسبه دوبار خوانده میشود
+            $.each(self.totalFunctionDetails["forRender"], function (k, v) {
+                let cellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][v.cellName];
+                if (v) {
+                    m.thisColumnDefs.push({
+                        targets: cellIndex,
+                        render: function (cellData, type, rowData, meta) {
+                            let rowIndex = meta.row;
+                            let colIndex = meta.col;
+                            //forRender: function (td, cellData, rowData, rowIndex, c) {
+                            let thisCellNewData = cellData;
+                            $.each(v["functions"], function (kf, FuncArray) {
+                                let fnName = FuncArray.funcName //+ "_ServerCall_SGV";
+                                //let uniqueKey = self.containerId + self.thisTableId + v.cellName + tmp + rowIndex + cellIndex + "-" + kf;
+                                let uniqueKey = self.containerId + self.thisTableId + v.cellName + rowIndex + cellIndex + "-" + kf;
+                                uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;;
+                                if (uniqueKeyArray.includes(uniqueKey) == false) {
+                                    uniqueKeyArray.push(uniqueKey);
+
+                                    let tbodyCheck = ["TextFeature", "Separator"].includes(FuncArray.funcName);
+                                    let section = parseInt(FuncArray.section);
+
+                                    if (typeof self[fnName] === "function") {
+                                        if ((tbodyCheck === true && section == 1) || tbodyCheck === false) {
+                                            let cellInfo = {
+                                                td: thisCellNewData, //td,
+                                                cellData: thisCellNewData,
+                                                rowData: rowData,
+                                                funcArray: FuncArray,
+                                                cellName: v.cellName
+                                            };
+                                            let tmp = self[fnName](cellInfo);
+                                            thisCellNewData = tmp[0];
+                                            let ThisTDNewData = tmp[1];
+
+                                            //$(td).html(ThisTDNewData);
+                                        }
+                                    }
+                                    rowData[v.cellName] = $("<span>" + thisCellNewData + "</span>").text();
+                                }
+                            });
+                            return thisCellNewData;
+                        }
+                    });
+                }
+            });
+            uniqueKeyArray = null;
+        }
+        return m.thisColumnDefs;
+    }
+    */
+
+
+    Separator(cellInfo, self = this) {
+        console.log("Separator start");
+        let ThisCellNewData = cellInfo.cellData;
+        if ([0, null, 'null', '0', '', ' ', undefined, NaN, 'undefined', 'NaN'].includes(ThisCellNewData) === false) {
+            ThisCellNewData = sapGridViewTools.strToFloat(ThisCellNewData);
+            if ([null, 0, 2].includes(parseInt(cellInfo.funcArray.section)) == false) {
+                let minFraction = 0;
+                let maxFraction = 0;
+                if (!Number.isInteger(ThisCellNewData)) {
+                    /*مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد*/
+                    minFraction = cellInfo.funcArray.minimumFractionDigits > cellInfo.funcArray.maximumFractionDigits ? cellInfo.funcArray.maximumFractionDigits : cellInfo.funcArray.minimumFractionDigits;
+                    maxFraction = cellInfo.funcArray.maximumFractionDigits;
+                    if (maxFraction > 1 && minFraction < 1) {
+                        minFraction = 2;
+                    }
+                    else if (maxFraction == 1) {
+                        ThisCellNewData = sapGridViewTools.strToFloat(Number(ThisCellNewData).toFixed(1));
+                        minFraction = 2;
+                        maxFraction = 2;
+                    }
+                }
+                ThisCellNewData = ThisCellNewData.toLocaleString(cellInfo.funcArray.locales, {
+                    minimumFractionDigits: minFraction,
+                    maximumFractionDigits: maxFraction
+                });
+            }
+        }
+        console.log(ThisCellNewData);
+        console.log(cellInfo.cellData);
+        console.log("-----------------------");
+        return ThisCellNewData;
+    }
+
+    TextFeature(cellInfo, self = this) {
+        let ThisCellNewData = cellInfo.cellData;
+        let ThisTDNewData = cellInfo.td;
+        if (cellInfo.funcArray.condition !== null) {
+            ThisTDNewData = cellInfo.cellData;
+            let condition = cellInfo.funcArray.condition;
+            let isTrueCssClass = cellInfo.funcArray.isTrueCssClass;
+            let isFalseCssClass = cellInfo.funcArray.isFalseCssClass;
+            let isTrueText = cellInfo.funcArray.isTrueText;
+            let isFalseText = cellInfo.funcArray.isFalseText;
+            let strReplace = cellInfo.funcArray.strReplace;
+            let numericCheckInText = cellInfo.funcArray.numericCheckInText;
+            let numericCheckInCondition = cellInfo.funcArray.numericCheckInCondition;
+            isTrueText = cellInfo.funcArray.isTrueText != null ? sapGridViewTools.customStrReplace(isTrueText, cellInfo.cellName, ThisCellNewData, true) : ThisCellNewData;
+            isFalseText = cellInfo.funcArray.isFalseText != null ? sapGridViewTools.customStrReplace(isFalseText, cellInfo.cellName, ThisCellNewData, true) : ThisCellNewData;
+            $.each(cellInfo.rowData, function (key, val) {
+                let valNumber = ["", undefined, NaN, null, 'undefined', 'NaN', 'null'].includes(sapGridViewTools.strToFloat(val)) == false && sapGridViewTools.strToFloat(val) ? sapGridViewTools.strToFloat(val) : val;
+                let vTest = numericCheckInText ? valNumber : val;
+                let vCondition = numericCheckInCondition ? valNumber : val;
+
+
+                if (cellInfo.funcArray.isTrueText !== null)
+                    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, vTest, true);
+                if (cellInfo.funcArray.isFalseText !== null)
+                    isFalseText = sapGridViewTools.customStrReplace(isFalseText, key, vTest, true);
+                condition = sapGridViewTools.customStrReplace(condition, key, vCondition, true);
+            });
+            if (eval(condition)) {
+                $.each(strReplace, function (key, val) {
+                    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, val);
+                });
+                //$(cellInfo.td).addClass(isTrueCssClass); //forRender 1
+                //ThisTDNewData = isTrueText; //forRender 2
+
+                ThisTDNewData = "<span class='" + isTrueCssClass + "'>" + isTrueText + "</span>"; //render
+            } else {
+                //$(cellInfo.td).addClass(isFalseCssClass); //forRender 1
+                //ThisTDNewData = isFalseText; //forRender 2
+
+                ThisTDNewData = "<span class='" + isTrueCssClass + "'>" + isFalseText + "</span>"; //render
+            }
+        } else {
+            errorLogs.log("TextFeatureConditionNotFound");
+        }
+        /*
+         * ThisCellNewData ممکن است با تغییر دیتای اصلی
+         *مشکلی ایجاد شود مثلا  برای اعداد منفی
+         * پرانتز بگذاریم یا متن را تبدیل به تگ اچ تی ام ال کنیم
+         */
+        //if (cellInfo.funcArray.changeOriginalData == true)
+        ThisCellNewData = ThisTDNewData;
+        return ThisCellNewData;
+    }
+
+    MiladiToJalali(cellInfo, self = this) {
+        let ThisCellNewData = cellInfo.cellData;
+        if (["", " ", undefined, NaN, null, 'undefined', 'NaN', 'null', "-"].includes(ThisCellNewData) === false) {
+            ThisCellNewData = ThisCellNewData.toString();
+            let ThisDate = ThisCellNewData ? ThisCellNewData.trim() : "";
+            ThisDate = ThisDate.replace(/-/g, "/").split('.')[0];
+            ThisDate = ThisDate.replace("T", " ");
+            if (sapGridViewTools.isValidDate(ThisDate)) {
+                let dateTime = new Date(Date.parse(ThisDate));
+                let j = jalaliConvert.gregorianToJalali(new Array(
+                    dateTime.getFullYear(),
+                    dateTime.getMonth() + 1,
+                    dateTime.getDate()
+                ));
+                let hour = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getHours()).slice(-2) : dateTime.getHours();
+                let minute = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getMinutes()).slice(-2) : dateTime.getMinutes();
+                let second = cellInfo.funcArray.zeroPad && cellInfo.funcArray.zeroPad == true ? ("0" + dateTime.getSeconds()).slice(-2) : dateTime.getSeconds();
+                switch (cellInfo.funcArray.outPut) {
+                    case 0: //TimeOnly
+                        ThisCellNewData = hour + ":" + minute;
+                        break;
+                    case 1: //DateOnly
+                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2];
+                        break;
+                    case 2: //FullDate
+                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute;
+                        break;
+                    case 3: //TimeOnlyWithSecond
+                        ThisCellNewData = hour + ":" + minute + ":" + second;
+                        break;
+                    case 4: //FullDateWithSecond
+                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute + ":" + second;
+                        break;
+                    default:
+                        ThisCellNewData = j[0] + "/" + j[1] + "/" + j[2] + " " + hour + ":" + minute + ":" + second;
+                }
+            }
+        }
+        return ThisCellNewData;
+    }
+
+    Calc(cellInfo, self = this) {
+        let ThisCellNewData = cellInfo.cellData;
+        let tmpFormula = cellInfo.funcArray.formula;
+        let tmpOperator = cellInfo.funcArray.operator;
+        let CellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][cellInfo.cellName];
+        self.footerFields[self.containerId][self.thisTableId].hasThead = parseInt(cellInfo.funcArray.section) === 0 && self.footerFields[self.containerId][self.thisTableId].hasThead === 0 ? 1 : self.footerFields[self.containerId][self.thisTableId].hasThead;
+        self.footerFields[self.containerId][self.thisTableId].hasTfoot = parseInt(cellInfo.funcArray.section) === 2 && self.footerFields[self.containerId][self.thisTableId].hasTfoot === 0 ? 1 : self.footerFields[self.containerId][self.thisTableId].hasTfoot;
+        if (parseInt(cellInfo.funcArray.section) === 1) {
+            $.each(cellInfo.rowData, function (key, val) {
+                valNumber = val;
+                if (cellInfo.funcArray.numericCheck == true)
+                    valNumber = sapGridViewTools.strToFloat(val);
+                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
+            });
+            try {
+                ThisCellNewData = eval(tmpFormula);
+            } catch (e) {
+                if (e instanceof SyntaxError) {
+                    console.log(e.message);
+                    console.log("-------------------------");
+                }
+            }
+        }
+        if ([0, 2].includes(parseInt(cellInfo.funcArray.section)) == true && tmpOperator == 0 && cellInfo.funcArray.formula == null) {//verticalSum
+            self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["name"] = cellInfo.cellName;
+            self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"] = sapGridViewTools.strToFloat(self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"]);
+            self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"] += sapGridViewTools.strToFloat(ThisCellNewData);
+        } else if ([0, 2].includes(parseInt(cellInfo.funcArray.section)) == false && tmpOperator == 0 && cellInfo.funcArray.formula == null) {
+            errorLogs.log("VerticalSumWithoutSelectFooterSection");
+        }
+        return ThisCellNewData;
+    }
+
+    OnClick(cellInfo, self = this) {
+        let rowAllData = {};
+        rowAllData["FuncArray"] = cellInfo.funcArray;
+        rowAllData["RowData"] = cellInfo.rowData;
+        rowAllData["MainColumnsName"] = self.mainColumnsName;
+        let ThisRowData = JSON.stringify(rowAllData);
+        ThisRowData = sapGridViewTools.base64Encode(ThisRowData);
+        let cssClass = cellInfo.funcArray.cssClass ? cellInfo.funcArray.cssClass : "btn btn-link text-danger p-0 m-0";
+        let webMethodName = cellInfo.funcArray.webMethodName ? cellInfo.funcArray.webMethodName : "SapGridEvent";
+        let hrefLink = cellInfo.funcArray.hrefLink ? cellInfo.funcArray.hrefLink : "javascript:void(0)";
+        let javaScriptMethodName = cellInfo.funcArray.javaScriptMethodName ? cellInfo.funcArray.javaScriptMethodName : null;
+        let nextTabTitle = cellInfo.funcArray.nextTabTitle ? cellInfo.funcArray.nextTabTitle : "";
+        let httpRequestType = cellInfo.funcArray.httpRequestType ? parseInt(cellInfo.funcArray.httpRequestType) : 0;
+        let ThisCellNewData = cellInfo.cellData;
+        if (parseInt(cellInfo.funcArray.section) == 1 && cellInfo.funcArray.enable == true) {
+            switch (httpRequestType) {
+                case 0:
+                    //Ajax
+                    ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellInfo.cellName + "' data-containerid='" + self.containerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "' onclick='sapGridViewOnClick.ajaxClick(this)'>" + cellInfo.cellData + "</a>";
+                    break;
+                case 1:
+                    //PageLink
+                    ThisCellNewData = "<a class='" + cssClass + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "' href='" + hrefLink + "'>" + cellInfo.cellData + "</a>";
+                    break;
+                case 2:
+                    //CallJavaScriptMethod
+                    ThisCellNewData = "<a class='" + cssClass + "' data-javascriptmethod='" + javaScriptMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "' onclick='sapGridViewOnClick.callJavaScriptMethodClick(this)'>" + cellInfo.cellData + "</a>";
+                    break;
+                default:
+                    ThisCellNewData = "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellInfo.cellName + "' data-containerid='" + self.containerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "' onclick='sapGridViewOnClick.ajaxClick(this)'>" + cellInfo.cellData + "</a>";
+                /*ThisCellNewData = cellInfo.cellData;
+                //PostBack type
+                //ThisCellNewData = '<a id="cphMain_SapGrid" href="javascript:__doPostBack(\'ctl00$cphMain$SapGrid\',\'\')">ssssssss</a>';
+                ThisCellNewData = "<a class='" + cssClass + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "'  onclick='sapGridViewOnClick.postBackClick(this)'>" + cellInfo.cellData + "</a>";
+                break;*/
+            }
+        }
+        return ThisCellNewData;
+    }
+
+    SAPCheckBox(cellInfo, self = this) {
+        let rowAllData = {};
+        rowAllData["FuncArray"] = cellInfo.funcArray;
+        rowAllData["RowData"] = cellInfo.rowData;
+        let ThisRowData = JSON.stringify(rowAllData);
+        ThisRowData = sapGridViewTools.base64Encode(ThisRowData);
+        let cssClass = cellInfo.funcArray.cssClass ? cellInfo.funcArray.cssClass : "btn btn-link text-danger p-0 m-0";
+        let webMethodName = cellInfo.funcArray.webMethodName ? cellInfo.funcArray.webMethodName : "SapGridEvent";
+        let ThisCellNewData = cellInfo.cellData;
+        if (cellInfo.funcArray.enable == true) {
+            ThisCellNewData = "<input type='checkbox' class='" + cssClass + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + self.thisTableId + "' onclick='SAPCheckBoxClick_SGV(this)' >" + cellInfo.cellData;
+        }
+        return ThisCellNewData;
+    }
+
+    CumulativeSum(cellInfo, self = this) {
+        let ThisCellNewData = cellInfo.cellData;
+        let CellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][cellInfo.cellName];
+        if (cellInfo.funcArray.sourceField && cellInfo.funcArray.sourceField !== null) {
+            let tmpFormula = cellInfo.funcArray.sourceField;
+            $.each(cellInfo.rowData, function (key, val) {
+                let valNumber = sapGridViewTools.strToFloat(val);
+                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
+            });
+            self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["cumulative"] += eval(tmpFormula);
+            ThisCellNewData = self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["cumulative"];
+        } else
+            errorLogs.log("CumulativeSumSourceFieldNotFound");
+        return ThisCellNewData;
+    }
+
+    //--AfterDraw-----------------------
+    CumulativeSumAfterDraw(CellIndex, CellFunc, DTOrderChangeFunctions, ThisColumnDefs, TableInfo) {
+        console.log("CumulativeSumAfterDraw");
+        var sum = 0;
+        TableInfo.TableObject.column(CellIndex).rows({ order: 'applied', filter: 'applied', search: 'applied' }).indexes().each(function (rowIndex, i, allFilteredIndexes) {
+            var tmpFormula = CellFunc.sourceField;
+            $.each(TableInfo.Columns, function (cIndex, cArray) {
+                var cName = cArray.data;
+                var cValue = TableInfo.TableObject.cell(rowIndex, cIndex).data();
+                cValue = sapGridViewTools.strToFloat(cValue);
+                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, cName, cValue, true);
+            });
+            var v = eval(tmpFormula);
+            sum += v;
+            TableInfo.TableObject.cell(rowIndex, CellIndex).data(sum.toLocaleString(undefined, { maximumFractionDigits: 3 }));
+        });
+    }
+
+    //#endregion
+
 }
 
 class sapGridViewTools {
@@ -1483,7 +1587,7 @@ class sapGridViewOnClick {
         let gridParameters = sapGridViewTools.base64Decode($("#" + ThisTableID).attr("data-gridparameters"));
         let callBackData = {
             GridParameters: JSON.parse(gridParameters),
-            TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, CellName: cellName },
+            TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, cellName: cellName },
             RowData: sapGridViewTools.copyAndCamelCaseIgnore(rowData, cData.MainColumnsName),
             FuncArray: cData.FuncArray
         };
@@ -1607,13 +1711,13 @@ class gridModel {
     tableInfo = {};
     gridArray = {};
     functionsList = {
-        CumulativeSum: { FuncListBuild: ["createdCell", "orderChange"] },
-        Calc: { FuncListBuild: ["createdCell"] },
-        MiladiToJalali: { FuncListBuild: ["createdCell"] },
-        Separator: { FuncListBuild: ["createdCell"] },
-        SAPCheckBox: { FuncListBuild: ["createdCell"] },
-        OnClick: { FuncListBuild: ["createdCell"] },
-        TextFeature: { FuncListBuild: ["createdCell"] }
+        CumulativeSum: { FuncListBuild: ["forRender", "forAfterDraw"] },
+        Calc: { FuncListBuild: ["forRender"] },
+        MiladiToJalali: { FuncListBuild: ["forRender"] },
+        Separator: { FuncListBuild: ["forRender"] },
+        SAPCheckBox: { FuncListBuild: ["forRender"] },
+        OnClick: { FuncListBuild: ["forRender"] },
+        TextFeature: { FuncListBuild: ["forRender"] }
     };
     footerFields = {}; // { hasTfoot: 0, columns: {}, columnsName: {} };
     headerFields = {}; //{ hasThead: 0, columns: {}, columnsName: {} };
@@ -1645,8 +1749,8 @@ class gridModel {
             rowGrouping: false
         };
         m.totalFunctionDetails = {
-            createdCell: [],
-            orderChange: []
+            forRender: [],
+            forAfterDraw: []
         };
         m.footerFields[m.containerId] = {};
         m.headerFields[m.containerId] = {};
@@ -1838,5 +1942,23 @@ class jalaliConvert {
             today.getDate()
         ));
         return j[0] + "/" + j[1] + "/" + j[2];
+    }
+}
+
+class errorLogs {
+    static log(errorKey, otherInfo = null) {
+        let errorArray = {
+            CumulativeSumSourceFieldNotFound: "در متد جمع انباشته ستونی برای مقدار اولیه انتخاب نشده",
+            CumulativeSumSourceFieldNotFoundInRowData: "در متد جمع انباشته ستونی که برای مقدار اولیه انتخاب شده در اطلاعات سطر وجود ندارد",
+            VerticalSumWithoutSelectFooterSection: "در گرید جمع سطرهای یک ستون انتخاب شده ولی قسمت فوتر انتخاب نشده",
+            TextFeatureConditionNotFound: "در گرید تغییر متن فیلد خواسته شده ولی شرطی وجود ندارد",
+            CustomizeButtonJsFunNotFound: "در قسمت سفارشی سازی دکمه های گرید یک متد جاوااسکریپت با یک نام تعریف شده که در صفحه شما وجود ندارد",
+            CustomizeButtonJsUnDefine: "در قسمت سفارشی سازی دکمه های گرید متد جاوااسکریپت بدون مقدار تعریف شده",
+            CustomizeButtonNameUnDefine: "در قسمت سفارشی سازی دکمه های گرید نام دکمه بدون مقدار تعریف شده"
+        };
+        if (otherInfo)
+            console.log(errorArray[errorKey], otherInfo);
+        else
+            console.log(errorArray[errorKey]);
     }
 }
