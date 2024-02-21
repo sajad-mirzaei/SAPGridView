@@ -30,39 +30,62 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 GridTitle = "گزارش تست 1",
                 Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
                 Columns = new List<Column>() {
-                new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
-                new Column { Data = "a", Title = "aa",
-                    Functions = {
-                        new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
-                        new Separator { Section = Function.SectionValue.Tfoot }
+                    new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
+                    new Column { Data = "a", Title = "aa",
+                        Functions = {
+                            new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
+                            new Separator { Section = Function.SectionValue.Tfoot }
+                        }
+                    },
+                    new Column { Data = "v2", Title = "vv2", DefaultContent = "vv2", Visible = false },
+                    new Column { Data = "CumulativeTest1", Title = "CumulativeSum(aa)", DefaultContent = "", CssClass = "ltr",
+                        Functions = {
+                            new CumulativeSum { Section = Function.SectionValue.Tbody, SourceField = "a" }
+                        }
+                    },
+                    new Column { Data = "aplusOne", Title = "aplusOne", DefaultContent = "",
+                        Functions = {
+                            new Calc()
+                            {
+                                Section = Function.SectionValue.Tbody,
+                                Formula = "a + 1"
+                            }
+                        }
+                    },
+                    new Column { Data = "b", Title = "bb",
+                        Functions =
+                        {
+                            new TextFeature(){ Section = Function.SectionValue.Tbody, Condition = "1==1", IsTrueCssClass = "text-warning"}
+                        }
+                    },
+                    new Column { Data = "c", Title = "cc",
+                        Functions = {
+                            new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
+                        }
+                    },
+                    new Column { Data = "d", Title = "dd" },
+                    new Column { Data = "e", Title = "ee",
+                        Functions = {
+                            new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
+                        }
+                    },
+                    new Column { Data = "f", Title = "ff",
+                        Functions =
+                        {
+                            new TextFeature(){ Section = Function.SectionValue.Tbody, Condition = "1==1", IsTrueCssClass = "text-info"}
+                        }
+                    },
+                    new Column { Data = "g", Title = "gg", DefaultContent = "1",
+                        Functions =
+                        {
+                            new Calc()
+                            {
+                                Section = Function.SectionValue.Tbody,
+                                Formula = "a + 1"
+                            }
+                        }
                     }
-                },
-                new Column { Data = "v2", Title = "vv2", DefaultContent = "vv2", Visible = false },
-                new Column { Data = "CumulativeTest1", Title = "CumulativeSum(aa)", DefaultContent = "", CssClass = "ltr",
-                    Functions = {
-                        new CumulativeSum { Section = Function.SectionValue.Tbody, SourceField = "a" }
-                    }
-                },
-                new Column { Data = "b", Title = "bb" },
-                new Column { Data = "c", Title = "cc",
-                    Functions = {
-                        new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
-                    }
-                },
-                new Column { Data = "d", Title = "dd" },
-                new Column { Data = "e", Title = "ee",
-                    Functions = {
-                        new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum }
-                    }
-                },
-                new Column { Data = "f", Title = "ff",
-                    Functions =
-                    {
-                        new TextFeature(){ Section = Function.SectionValue.Tbody, Condition = "1==1", IsTrueCssClass = "text-info"}
-                    }
-
                 }
-            }
             };
             return oSGV;
         }

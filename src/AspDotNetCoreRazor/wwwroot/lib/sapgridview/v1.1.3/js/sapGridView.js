@@ -68,6 +68,7 @@ class gridBind {
         this.firstBind();
         this.setGridArray();
         this.actionsAtEndOfBind();
+        new sapGridViewFunctions().callAfterDrawFunctions(this.model);
     }
     //#endregion
 
@@ -112,10 +113,8 @@ class gridBind {
                         //    self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex] = {};
                         if (m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex] == undefined)
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex] = {};
-                        if (FuncArray.funcName == "CumulativeSum") {
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["cumulative"] = 0;
-                            m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["cumulative"] = 0;
-                        } else if (["OnClick", "Calc"].includes(FuncArray.funcName) && sectionValue.isFooterOrHeader(FuncArray.section)) {
+
+                        if (["OnClick", "Calc"].includes(FuncArray.funcName) && sectionValue.isFooterOrHeader(FuncArray.section)) {
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["footerValue"] = 0;
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = cellName;
                             //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["tfootOnClick"] = true;
@@ -170,6 +169,9 @@ class gridBind {
         m.totalFunctionDetails["forRender"] = m.totalFunctionDetails["forRender"].filter(function (el) {
             return el != null;
         });
+        m.totalFunctionDetails["forCreatedCell"] = m.totalFunctionDetails["forCreatedCell"].filter(function (el) {
+            return el != null;
+        });
         m.totalFunctionDetails["forAfterDraw"] = m.totalFunctionDetails["forAfterDraw"].filter(function (el) {
             return el != null;
         });
@@ -205,7 +207,7 @@ class gridBind {
     }
 
     setDefaultOptions(self = this, m = this.model) {
-        m.thisColumnDefs = new sapGridViewFunctions().add(m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName);
+        m.thisColumnDefs = new sapGridViewFunctions().add(m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName, m.tableObject);
         m.defaultOptions = self.getDefaultOptions();
 
         m.defaultOptions["columnDefs"] = m.thisColumnDefs;
@@ -554,48 +556,11 @@ class gridBind {
 
     onDraw(self = this, m = this.model) {
         m.tableObject.on("draw", function (a, b, c, d) {
-            console.log("onDraw");
             if (m.grid.counterColumn == true)
                 self.counterColumn(m.tableInfo.TableObject);
-
-            if (m.totalFunctionDetails["forAfterDraw"].length > 0) {
-                $.each(m.totalFunctionDetails["forAfterDraw"], function (c, DTOrderChange) {
-                    let CellIndex = m.footerFields[m.containerId][m.tableInfo.TableId]["columnsName"][DTOrderChange.cellName];
-                    if (DTOrderChange) {
-                        $.each(DTOrderChange["functions"], function (kf, CellFunc) {
-                            if (CellFunc) {
-                                let fnName = CellFunc.funcName + "AfterDraw";
-                                if (typeof self[fnName] === "function") {
-                                    self[fnName](CellIndex, CellFunc, m.tableInfo);
-                                }
-                            }
-                        });
-                    }
-                });
-            }/**/
-
-            //CumulativeSumAfterDraw
-
+            new sapGridViewFunctions().callAfterDrawFunctions(m);
             if (m.grid.serverSide == true) self.setFooter();
-
-
-            console.log(m.tableObject.cell(1, 1).data());
-            //m.tableObject.cell(1, 1).data(111111111111);
-            //console.log(m.tableInfo.TableObject.cell(1, 1).data());
-            console.log("----------------------------");
-
         });//.draw();
-        /*let t = 0
-        m.tableObject.on("draw", function () {
-        if (t > 0) {
-        //ServerSideGridBind(m.mainData, m.gridName, m.grid, m.level, m.gridFirstText, self.customData);
-        if (m.grid.serverSide) {
-        self.setDefaultOptions(self, m);
-        }
-        //self.onDrawSetFooter();
-        }
-        t = 1;
-        });*/
     }
 
     creatingUserSideFunctions(self = this, m = this.model) {
@@ -856,110 +821,112 @@ class gridBind {
         return DefaultOptions;
     }
 
-    /*onDrawSetFooter(self = this, m = this.model) {
-    let ThisFooter = $("#" + m.tableInfo["TableId"]).closest(".dataTables_wrapper").find(".dataTables_scrollFoot");
-    ThisFooter.find(".DT_TrTfootCalc").find("th").html("");
-    let showFooter = false;
-    let ContainerId = m.tableInfo.ContainerId;
-    let ColumnNumberIncludingStatus = 0;
-    $.each(self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns, function (CellIndex, cell) {
-    if (m.tableInfo.Columns[CellIndex].visible === true) {
-    let ThisValue = cell.footerValue;
-    let ThisDisplayValue = "";
-    let ThisVal_OpenTag = "";
-    let ThisVal_CloseTag = "";
-    let ItemCss = m.tableInfo.Columns[CellIndex].className;
-    let cellName = cell.name;
-    let tdTitle = "";
-    $.each(m.tableInfo.Columns[CellIndex].functions, function (k, FuncArray) {
-    if ([2].includes(parseInt(FuncArray.section))) {
-    if (FuncArray.funcName == "Calc" && FuncArray.formula == null && FuncArray.operator == 0) {
-    
-    // Total over all pages
-    let total = m.tableInfo.TableAPI
-    .column(CellIndex)
-    .data()
-    .reduce(function (a, b) {
-    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
-    }, 0);
-    
-    // Total over this page
-    let pageTotal = m.tableInfo.TableAPI
-    .column(CellIndex, { page: 'current' })
-    .data()
-    .reduce(function (a, b) {
-    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
-    }, 0);
-    
-    // Total over filter
-    let pageFilter = m.tableInfo.TableAPI
-    .column(CellIndex, { filter: 'applied' })
-    .data()
-    .reduce(function (a, b) {
-    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
-    }, 0);
-    
-    
-    tdTitle += "جمع این صفحه: ";
-    tdTitle += pageTotal.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-    tdTitle += "\nجمع فیلتر شده ها: ";
-    tdTitle += pageFilter.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-    tdTitle += "\nجمع کل: ";
-    tdTitle += total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-    ThisValue = pageFilter;
-    //$(m.tableInfo.TableAPI.column(CellIndex).footer()).html('$' + pageTotal + ' ( $' + total + ' total)');
+    /*
+    onDrawSetFooter(self = this, m = this.model) {
+        let ThisFooter = $("#" + m.tableInfo["TableId"]).closest(".dataTables_wrapper").find(".dataTables_scrollFoot");
+        ThisFooter.find(".DT_TrTfootCalc").find("th").html("");
+        let showFooter = false;
+        let ContainerId = m.tableInfo.ContainerId;
+        let ColumnNumberIncludingStatus = 0;
+        $.each(self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns, function (CellIndex, cell) {
+            if (m.tableInfo.Columns[CellIndex].visible === true) {
+                let ThisValue = cell.footerValue;
+                let ThisDisplayValue = "";
+                let ThisVal_OpenTag = "";
+                let ThisVal_CloseTag = "";
+                let ItemCss = m.tableInfo.Columns[CellIndex].className;
+                let cellName = cell.name;
+                let tdTitle = "";
+                $.each(m.tableInfo.Columns[CellIndex].functions, function (k, FuncArray) {
+                    if ([2].includes(parseInt(FuncArray.section))) {
+                        if (FuncArray.funcName == "Calc" && FuncArray.formula == null && FuncArray.operator == 0) {
+
+                            // Total over all pages
+                            let total = m.tableInfo.TableAPI
+                                .column(CellIndex)
+                                .data()
+                                .reduce(function (a, b) {
+                                    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
+                                }, 0);
+
+                            // Total over this page
+                            let pageTotal = m.tableInfo.TableAPI
+                                .column(CellIndex, { page: 'current' })
+                                .data()
+                                .reduce(function (a, b) {
+                                    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
+                                }, 0);
+
+                            // Total over filter
+                            let pageFilter = m.tableInfo.TableAPI
+                                .column(CellIndex, { filter: 'applied' })
+                                .data()
+                                .reduce(function (a, b) {
+                                    return sapGridViewTools.strToFloat(a) + sapGridViewTools.strToFloat(b);
+                                }, 0);
+
+
+                            tdTitle += "جمع این صفحه: ";
+                            tdTitle += pageTotal.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+                            tdTitle += "\nجمع فیلتر شده ها: ";
+                            tdTitle += pageFilter.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+                            tdTitle += "\nجمع کل: ";
+                            tdTitle += total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+                            ThisValue = pageFilter;
+                            //$(m.tableInfo.TableAPI.column(CellIndex).footer()).html('$' + pageTotal + ' ( $' + total + ' total)');
+                        }
+                        else if (FuncArray.funcName == "Separator" && ThisValue !== undefined) {
+                            ThisDisplayValue = sapGridViewTools.strToFloat(ThisValue).toLocaleString(FuncArray.locales, { minimumFractionDigits: FuncArray.minimumFractionDigits, maximumFractionDigits: FuncArray.maximumFractionDigits });
+                        }
+                        else if (FuncArray.funcName == "TextFeature" && FuncArray.condition != null) {
+
+                            let condition = FuncArray.condition;
+                            let isTrueCssClass = FuncArray.isTrueCssClass;
+                            let isFalseCssClass = FuncArray.isFalseCssClass;
+                            let isTrueText = FuncArray.isTrueText;
+                            let isFalseText = FuncArray.isFalseText;
+                            let strReplace = FuncArray.strReplace;
+                            $.each(self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns, function (key, val) {
+                                let footerValue = [undefined, NaN, null, 'undefined', 'NaN', 'null', 'false', false, ""].includes(val["footerValue"]) == false ? val["footerValue"] : 0;
+                                let columnName = [undefined, NaN, null, 'undefined', 'NaN', 'null', 'false', false, ""].includes(val["name"]) == false ? val["name"] : false;
+                                condition = sapGridViewTools.customStrReplace(condition, columnName, footerValue, true);
+                                footerValue = columnName == cellName && ThisDisplayValue !== "" ? ThisDisplayValue : footerValue;
+                                isTrueText = sapGridViewTools.customStrReplace(isTrueText, columnName, footerValue, true);
+                                isFalseText = sapGridViewTools.customStrReplace(isFalseText, columnName, footerValue, true);
+                            });
+                            if (eval(condition)) {
+                                $.each(strReplace, function (key, val) {
+                                    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, val);
+                                });
+                                ThisDisplayValue = [null, undefined, NaN, "", "null"].includes(isTrueText) === false ? isTrueText : ThisValue;
+                                ItemCss = [null, undefined, NaN, 'undefined', 'NaN', 'null', ""].includes(isTrueCssClass) === false ? isTrueCssClass : ItemCss;
+                            } else {
+                                ThisDisplayValue = [null, undefined, NaN, "", "null"].includes(isFalseText) === false ? isFalseText : ThisValue;
+                                ItemCss = [null, undefined, NaN, 'undefined', 'NaN', 'null', ""].includes(isFalseCssClass) === false ? isFalseCssClass : ItemCss;
+                            }
+                        }
+                        self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns[CellIndex]["footerValue"] = ThisValue;
+                    }
+                });
+                let TempThisVal = ThisDisplayValue !== "" ? ThisVal_OpenTag + ThisDisplayValue + ThisVal_CloseTag : ThisVal_OpenTag + ThisValue + ThisVal_CloseTag;
+                let TdId = "Footer_" + m.tableInfo.TableId + "_" + cell.name; //dataTables_scrollFoot
+                if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
+                    $(".dataTables_scrollFoot #" + TdId).html(TempThisVal);
+                    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(TempThisVal);
+                    $(".dataTables_scrollFoot #" + TdId).attr("title", tdTitle);
+                    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").attr("title", tdTitle);
+                    //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); after a column to be false visible, not Work
+                }
+                if (ItemCss != "") {
+                    $(".dataTables_scrollFoot #" + TdId).addClass(ItemCss);
+                    //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).addClass(ItemCss); after a column to be false visible, not Work
+                }
+                showFooter = true;
+                ColumnNumberIncludingStatus++;
+            }
+        });
     }
-    else if (FuncArray.funcName == "Separator" && ThisValue !== undefined) {
-    ThisDisplayValue = sapGridViewTools.strToFloat(ThisValue).toLocaleString(FuncArray.locales, { minimumFractionDigits: FuncArray.minimumFractionDigits, maximumFractionDigits: FuncArray.maximumFractionDigits });
-    }
-    else if (FuncArray.funcName == "TextFeature" && FuncArray.condition != null) {
-    
-    let condition = FuncArray.condition;
-    let isTrueCssClass = FuncArray.isTrueCssClass;
-    let isFalseCssClass = FuncArray.isFalseCssClass;
-    let isTrueText = FuncArray.isTrueText;
-    let isFalseText = FuncArray.isFalseText;
-    let strReplace = FuncArray.strReplace;
-    $.each(self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns, function (key, val) {
-    let footerValue = [undefined, NaN, null, 'undefined', 'NaN', 'null', 'false', false, ""].includes(val["footerValue"]) == false ? val["footerValue"] : 0;
-    let columnName = [undefined, NaN, null, 'undefined', 'NaN', 'null', 'false', false, ""].includes(val["name"]) == false ? val["name"] : false;
-    condition = sapGridViewTools.customStrReplace(condition, columnName, footerValue, true);
-    footerValue = columnName == cellName && ThisDisplayValue !== "" ? ThisDisplayValue : footerValue;
-    isTrueText = sapGridViewTools.customStrReplace(isTrueText, columnName, footerValue, true);
-    isFalseText = sapGridViewTools.customStrReplace(isFalseText, columnName, footerValue, true);
-    });
-    if (eval(condition)) {
-    $.each(strReplace, function (key, val) {
-    isTrueText = sapGridViewTools.customStrReplace(isTrueText, key, val);
-    });
-    ThisDisplayValue = [null, undefined, NaN, "", "null"].includes(isTrueText) === false ? isTrueText : ThisValue;
-    ItemCss = [null, undefined, NaN, 'undefined', 'NaN', 'null', ""].includes(isTrueCssClass) === false ? isTrueCssClass : ItemCss;
-    } else {
-    ThisDisplayValue = [null, undefined, NaN, "", "null"].includes(isFalseText) === false ? isFalseText : ThisValue;
-    ItemCss = [null, undefined, NaN, 'undefined', 'NaN', 'null', ""].includes(isFalseCssClass) === false ? isFalseCssClass : ItemCss;
-    }
-    }
-    self.globalVariables[ContainerId][m.tableInfo["TableId"]].columns[CellIndex]["footerValue"] = ThisValue;
-    }
-    });
-    let TempThisVal = ThisDisplayValue !== "" ? ThisVal_OpenTag + ThisDisplayValue + ThisVal_CloseTag : ThisVal_OpenTag + ThisValue + ThisVal_CloseTag;
-    let TdId = "Footer_" + m.tableInfo.TableId + "_" + cell.name; //dataTables_scrollFoot
-    if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
-    $(".dataTables_scrollFoot #" + TdId).html(TempThisVal);
-    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(TempThisVal);
-    $(".dataTables_scrollFoot #" + TdId).attr("title", tdTitle);
-    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").attr("title", tdTitle);
-    //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); after a column to be false visible, not Work
-    }
-    if (ItemCss != "") {
-    $(".dataTables_scrollFoot #" + TdId).addClass(ItemCss);
-    //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).addClass(ItemCss); after a column to be false visible, not Work
-    }
-    showFooter = true;
-    ColumnNumberIncludingStatus++;
-    }
-    });
-    }*/
+    */
 
     clearAllFilters(TableObject, ThisTableID) {
         $("." + ThisTableID + "GeneralSearch").val("");
@@ -1034,36 +1001,57 @@ class sapGridViewFunctions {
     containerId = null;
     thisTableId = null;
     mainColumnsName = null;
+    tableObject = null;
+    cumulativeSum = 0;
     //thisColumnDefs = null;
     //#region functions in columns -> use for addFunctionsToColumns method
 
-    add(totalFunctionDetails, footerFields, containerId, thisTableId, mainColumnsName) {
+    //#region add main functions
+    add(totalFunctionDetails, footerFields, containerId, thisTableId, mainColumnsName, tableObject) {
         self = this;
         self.totalFunctionDetails = totalFunctionDetails;
         self.footerFields = footerFields;
         self.containerId = containerId;
         self.thisTableId = thisTableId;
         self.mainColumnsName = mainColumnsName;
-
+        self.tableObject = tableObject;
         let thisColumnDefs = [];
         if (self.totalFunctionDetails["forRender"].length > 0) {
             $.each(self.totalFunctionDetails["forRender"], function (k, forRender) {
                 thisColumnDefs.push(self.getRender(forRender));
             });
+            //CreatedCell not work in server side 
+            $.each(self.totalFunctionDetails["forCreatedCell"], function (k, forCreatedCell) {
+                thisColumnDefs.push(self.getCreatedCell(forCreatedCell));
+            });
         }
-        console.log(self.totalFunctionDetails["forRender"]);
-        console.log(thisColumnDefs);
         return thisColumnDefs;
     }
 
     getRender(forRender, self = this) {
         let cellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][forRender.cellName];
+        self.cumulativeSum = 0;
         return {
             targets: [cellIndex],
             render: function (cellData, type, rowData, meta) {
                 self.rowsStartReset(meta.row, meta.col);
-                cellData = self.getFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta);
+                cellData = self.getRenderFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta);
                 return cellData;
+            }
+        };
+    }
+
+    getCreatedCell(forCreatedCell, self = this) {
+        let cellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][forCreatedCell.cellName];
+        self.cumulativeSum = 0;
+        return {
+            targets: [cellIndex],
+            //CreatedCell not work in server side 
+            createdCell: function (td, cellData, rowData, row, col) {
+                self.rowsStartReset(row, cellIndex);//(forCreatedCell, cellIndex, rowIndex, cellData, rowData, self = this)
+                let thisTDNewData = self.getCreatedCellFunctionsChanges(forCreatedCell, cellIndex, cellData, null, rowData);
+                $(td).html(thisTDNewData);
+                return thisTDNewData;
             }
         };
     }
@@ -1071,19 +1059,17 @@ class sapGridViewFunctions {
     rowsStartReset(row, col, self = this) {
         if (row === 0) {
             self.footerFields[self.containerId][self.thisTableId].columns[col]["footerValue"] = 0;
-            self.footerFields[self.containerId][self.thisTableId].columns[col]["cumulative"] = 0;
-            ////console.log(self.footerFields[self.containerId][self.thisTableId]);
         }
     }
 
-    getFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta, self = this) {
-        let rowIndex = meta.row;
-        let colIndex = meta.col;
+    getCreatedCellFunctionsChanges(forCreatedCell, cellIndex, rowIndex, cellData, rowData, self = this) {
         let thisCellNewData = cellData;
         let uniqueKeyArray = [];
-        $.each(forRender["functions"], function (kf, func) {
+        //console.log(forCreatedCell["functions"]);
+        $.each(forCreatedCell["functions"], function (kf, func) {
             let fnName = func.funcName;
-            let uniqueKey = self.containerId + self.thisTableId + forRender.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
+            let uniqueKey = self.containerId + self.thisTableId + forCreatedCell.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
+            //console.log(uniqueKey);
             uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;
             if (uniqueKeyArray.includes(uniqueKey) == false) {
                 uniqueKeyArray.push(uniqueKey);
@@ -1092,11 +1078,46 @@ class sapGridViewFunctions {
                 if (typeof self[fnName] === "function") {
                     if ((tbodyCheck === true && section == sectionValue.Tbody) || tbodyCheck === false) {
                         let cellInfo = {
-                            td: thisCellNewData, //td,
+                            td: thisCellNewData,//td
                             cellData: thisCellNewData,
                             rowData: rowData,
                             funcArray: func,
-                            cellName: forRender.cellName
+                            cellName: forCreatedCell.cellName,
+                            meta: { row: rowIndex, col: cellIndex }
+                        };
+                        thisCellNewData = self[fnName](cellInfo);
+                    }
+                }
+                //rowData[func.funcName] = $("<span>" + thisCellNewData + "</span>").text();
+            }
+        });
+        return thisCellNewData;
+    }
+    
+    getRenderFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta, self = this) {
+        let rowIndex = meta.row;
+        let colIndex = meta.col;
+        let thisCellNewData = cellData;
+        let uniqueKeyArray = [];
+        //console.log(forRender["functions"]);
+        $.each(forRender["functions"], function (kf, func) {
+            let fnName = func.funcName;
+            let uniqueKey = self.containerId + self.thisTableId + forRender.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
+            //console.log(uniqueKey);
+            uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;
+            if (uniqueKeyArray.includes(uniqueKey) == false) {
+                uniqueKeyArray.push(uniqueKey);
+                let tbodyCheck = ["TextFeature", "Separator"].includes(func.funcName);
+                let section = parseInt(func.section);
+                if (typeof self[fnName] === "function") {
+                    if ((tbodyCheck === true && section == sectionValue.Tbody) || tbodyCheck === false) {
+                        let cellInfo = {
+                            td: thisCellNewData, //td,6037 6916 2993 2831 
+                            cellData: thisCellNewData,
+                            rowData: rowData,
+                            funcArray: func,
+                            cellName: forRender.cellName,
+                            meta: meta
                         };
                         thisCellNewData = self[fnName](cellInfo);
 
@@ -1110,6 +1131,7 @@ class sapGridViewFunctions {
         });
         return thisCellNewData;
     }
+    //#endregion
 
     //#region functions
     Separator(cellInfo, self = this) {
@@ -1142,7 +1164,7 @@ class sapGridViewFunctions {
     }
 
     TextFeature(cellInfo, self = this) {
-        console.log("TextFeature");
+        //console.log("TextFeature");
         let ThisCellNewData = cellInfo.cellData;
         let ThisTDNewData = cellInfo.td;
         if (cellInfo.funcArray.condition !== null) {
@@ -1246,7 +1268,7 @@ class sapGridViewFunctions {
         self.footerFields[self.containerId][self.thisTableId].hasTfoot = sectionValue.isFooter(cellInfo.funcArray.section) && self.footerFields[self.containerId][self.thisTableId].hasTfoot === 0 ? 1 : self.footerFields[self.containerId][self.thisTableId].hasTfoot;
         if (parseInt(cellInfo.funcArray.section) === 1) {
             $.each(cellInfo.rowData, function (key, val) {
-                valNumber = val;
+                let valNumber = val;
                 if (cellInfo.funcArray.numericCheck == true)
                     valNumber = sapGridViewTools.strToFloat(val);
                 tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
@@ -1326,43 +1348,47 @@ class sapGridViewFunctions {
     }
 
     CumulativeSum(cellInfo, self = this) {
-        // console.log("CumulativeSum");
-        let ThisCellNewData = cellInfo.cellData;
-        let CellIndex = self.footerFields[self.containerId][self.thisTableId]["columnsName"][cellInfo.cellName];
-        if (cellInfo.funcArray.sourceField && cellInfo.funcArray.sourceField !== null) {
-            let tmpFormula = cellInfo.funcArray.sourceField;
-            $.each(cellInfo.rowData, function (key, val) {
-                let valNumber = sapGridViewTools.strToFloat(val);
-                tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, key, valNumber, true);
-            });
-            //104950
-            //console.log("CumulativeSum", tmpFormula, self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["cumulative"].toString());
-            //console.log("--------------------------");
+        let sourceField = cellInfo.funcArray.sourceField;
+        if (parseInt(cellInfo.funcArray.section) === 1) {
+            self.cumulativeSum += sapGridViewTools.strToFloat(cellInfo.rowData[sourceField]);
+        }
+        return self.cumulativeSum;
+    }
+    //#endregion
 
-            self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["cumulative"] += eval(tmpFormula);
-            ThisCellNewData = self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["cumulative"];
-        } else
-            createLog.erorr("CumulativeSumSourceFieldNotFound");
-        return ThisCellNewData;
+    //#region afterDraw
+    callAfterDrawFunctions(m) {
+        let oSapGridViewFunctions = new sapGridViewFunctions();
+        $.each(m.totalFunctionDetails["forAfterDraw"], function (c, DTOrderChange) {
+            let colIndex = m.footerFields[m.containerId][m.tableInfo.TableId]["columnsName"][DTOrderChange.cellName];
+            if (DTOrderChange) {
+                $.each(DTOrderChange["functions"], function (kf, CellFunc) {
+                    if (CellFunc) {
+                        let fnName = CellFunc.funcName + "AfterDraw";
+                        if (typeof oSapGridViewFunctions[fnName] === "function") {
+                            oSapGridViewFunctions[fnName](colIndex, CellFunc, m.tableInfo);
+                        }
+                    }
+                });
+            }
+        });
     }
 
-    //--AfterDraw-----------------------
-    CumulativeSumAfterDraw(CellIndex, CellFunc, TableInfo) {
+    CumulativeSumAfterDraw(CellIndex, CellFunc, tableInfo) {
         var sum = 0;
-        console.log("CumulativeSumAfterDraw");
-        TableInfo.TableObject.column(CellIndex).rows({ order: 'applied', filter: 'applied', search: 'applied' }).indexes().each(function (rowIndex, i, allFilteredIndexes) {
+        tableInfo.TableObject.column(CellIndex).rows({ order: 'applied', filter: 'applied', search: 'applied' }).indexes().each(function (rowIndex, i, allFilteredIndexes) {
             var tmpFormula = CellFunc.sourceField;
-            $.each(TableInfo.Columns, function (cIndex, cArray) {
+            $.each(tableInfo.Columns, function (cIndex, cArray) {
                 var cName = cArray.data;
-                var cValue = TableInfo.TableObject.cell(rowIndex, cIndex).data();
+                var cValue = tableInfo.TableObject.cell(rowIndex, cIndex).data();
                 cValue = sapGridViewTools.strToFloat(cValue);
                 tmpFormula = sapGridViewTools.customStrReplace(tmpFormula, cName, cValue, true);
             });
             var v = eval(tmpFormula);
             sum += v;
-            TableInfo.TableObject.cell(rowIndex, CellIndex).data(sum.toLocaleString(undefined, { maximumFractionDigits: 3 }));
+            tableInfo.TableObject.cell(rowIndex, CellIndex).data(sum.toLocaleString(undefined, { maximumFractionDigits: 3 }));
         });
-    }/**/
+    }
     //#endregion
 }
 
@@ -1634,7 +1660,7 @@ class gridModel {
     tableInfo = {};
     gridArray = {};
     functionsList = {
-        CumulativeSum: { FuncListBuild: ["forRender", "forAfterDraw"] },
+        CumulativeSum: { FuncListBuild: ["forCreatedCell", "forAfterDraw"] },
         Calc: { FuncListBuild: ["forRender"] },
         MiladiToJalali: { FuncListBuild: ["forRender"] },
         Separator: { FuncListBuild: ["forRender"] },
@@ -1673,6 +1699,7 @@ class gridModel {
         };
         m.totalFunctionDetails = {
             forRender: [],
+            forCreatedCell: [],
             forAfterDraw: []
         };
         m.footerFields[m.containerId] = {};
