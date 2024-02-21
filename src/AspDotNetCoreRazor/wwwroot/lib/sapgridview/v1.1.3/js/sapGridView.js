@@ -48,7 +48,6 @@ class gridBind {
     //#region bind
     bind() {
         this.addRowCounter();
-        //this.setSGVGlobalVariables();
         this.columnsTrace();
         this.removeNullsFromTotalFunctionDetails();
         this.addEmptyTable();
@@ -68,6 +67,7 @@ class gridBind {
         this.firstBind();
         this.setGridArray();
         this.actionsAtEndOfBind();
+        this.counterColumn();
         new sapGridViewFunctions().callAfterDrawFunctions(this.model);
     }
     //#endregion
@@ -89,12 +89,6 @@ class gridBind {
         }
     }
 
-    //setSGVGlobalVariables(self = this, m = this.model) {
-    //    if (self.globalVariables[m.containerId] == undefined)
-    //        self.globalVariables[m.containerId] = {};
-    //    self.globalVariables[m.containerId][m.thisTableId] = { hasThead: 0, hasTfoot: 0, columns: {}, columnsName: {} };
-    //}
-
     columnsTrace(self = this, m = this.model) {
         for (let j = 0; j < m.grid.columns.length; j++) {
             let TempColumn = m.grid.columns[j];
@@ -106,20 +100,12 @@ class gridBind {
                 m.allTitleTh += "<th data-tbodyid='" + m.tbodyId + "'>" + TempColumn.title + "</th>";
                 m.allFooterTh += "<th data-tbodyid='" + m.tbodyId + "' id='Footer_" + m.thisTableId + "_" + cellName + "'>" + TempColumn.title + "</th>";
                 if (TempColumn["functions"] && TempColumn["functions"] !== null && TempColumn["functions"].length > 0) {
-                    //self.globalVariables[m.containerId][m.thisTableId].columnsName[cellName] = m.cellIndex;
                     m.footerFields[m.containerId][m.thisTableId].columnsName[cellName] = m.cellIndex;
                     $.each(TempColumn["functions"], function (k, FuncArray) {
-                        //if (self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex] == undefined)
-                        //    self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex] = {};
                         if (m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex] == undefined)
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex] = {};
 
                         if (["OnClick", "Calc"].includes(FuncArray.funcName) && sectionValue.isFooterOrHeader(FuncArray.section)) {
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["footerValue"] = 0;
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = cellName;
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["tfootOnClick"] = true;
-                            //self.globalVariables[m.containerId][m.thisTableId].columns[m.cellIndex]["footerText"] = FuncArray.footerText !== undefined ? FuncArray.footerText : null;
-
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["footerValue"] = 0;
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["name"] = cellName;
                             m.footerFields[m.containerId][m.thisTableId].columns[m.cellIndex]["tfootOnClick"] = true;
@@ -264,6 +250,7 @@ class gridBind {
                         gridName: m.gridName
                     }
                     d.customData = self.customData;
+                    d.searched = m.searchedValues;
 
                     //delete d.columns;
                     // d.custom = $('#myInput').val();
@@ -273,12 +260,6 @@ class gridBind {
             m.defaultOptions["processing"] = true;
             m.defaultOptions["serverSide"] = true;
             m.defaultOptions["columns"] = m.allCamelCaseColumns;
-
-
-            //let columnDefs = self.addFunctionsToColumns();
-            //m.defaultOptions["columnDefs"] = columnDefs;
-            //m.defaultOptions["columnDefs"] = d["columnDefs"];
-            //m.defaultOptions["columnDefs"] = self.addFunctionsToColumns();
         }
     }
 
@@ -303,20 +284,6 @@ class gridBind {
         m.gridArray[m.containerId] = m.gridArray[m.containerId] == undefined ? {} : m.gridArray[m.containerId];
         m.gridArray[m.containerId][m.thisTableId] = { TableId: m.thisTableId, TableObject: m.tableObject, TableAPI: m.thisTableApi };
     }
-
-    /*onDraw(self = this, m = this.model) {
-    let t = 0
-    m.tableObject.on("draw", function () {
-    if (t > 0) {
-    //ServerSideGridBind(m.mainData, m.gridName, m.grid, m.level, m.gridFirstText, self.customData);
-    if (m.grid.serverSide) {
-    self.setDefaultOptions(self, m);
-    }
-    //self.onDrawSetFooter();
-    }
-    t = 1;
-    });
-    }*/
     //#endregion
 
     //#region refactor old functions
@@ -353,14 +320,16 @@ class gridBind {
 
                     let ThisTh = $("#" + m.theadId).find(".DT_TrFilters").children("th").eq(i);
                     let title = ThisTh.text();
-                    let width = parseInt(ThisTh.width()) + 20;
+                    //let width = parseInt(ThisTh.width()) + 20;
                     let selectTag = "";
                     let inputTag = "";
                     if (m.grid.options["dropDownFilterButton"] === true && m.grid.columns[k].dropDownFilter == true) {
-                        selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter " + m.thisTableId + "ColumnFilter' data-columnnum='" + k + "' data-tbodyid='" + m.tbodyId + "'><option value=''> " + title + " </option></select></span>";
+                        //selectTag = "<span class='DT_ColumnFilterContainer'><select style='min-width:" + width + "px;' class='DT_ColumnFilter " + m.thisTableId + "ColumnFilter' data-columnnum='" + k + "' data-tbodyid='" + m.tbodyId + "'><option value=''> " + title + " </option></select></span>";
+                        selectTag = "<span class='DT_ColumnFilterContainer'><select class='DT_ColumnFilter " + m.thisTableId + "ColumnFilter' data-columnnum='" + k + "' data-dataname='" + column.data + "' data-tbodyid='" + m.tbodyId + "'><option value=''> " + title + " </option></select></span>";
                     }
                     if (m.grid.options["columnsSearchButton"] === true) {
-                        inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch " + m.thisTableId + "ColumnSearch' data-columnnum='" + k + "' data-tbodyid='" + m.tbodyId + "' placeholder='" + title + "'></span>";
+                        //inputTag = "<span class='DT_ColumnSearchContainer'><input style='min-width:" + width + "px;' type='text' class='form-control-sm input-sm DT_ColumnSearch " + m.thisTableId + "ColumnSearch' data-columnnum='" + k + "' data-tbodyid='" + m.tbodyId + "' placeholder='" + title + "'></span>";
+                        inputTag = "<span class='DT_ColumnSearchContainer'><input type='text' class='form-control-sm input-sm DT_ColumnSearch " + m.thisTableId + "ColumnSearch' data-columnnum='" + k + "' data-dataname='" + column.data + "' data-tbodyid='" + m.tbodyId + "' placeholder='" + title + "'></span>";
                     }
                     i++;
                     ThisTh.html(selectTag + inputTag);
@@ -383,8 +352,8 @@ class gridBind {
                     let thisFixedTh = $("#" + m.theadId).find(".DT_TrFilters th").eq(i);
                     let thisScrollTh = $(".dataTables_scrollBody thead tr").find("th").eq(i);
                     let title = thisFixedTh.text();
-                    let width = title.length * 10;
-                    sumWidth += width;
+                    //let width = title.length * 10;
+                    //sumWidth += width;
                     let tbodyid = thisFixedTh.attr("data-tbodyid");
 
                     thisScrollTh.html("");
@@ -410,10 +379,14 @@ class gridBind {
             let tbodyid = $(this).attr("data-tbodyid");
             self.searchCustomized(allInput, tbodyid, "ColumnFilter", m.tableInfo);
         });
-        $(".DT_ColumnSearch").on('keyup change', function () {
+        $(".DT_ColumnSearch").on('change', function () {
             let allInput = $(this).closest("tr").find("input");
             let tbodyid = $(this).attr("data-tbodyid");
             self.searchCustomized(allInput, tbodyid, "ColumnSearch", m.tableInfo);
+            if (jQuery.isEmptyObject(m.searchedValues)) {
+                m.tableObject.search('').columns().search('').draw();
+            } else
+                m.tableObject.draw();
         });
         $(".dataTables_filter input").on('keyup', function () {
             let allInput = $(this);
@@ -556,8 +529,7 @@ class gridBind {
 
     onDraw(self = this, m = this.model) {
         m.tableObject.on("draw", function (a, b, c, d) {
-            if (m.grid.counterColumn == true)
-                self.counterColumn(m.tableInfo.TableObject);
+            self.counterColumn();
             new sapGridViewFunctions().callAfterDrawFunctions(m);
             if (m.grid.serverSide == true) self.setFooter();
         });//.draw();
@@ -942,16 +914,19 @@ class gridBind {
         let i = 0;
         let TableObject = TableInfo.TableObject;
         let ThisTableID = TableInfo.TableID;
-        TableObject.search('').columns().search('').draw(); //Clear All Search & Filters
+        //TableObject.search('').columns().search('').draw(); //Clear All Search & Filters
         let elementsType = "";
+        m.searchedValues = {};
         allInput.each(function () {
             let inputData = $(this).val();
             //let inputData = sapGridViewTools.arabicToPersianChar(inputData); نباید تبدیل به فارسی شود، چراکه جایی
             let columnNum = $(this).attr("data-columnnum");
+            let colName = $(this).attr("data-dataname"); //column.data
             let elementType = $(this).prop("nodeName");
             if (inputData.trim() != "" && inputData != "undefined") {
                 dataSearch[i] = { "inputData": inputData, "columnNum": columnNum, "tbodyid": tbodyid, "elementType": elementType };
                 elementsType = elementType.toUpperCase();
+                m.searchedValues[colName] = inputData;
                 i++;
             }
         });
@@ -972,26 +947,26 @@ class gridBind {
                 let persianText = sapGridViewTools.arabicToPersianChar(v.inputData);
                 let arabicText = sapGridViewTools.persianToArabicChar(v.inputData);
                 if (SearchType == "GeneralSearch") {
-                    TableObject.search(persianText + '|' + arabicText, true, false).draw(); //smart search
+                    TableObject.search(persianText + '|' + arabicText, true, false);//.draw(); //smart search
                 }
                 else if (SearchType == "ColumnSearch") {
-                    TableObject.columns(v.columnNum).search(persianText + '|' + arabicText, true, false).draw(); //smart search
+                    TableObject.columns(v.columnNum).search(persianText + '|' + arabicText, true, false);//.draw(); //smart search
                 }
                 else {
-                    TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false).draw(); //match search for dropdown filter
+                    TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false);//.draw(); //match search for dropdown filter
                 }
             }
         });
     }
 
-    counterColumn(TableObject) {
-        let self = this, m = this.model;
-        let i = 1;
-        TableObject.rows({ order: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
-            TableObject.cell(rowIdx, 0).data(i++);
-        });
+    counterColumn(self, m = this.model) {
+        if (m.grid.counterColumn == true) {
+            let i = 1;
+            m.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
+                m.tableObject.cell(rowIdx, 0).data(i++);
+            });
+        }
     }
-
     //#endregion
 }
 
@@ -1065,11 +1040,9 @@ class sapGridViewFunctions {
     getCreatedCellFunctionsChanges(forCreatedCell, cellIndex, rowIndex, cellData, rowData, self = this) {
         let thisCellNewData = cellData;
         let uniqueKeyArray = [];
-        //console.log(forCreatedCell["functions"]);
         $.each(forCreatedCell["functions"], function (kf, func) {
             let fnName = func.funcName;
             let uniqueKey = self.containerId + self.thisTableId + forCreatedCell.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
-            //console.log(uniqueKey);
             uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;
             if (uniqueKeyArray.includes(uniqueKey) == false) {
                 uniqueKeyArray.push(uniqueKey);
@@ -1093,17 +1066,15 @@ class sapGridViewFunctions {
         });
         return thisCellNewData;
     }
-    
+
     getRenderFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta, self = this) {
         let rowIndex = meta.row;
         let colIndex = meta.col;
         let thisCellNewData = cellData;
         let uniqueKeyArray = [];
-        //console.log(forRender["functions"]);
         $.each(forRender["functions"], function (kf, func) {
             let fnName = func.funcName;
             let uniqueKey = self.containerId + self.thisTableId + forRender.cellName + "_" + rowIndex + "_" + cellIndex + "_" + kf;
-            //console.log(uniqueKey);
             uniqueKeyArray = uniqueKeyArray == null ? [] : uniqueKeyArray;
             if (uniqueKeyArray.includes(uniqueKey) == false) {
                 uniqueKeyArray.push(uniqueKey);
@@ -1112,7 +1083,7 @@ class sapGridViewFunctions {
                 if (typeof self[fnName] === "function") {
                     if ((tbodyCheck === true && section == sectionValue.Tbody) || tbodyCheck === false) {
                         let cellInfo = {
-                            td: thisCellNewData, //td,6037 6916 2993 2831 
+                            td: thisCellNewData, //td
                             cellData: thisCellNewData,
                             rowData: rowData,
                             funcArray: func,
@@ -1164,7 +1135,6 @@ class sapGridViewFunctions {
     }
 
     TextFeature(cellInfo, self = this) {
-        //console.log("TextFeature");
         let ThisCellNewData = cellInfo.cellData;
         let ThisTDNewData = cellInfo.td;
         if (cellInfo.funcArray.condition !== null) {
@@ -1357,16 +1327,15 @@ class sapGridViewFunctions {
     //#endregion
 
     //#region afterDraw
-    callAfterDrawFunctions(m) {
-        let oSapGridViewFunctions = new sapGridViewFunctions();
+    callAfterDrawFunctions(m, self = this) {
         $.each(m.totalFunctionDetails["forAfterDraw"], function (c, DTOrderChange) {
             let colIndex = m.footerFields[m.containerId][m.tableInfo.TableId]["columnsName"][DTOrderChange.cellName];
             if (DTOrderChange) {
                 $.each(DTOrderChange["functions"], function (kf, CellFunc) {
                     if (CellFunc) {
                         let fnName = CellFunc.funcName + "AfterDraw";
-                        if (typeof oSapGridViewFunctions[fnName] === "function") {
-                            oSapGridViewFunctions[fnName](colIndex, CellFunc, m.tableInfo);
+                        if (typeof self[fnName] === "function") {
+                            self[fnName](colIndex, CellFunc, m.tableInfo);
                         }
                     }
                 });
@@ -1421,20 +1390,20 @@ class sapGridViewTools {
     }
 
     static datatableHeaderFilters(TableId, type) {
-        let ThisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
-        let ThisThead = ThisDataTable.find(".DT_TrFilters");
-        let AllTheadFiltersID = ThisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
-        let ThisTheadFilterID = ThisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
-        let flag = ThisThead.attr("data-flag");
+        let thisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
+        let thisThead = thisDataTable.find(".DT_TrFilters");
+        let allTheadFiltersID = thisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
+        let thisTheadFilterID = thisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
+        let flag = thisThead.attr("data-flag");
         if (flag == "hide" || flag != type) {
-            ThisThead.attr("data-flag", type);
-            ThisThead.slideDown();
-            AllTheadFiltersID.hide();
-            ThisTheadFilterID.fadeIn();
+            thisThead.attr("data-flag", type);
+            thisThead.slideDown();
+            allTheadFiltersID.hide();
+            thisTheadFilterID.fadeIn();
         } else {
-            ThisThead.attr("data-flag", "hide");
-            ThisThead.hide();
-            AllTheadFiltersID.slideUp();
+            thisThead.attr("data-flag", "hide");
+            thisThead.hide();
+            allTheadFiltersID.slideUp();
         }
     };
 
@@ -1659,6 +1628,7 @@ class gridModel {
     tableObject = null;
     tableInfo = {};
     gridArray = {};
+    searchedValues = {};
     functionsList = {
         CumulativeSum: { FuncListBuild: ["forCreatedCell", "forAfterDraw"] },
         Calc: { FuncListBuild: ["forRender"] },
