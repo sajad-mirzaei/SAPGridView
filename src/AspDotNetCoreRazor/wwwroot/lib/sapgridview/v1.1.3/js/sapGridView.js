@@ -69,6 +69,7 @@ class gridBind {
         this.actionsAtEndOfBind();
         this.counterColumn();
         new sapGridViewFunctions().callAfterDrawFunctions(this.model);
+        new charts(this.model.grid.charts, this.model.tableObject);
     }
     //#endregion
 
@@ -467,8 +468,8 @@ class gridBind {
                                 ThisValue = eval(tmpFormula);
                             } catch (e) {
                                 if (e instanceof SyntaxError) {
-                                    createLog.erorr(e.message);
-                                    createLog.erorr("-------------------------");
+                                    createLog.error(e.message);
+                                    createLog.error("-------------------------");
                                 }
                             }
                         }
@@ -532,6 +533,7 @@ class gridBind {
             self.counterColumn();
             new sapGridViewFunctions().callAfterDrawFunctions(m);
             if (m.grid.serverSide == true) self.setFooter();
+            new charts(m.grid.charts, m.tableObject);
         });//.draw();
     }
 
@@ -739,9 +741,9 @@ class gridBind {
         if (m.grid.customizeButtons) {
             for (const [k, btnArray] of Object.entries(m.grid.customizeButtons)) {
                 if (btnArray.javascriptMethodName == null || btnArray.javascriptMethodName.trim() == "") {
-                    createLog.erorr("CustomizeButtonJsUnDefine", btnArray.javascriptMethodName);
+                    createLog.error("CustomizeButtonJsUnDefine", btnArray.javascriptMethodName);
                 } else if (btnArray.buttonName == null || btnArray.buttonName == 0) {
-                    createLog.erorr("CustomizeButtonNameUnDefine", btnArray.buttonName);
+                    createLog.error("CustomizeButtonNameUnDefine", btnArray.buttonName);
                 } else {
                     customButton(btnArray);
                 }
@@ -767,7 +769,7 @@ class gridBind {
                 }
 
             } else {
-                createLog.erorr("CustomizeButtonJsFunNotFound", btnArray.javascriptMethodName);
+                createLog.error("CustomizeButtonJsFunNotFound", btnArray.javascriptMethodName);
             }
         }
         //-End---customizeButtons-------
@@ -966,6 +968,156 @@ class gridBind {
                 m.tableObject.cell(rowIdx, 0).data(i++);
             });
         }
+    }
+    //#endregion
+}
+
+class charts {
+    tableObject = null;
+    titleAlign = { 0: "right", 1: "center", 2: "left" };
+    chartsData = null;
+
+    constructor(charts, tableObject, self = this) {
+        self.tableObject = tableObject;
+        //One-time trace data and charts-data assignment
+        self.setChartsData(charts);
+
+        //Making requested charts
+        self.traceCharts(charts);
+
+        $(".highcharts-credits").hide();
+    }
+
+    //#region Prepare data for charts
+    setChartsData(charts, self = this) {
+        let chartsData = {};
+        self.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
+            let rowData = this.data();
+            $.each(charts, function (k, chart) {
+                let chartName = self.getChartType(chart.chartName);
+                
+                let fName = "set" + chartName + "Data";
+                if (typeof self[fName] === "function") {
+                    chartsData = self[fName](chartsData, rowData, chart, chartName); //Example: setpieData
+                }
+            });
+        });
+        self.chartsData = chartsData;
+    }
+
+    setpieData(chartsData, rowData, chart, chartName, self = this) {
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["data"] = [];
+        }
+        chartsData[chartName].data.push({ name: rowData[chart.key], y: rowData[chart.value] });
+        return chartsData;
+    }
+
+    setcolumnData(chartsData, rowData, chart, chartName, self = this) {
+        
+        return chartsData;
+    }
+    //#endregion
+
+    //#region call charts
+    traceCharts(charts, self = this) {
+        $.each(charts, function (k, chart) {
+            let chartName = self.getChartType(chart.chartName);
+            if (typeof self[chartName] === "function") {
+                self[chartName](chart);
+            }
+        });
+    }
+    //#endregion
+
+    //#region charts methods
+    pie(chart, self = this) {
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName),
+                styledMode: true
+            },
+            title: {
+                text: chart.title,
+                align: self.titleAlign[chart.titleAlign]
+            },
+            subtitle: {
+                text: chart.subTitle,
+                align: self.titleAlign[chart.titleAlign]
+            },
+            series: [
+                {
+                    data: self.chartsData.pie.data
+                }
+            ]
+        });
+    }
+
+    column(chart, self = this) {
+        //console.log(self.tableObject.columns("").data());
+        //console.log(chart);
+
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName)
+            },
+            title: {
+                text: chart.title,
+                align: self.titleAlign[chart.titleAlign]
+            },
+            subtitle: {
+                text: chart.subTitle,
+                align: self.titleAlign[chart.titleAlign]
+            },
+            xAxis: {
+                categories: ['USA', 'China', 'Brazil', 'EU', 'India', 'Russia'],
+                crosshair: true,
+                accessibility: {
+                    description: 'Countries'
+                },
+                title: {
+                    text: 'xAxis title',
+                    align: "left"
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'yAxis title'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' (1000 MT)'
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [
+                {
+                    name: 'Corn',
+                    data: [406292, 260000, 107000, 68300, 27500, 14500]
+                },
+                {
+                    name: 'Wheat',
+                    data: [51086, 136000, 5500, 141000, 107180, 77000]
+                },
+                {
+                    name: 'Wheat2',
+                    data: [51186, 13700, 5500, 141000, 107180, 77000]
+                }
+            ]
+        });
+
+    }
+    //#endregion
+
+    //#region tools
+    getChartType(t) {
+        return t.toLowerCase().replace("chart", "");
     }
     //#endregion
 }
@@ -1176,7 +1328,7 @@ class sapGridViewFunctions {
                 ThisTDNewData = "<span class='" + isTrueCssClass + "'>" + isFalseText + "</span>"; //render
             }
         } else {
-            createLog.erorr("TextFeatureConditionNotFound");
+            createLog.error("TextFeatureConditionNotFound");
         }
         /*
         * ThisCellNewData ممکن است با تغییر دیتای اصلی
@@ -1247,8 +1399,8 @@ class sapGridViewFunctions {
                 ThisCellNewData = eval(tmpFormula);
             } catch (e) {
                 if (e instanceof SyntaxError) {
-                    createLog.erorr(e.message);
-                    createLog.erorr("-------------------------");
+                    createLog.error(e.message);
+                    createLog.error("-------------------------");
                 }
             }
         }
@@ -1257,7 +1409,7 @@ class sapGridViewFunctions {
             self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"] = sapGridViewTools.strToFloat(self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"]);
             self.footerFields[self.containerId][self.thisTableId].columns[CellIndex]["footerValue"] += sapGridViewTools.strToFloat(ThisCellNewData);
         } else if (sectionValue.isFooterOrHeader(cellInfo.funcArray.section) == false && tmpOperator == 0 && cellInfo.funcArray.formula == null) {
-            createLog.erorr("VerticalSumWithoutSelectFooterSection");
+            createLog.error("VerticalSumWithoutSelectFooterSection");
         }
         return ThisCellNewData;
     }
@@ -1536,7 +1688,7 @@ class sapGridViewOnClick {
                 $(".SGV_LoadingContainer").hide();
             },
             error: function (error) {
-                createLog.erorr(error);
+                createLog.error(error);
                 $(".SGV_LoadingContainer").hide();
                 alert("خطایی در ارتباط با سرور وجود دارد");
             }
@@ -1557,7 +1709,7 @@ class sapGridViewOnClick {
                 $(".SGV_LoadingContainer").hide();
             },
             error: function (error) {
-                createLog.erorr(error);
+                createLog.error(error);
                 $(".SGV_LoadingContainer").hide();
                 alert("خطایی در ارتباط با سرور وجود دارد");
             }
@@ -1589,7 +1741,6 @@ class sapGridViewOnClick {
         $("#" + ThisTabContentID).addClass("SGV_ActiveTabContent").css("display", "");
     }
     //#endregion
-
 }
 
 class gridModel {
