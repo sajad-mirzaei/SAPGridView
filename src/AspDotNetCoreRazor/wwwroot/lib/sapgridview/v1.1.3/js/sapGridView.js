@@ -736,8 +736,14 @@ class gridBind {
                 self.clearAllFilters(dt, m.thisTableId);
             }
         };
-
-
+        let addChart = {
+            text: '<i class="fa fa-chart"></i>',
+            titleAttr: "حذف همه فیلترها و جستجوها",
+            action: function (e, dt, node, conf) {
+                self.clearAllFilters(dt, m.thisTableId);
+            }
+        };
+        
         //-Start---customizeButtons-------
         if (m.grid.customizeButtons) {
             for (const [k, btnArray] of Object.entries(m.grid.customizeButtons)) {
@@ -950,13 +956,13 @@ class gridBind {
                 let persianText = sapGridViewTools.arabicToPersianChar(v.inputData);
                 let arabicText = sapGridViewTools.persianToArabicChar(v.inputData);
                 if (SearchType == "GeneralSearch") {
-                    TableObject.search(persianText + '|' + arabicText, true, false);//.draw(); //smart search
+                    TableObject.search(persianText + '|' + arabicText, true, false).draw(); //smart search
                 }
                 else if (SearchType == "ColumnSearch") {
-                    TableObject.columns(v.columnNum).search(persianText + '|' + arabicText, true, false);//.draw(); //smart search
+                    TableObject.columns(v.columnNum).search(persianText + '|' + arabicText, true, false).draw(); //smart search
                 }
                 else {
-                    TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false);//.draw(); //match search for dropdown filter
+                    TableObject.columns(v.columnNum).search(v.inputData ? '^' + v.inputData + '$' : '', true, false).draw(); //match search for dropdown filter
                 }
             }
         });
@@ -1048,6 +1054,7 @@ class charts {
 
     //#region charts methods
     pie(chart, self = this) {
+        let data = self.chartsData && self.chartsData.pie && self.chartsData.pie.data ? self.chartsData.pie.data : [];
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName),
@@ -1063,13 +1070,15 @@ class charts {
             },
             series: [
                 {
-                    data: self.chartsData.pie.data
+                    data: data
                 }
             ]
         });
     }
 
     column(chart, self = this) {
+        let categories = self.chartsData && self.chartsData.column && self.chartsData.column.categories ? self.chartsData.column.categories : [];
+        let series = self.chartsData && self.chartsData.column && self.chartsData.column.series ? self.chartsData.column.series : [];
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName)
@@ -1083,7 +1092,7 @@ class charts {
                 align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
             },
             xAxis: {
-                categories: self.chartsData.column.categories,
+                categories: categories,
                 crosshair: true,
                 accessibility: {
                     description: chart.xAxis.accessibility
@@ -1111,7 +1120,7 @@ class charts {
                     borderWidth: chart.plotOptions.column.borderWidth
                 }
             },
-            series: self.chartsData.column.series
+            series: series
         });
 
     }
