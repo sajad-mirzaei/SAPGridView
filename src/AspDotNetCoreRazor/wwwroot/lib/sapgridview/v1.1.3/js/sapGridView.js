@@ -69,7 +69,7 @@ class gridBind {
         this.actionsAtEndOfBind();
         this.counterColumn();
         new sapGridViewFunctions().callAfterDrawFunctions(this.model);
-        new charts(this.model.grid.charts, this.model.tableObject);
+        new charts(this.model);
     }
     //#endregion
 
@@ -128,6 +128,7 @@ class gridBind {
                 t.data = sapGridViewTools.toCamelCase(t.data);
                 m.allCamelCaseColumns.push(t);
                 m.mainColumnsName[cellName] = "";
+                m.mainColumnsTitle[cellName] = TempColumn.title;
                 //-start-headerComplex------------------
                 if (TempColumn.visible == false)
                     m.numberOfUnVisibleCells++;
@@ -533,7 +534,7 @@ class gridBind {
             self.counterColumn();
             new sapGridViewFunctions().callAfterDrawFunctions(m);
             if (m.grid.serverSide == true) self.setFooter();
-            new charts(m.grid.charts, m.tableObject);
+            new charts(m);
         });//.draw();
     }
 
@@ -976,14 +977,17 @@ class charts {
     tableObject = null;
     titleAlign = { 0: "right", 1: "center", 2: "left" };
     chartsData = null;
+    mainColumnsTitle = null;
 
-    constructor(charts, tableObject, self = this) {
-        self.tableObject = tableObject;
+    constructor(m) {
+        this.tableObject = m.tableObject;
+        this.mainColumnsTitle = m.mainColumnsTitle;
+
         //One-time trace data and charts-data assignment
-        self.setChartsData(charts);
+        this.setChartsData(m.grid.charts);
 
         //Making requested charts
-        self.traceCharts(charts);
+        this.traceCharts(m.grid.charts);
 
         $(".highcharts-credits").hide();
     }
@@ -1015,7 +1019,18 @@ class charts {
     }
 
     setcolumnData(chartsData, rowData, chart, chartName, self = this) {
-        
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["categories"] = [];
+            chartsData[chartName]["series"] = [];
+            $.each(chart.series, function (k, sery) {
+                chartsData[chartName]["series"].push({ name: self.mainColumnsTitle[sery], customKey: sery, data: [] });
+            });
+        }
+        $.each(chartsData[chartName]["series"], function (k, sery) {
+            chartsData[chartName]["series"][k].data.push(rowData[sery.customKey]);
+        });
+        chartsData[chartName]["categories"].push(rowData[chart.xAxis.categories]);
         return chartsData;
     }
     //#endregion
@@ -1039,12 +1054,12 @@ class charts {
                 styledMode: true
             },
             title: {
-                text: chart.title,
-                align: self.titleAlign[chart.titleAlign]
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
             },
             subtitle: {
-                text: chart.subTitle,
-                align: self.titleAlign[chart.titleAlign]
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
             },
             series: [
                 {
@@ -1055,61 +1070,48 @@ class charts {
     }
 
     column(chart, self = this) {
-        //console.log(self.tableObject.columns("").data());
-        //console.log(chart);
-
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName)
             },
             title: {
-                text: chart.title,
-                align: self.titleAlign[chart.titleAlign]
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
             },
             subtitle: {
-                text: chart.subTitle,
-                align: self.titleAlign[chart.titleAlign]
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
             },
             xAxis: {
-                categories: ['USA', 'China', 'Brazil', 'EU', 'India', 'Russia'],
+                categories: self.chartsData.column.categories,
                 crosshair: true,
                 accessibility: {
-                    description: 'Countries'
+                    description: chart.xAxis.accessibility
                 },
                 title: {
-                    text: 'xAxis title',
-                    align: "left"
+                    text: chart.xAxis.title && chart.xAxis.title.text ? chart.xAxis.title.text : "",
+                    //align in xAxix not work
+                    //align: self.titleAlign[chart.xAxis.title.align] ? self.titleAlign[chart.xAxis.title.align] : "center"
                 }
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'yAxis title'
+                    text: chart.yAxis.title && chart.yAxis.title.text ? chart.yAxis.title.text : "",
+                    //align in yAxis not work
+                    //align: self.titleAlign[chart.yAxis.title.align] ? self.titleAlign[chart.yAxis.title.align] : "center"
                 }
             },
             tooltip: {
-                valueSuffix: ' (1000 MT)'
+                valueSuffix: chart.tooltip && chart.tooltip.valueSuffix ? chart.tooltip.valueSuffix : ""
             },
             plotOptions: {
                 column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
+                    pointPadding: chart.plotOptions.column.pointPadding,
+                    borderWidth: chart.plotOptions.column.borderWidth
                 }
             },
-            series: [
-                {
-                    name: 'Corn',
-                    data: [406292, 260000, 107000, 68300, 27500, 14500]
-                },
-                {
-                    name: 'Wheat',
-                    data: [51086, 136000, 5500, 141000, 107180, 77000]
-                },
-                {
-                    name: 'Wheat2',
-                    data: [51186, 13700, 5500, 141000, 107180, 77000]
-                }
-            ]
+            series: self.chartsData.column.series
         });
 
     }
@@ -1768,6 +1770,7 @@ class gridModel {
     totalFunctionDetails = {};
     cellIndex = 0;
     mainColumnsName = {};
+    mainColumnsTitle = {};
     allColumns = [];
     allCamelCaseColumns = [];
     rowGrouping = null;

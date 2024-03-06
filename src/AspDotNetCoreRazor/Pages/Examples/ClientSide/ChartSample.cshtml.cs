@@ -33,14 +33,14 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
                 Columns = new List<Column>() {
                     new() { Data = "Id", Title = "Id" },
-                    new() { Data = "Province", Title = "Province" },
-                    new() { Data = "Population2005", Title = "Population2005" },
-                    new() { Data = "Population2013", Title = "Population2013" },
-                    new() { Data = "Population2015", Title = "Population2015" },
-                    new() { Data = "Population2013ComparedTo2005", Title = "Population2013ComparedTo2005" },
+                    new() { Data = "Province", Title = "Province Title" },
+                    new() { Data = "Population2005", Title = "Population 2005" },
+                    new() { Data = "Population2013", Title = "Population 2013" },
+                    new() { Data = "Population2015", Title = "Population 2015" },
+                    new() { Data = "Population2013ComparedTo2005", Title = "Population 2013 Compared To 2005" },
                     new()
                     {
-                        Data = "Population2015ComparedTo2005", Title = "Population2015ComparedTo2005",
+                        Data = "Population2015ComparedTo2005", Title = "Population 2015 Compared To 2005",
                         Functions =
                         {
                             new Calc
@@ -68,7 +68,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
         public SAPGridView AddGridChart(SAPGridView oSGV)
         {
             oSGV.Grids["MyGrid1"].Charts.Add(GetPieChart());
-            oSGV.Grids["MyGrid1"].Charts.Add(GetColumnChart(oSGV.Grids["MyGrid1"]));
+            oSGV.Grids["MyGrid1"].Charts.Add(GetColumnChart());
             return oSGV;
         }
 
@@ -81,13 +81,13 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 Value = "Population2013ComparedTo2005",
                 Title = new ChartTitle
                 {
-                    Text = "PieChart Title 1",
+                    Text = "Population growth percentage in 2013 compared to 2005",
                     Align = TitleAlign.Center
                 }
             };
         }
 
-        public ColumnChart GetColumnChart(Grid grid)
+        public ColumnChart GetColumnChart()
         {
             return new ColumnChart()
             {
@@ -95,15 +95,14 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
 
                 Title = new ChartTitle
                 {
-                    Text = "ColumnChart Title 1",
+                    Text = "Population in 2005, 2015, 2013",
                     Align = TitleAlign.Center
                 },
                 XAxis = new ColumnChartXAxis()
                 {
                     Title = new ChartTitle()
                     {
-                        Text = "XAxis Title 1",
-                        Align = TitleAlign.Center
+                        Text = "XAxis Title 1"
                     },
                     Accessibility = new Accessibility()
                     {
@@ -115,10 +114,13 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 {
                     Title = new ChartTitle
                     {
-                        Text = "YAxis Title 1",
-                        Align = TitleAlign.Center
+                        Text = "YAxis Title 1"
                     },
                     Min = 0
+                },
+                Tooltip = new ChartTooltip()
+                {
+                    ValueSuffix = " (Tooltip)"
                 },
                 Series = new List<string>() { "Population2005", "Population2013", "Population2015" }
             };

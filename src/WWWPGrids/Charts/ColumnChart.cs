@@ -4,15 +4,13 @@ namespace WWWPGrids.Charts;
 
 public class ColumnChart : Chart
 {
-    [JsonProperty("key")] public string Key { get; set; }
-    [JsonProperty("value")] public string Value { get; set; }
-    [JsonProperty("title")] public ChartTitle Title { get; set; }
-    [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
-    [JsonProperty("xAxis")] public ColumnChartXAxis XAxis { get; set; }
-    [JsonProperty("yAxis")] public ColumnChartYAxis YAxis { get; set; }
-    [JsonProperty("tooltip")] public ChartTooltip Tooltip { get; set; }
-    [JsonProperty("plotOptions")] public ColumnChartPlotOptions PlotOptions { get; set; }
-    [JsonProperty("series")] public List<string> Series { get; set; } //ColumnChartSeries<SeriesDataType> Series { get; set; }
+    [JsonProperty("title")] public ChartTitle Title { get; set; } = new();
+    [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; } = new();
+    [JsonProperty("xAxis")] public ColumnChartXAxis XAxis { get; set; } = new();
+    [JsonProperty("yAxis")] public ColumnChartYAxis YAxis { get; set; } = new();
+    [JsonProperty("tooltip")] public ChartTooltip Tooltip { get; set; } = new();
+    [JsonProperty("plotOptions")] public ColumnChartPlotOptions PlotOptions { get; set; } = new();
+    [JsonProperty("series")] public List<string> Series { get; set; } = new();
     public ColumnChart()
     {
         ChartName = GetType().Name;
@@ -20,11 +18,10 @@ public class ColumnChart : Chart
 }
 public class ColumnChartXAxis
 {
-    [JsonProperty("categories")] public string Categories { get; set; }
+    [JsonProperty("categories")] public string Categories { get; set; } = String.Empty;
     [JsonProperty("crosshair")] public bool Crosshair { get; set; } = true;
     [JsonProperty("accessibility")] public Accessibility Accessibility { get; set; } = new();
-    [JsonProperty("title")] public ChartTitle Title { get; set; }
-    [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
+    [JsonProperty("title")] public ChartTitle Title { get; set; } = new();
 }
 public class Accessibility
 {
@@ -33,8 +30,7 @@ public class Accessibility
 public class ColumnChartYAxis
 {
     [JsonProperty("min")] public int Min { get; set; } = 0;
-    [JsonProperty("title")] public ChartTitle Title { get; set; }
-    [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
+    [JsonProperty("title")] public ChartTitle Title { get; set; } = new();
 }
 public class ColumnChartPlotOptions
 {
