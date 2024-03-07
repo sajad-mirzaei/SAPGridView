@@ -69,6 +69,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
         {
             oSGV.Grids["MyGrid1"].Charts.Add(GetPieChart());
             oSGV.Grids["MyGrid1"].Charts.Add(GetColumnChart());
+            oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart());
             return oSGV;
         }
 
@@ -87,6 +88,39 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
             };
         }
 
+        public LineChart GetLineChart()
+        {
+            return new LineChart()
+            {
+                ChartContainerId = "lineChartContainer",
+
+                Title = new ChartTitle
+                {
+                    Text = "Population in 2005, 2015, 2013",
+                    Align = TitleAlign.Center
+                },
+                SubTitle =
+                {
+                    Text = "SubTitle 1"
+                },
+                XAxis = new LineChartXAxis()
+                {
+                    Categories = "Province"
+                },
+                YAxis = new LineChartYAxis()
+                {
+                    Title = new ChartTitle
+                    {
+                        Text = "YAxis Title 1"
+                    }
+                },
+                Tooltip = new ChartTooltip()
+                {
+                    ValueSuffix = " (Tooltip)"
+                },
+                Series = new List<string>() { "Population2005", "Population2013", "Population2015" }
+            };
+        }
         public ColumnChart GetColumnChart()
         {
             return new ColumnChart()

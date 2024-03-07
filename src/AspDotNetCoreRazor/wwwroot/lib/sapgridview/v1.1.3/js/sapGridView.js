@@ -1039,6 +1039,22 @@ class charts {
         chartsData[chartName]["categories"].push(rowData[chart.xAxis.categories]);
         return chartsData;
     }
+
+    setlineData(chartsData, rowData, chart, chartName, self = this) {
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["categories"] = [];
+            chartsData[chartName]["series"] = [];
+            $.each(chart.series, function (k, sery) {
+                chartsData[chartName]["series"].push({ name: self.mainColumnsTitle[sery], customKey: sery, data: [] });
+            });
+        }
+        $.each(chartsData[chartName]["series"], function (k, sery) {
+            chartsData[chartName]["series"][k].data.push(rowData[sery.customKey]);
+        });
+        chartsData[chartName]["categories"].push(rowData[chart.xAxis.categories]);
+        return chartsData;
+    }
     //#endregion
 
     //#region call charts
@@ -1122,7 +1138,46 @@ class charts {
             },
             series: series
         });
+    }
 
+    line(chart, self = this) {
+        let categories = self.chartsData && self.chartsData.column && self.chartsData.column.categories ? self.chartsData.column.categories : [];
+        let series = self.chartsData && self.chartsData.column && self.chartsData.column.series ? self.chartsData.column.series : [];
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName)
+            },
+            title: {
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
+            },
+            subtitle: {
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
+            },
+            xAxis: {
+                categories: categories,
+            },
+            yAxis: {
+                title: {
+                    text: chart.yAxis.title && chart.yAxis.title.text ? chart.yAxis.title.text : "",
+                    //align in yAxis not work
+                    //align: self.titleAlign[chart.yAxis.title.align] ? self.titleAlign[chart.yAxis.title.align] : "center"
+                }
+            },
+            tooltip: {
+                valueSuffix: chart.tooltip && chart.tooltip.valueSuffix ? chart.tooltip.valueSuffix : ""
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: chart.plotOptions.line.enabled
+                    },
+                    enableMouseTracking: chart.plotOptions.line.enableMouseTracking
+                }
+            },
+            series: series
+        });
     }
     //#endregion
 
