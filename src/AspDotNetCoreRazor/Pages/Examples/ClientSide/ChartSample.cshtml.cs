@@ -69,7 +69,8 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
         {
             oSGV.Grids["MyGrid1"].Charts.Add(GetPieChart());
             oSGV.Grids["MyGrid1"].Charts.Add(GetColumnChart());
-            oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart());
+            //oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart());
+            oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart2());
             return oSGV;
         }
 
@@ -119,6 +120,39 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                     ValueSuffix = " (Tooltip)"
                 },
                 Series = new List<string>() { "Population2005", "Population2013", "Population2015" }
+            };
+        }
+        public LineChart GetLineChart2()
+        {
+            return new LineChart()
+            {
+                ChartContainerId = "lineChartContainer2",
+
+                Title = new ChartTitle
+                {
+                    Text = "Population 2015",
+                    Align = TitleAlign.Center
+                },
+                SubTitle =
+                {
+                    Text = "SubTitle 1"
+                },
+                XAxis = new LineChartXAxis()
+                {
+                    Categories = "Population2015"
+                },
+                YAxis = new LineChartYAxis()
+                {
+                    Title = new ChartTitle
+                    {
+                        Text = "YAxis Title 1"
+                    }
+                },
+                Tooltip = new ChartTooltip()
+                {
+                    ValueSuffix = " (Tooltip)"
+                },
+                Series = new List<string>() { "Province" }
             };
         }
         public ColumnChart GetColumnChart()

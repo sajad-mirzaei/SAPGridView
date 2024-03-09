@@ -296,17 +296,17 @@ class gridBind {
                 .find(".dt-buttons")
                 .prepend("<input type='search' class='form-control form-control-sm DTCustomGeneralSearch " + m.thisTableId + "GeneralSearch' placeholder='جستجو در همه ستون ها' aria-controls='" + m.thisTableId + "'>")
                 .children(".DTCustomGeneralSearch")
-                .on("keyup change", function () {
+                .on("change keyup", sapGridViewTools.delayFireEvent(function () {
                     self.searchCustomized($(this), m.tbodyId, "GeneralSearch", m.tableInfo);
-                });
+                }));
         }
         if (m.thisTable.closest(".dataTables_scroll").length) {
             m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody thead.DT_Thead").removeClass("DT_Thead").addClass("DT_TheadWidthControl");
             m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tr.DT_TrThead").removeClass("DT_TrThead").addClass("DT_TrWidthControl");
             m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody tfoot").remove();
             m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollBody .DT_TrFilters").remove();
+            m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot .DT_TrFilters").remove();
             //m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot tr.DT_TrTfoot").removeClass("DT_TrTfoot").addClass("DT_TrWidthControl");
-            //m.thisTable.closest(".dataTables_scroll").find(".dataTables_scrollFoot .DT_TrFilters").removeClass("DT_TrFilters").addClass("DT_TrTfootCalc");
         }
     }
 
@@ -381,7 +381,7 @@ class gridBind {
             let tbodyid = $(this).attr("data-tbodyid");
             self.searchCustomized(allInput, tbodyid, "ColumnFilter", m.tableInfo);
         });
-        $(".DT_ColumnSearch").on('change', function () {
+        $(".DT_ColumnSearch").on("change keyup", sapGridViewTools.delayFireEvent(function () {
             let allInput = $(this).closest("tr").find("input");
             let tbodyid = $(this).attr("data-tbodyid");
             self.searchCustomized(allInput, tbodyid, "ColumnSearch", m.tableInfo);
@@ -389,12 +389,12 @@ class gridBind {
                 m.tableObject.search('').columns().search('').draw();
             } else
                 m.tableObject.draw();
-        });
-        $(".dataTables_filter input").on('keyup', function () {
-            let allInput = $(this);
-            let tbodyid = $(this).closest(".dataTables_wrapper").find("th").attr("data-tbodyid");
-            self.searchCustomized(allInput, tbodyid, "GeneralSearch", m.tableInfo);
-        });
+        }));
+        //$(".dataTables_filter input").on("change keyup", sapGridViewTools.delayFireEvent(function () {
+        //    let allInput = $(this);
+        //    let tbodyid = $(this).closest(".dataTables_wrapper").find("th").attr("data-tbodyid");
+        //    self.searchCustomized(allInput, tbodyid, "GeneralSearch", m.tableInfo);
+        //}));
     }
 
     keepScrolHeight(self = this, m = this.model) {
@@ -1682,6 +1682,19 @@ class sapGridViewTools {
             }
         });
         return destination;
+    }
+
+    //dely Fire event after n milliseconds
+    static delayFireEvent(f, delay) {
+        var timer = null;
+        return function () {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = window.setTimeout(function () {
+                f.apply(context, args);
+            },
+                delay || 700);
+        };
     }
 }
 
