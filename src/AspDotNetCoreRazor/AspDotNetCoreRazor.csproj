@@ -15,7 +15,11 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <Content Update="Pages\Examples\ClientSide\ChartSample.cshtml">
+	  <Content Update="Pages\Examples\ClientSide\ChartLine.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Pages\Examples\ClientSide\ChartMutiple.cshtml">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>

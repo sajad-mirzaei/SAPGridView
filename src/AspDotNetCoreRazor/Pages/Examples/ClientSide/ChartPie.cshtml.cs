@@ -4,10 +4,10 @@ using WWWPGrids.Charts;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
 {
-    public class ChartSample : PageModel
+    public class ChartPie : PageModel
     {
-        private readonly ILogger<ChartSample> _logger;
-        public ChartSample(ILogger<ChartSample> logger)
+        private readonly ILogger<ChartPie> _logger;
+        public ChartPie(ILogger<ChartPie> logger)
         {
             _logger = logger;
         }
@@ -21,7 +21,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
 
         protected SAPGridView AddGrid()
         {
-            List<ChartSampleModel> dt = new ChartSampleData().GetData();
+            List<ChartPieModel> dt = new ChartPieData().GetData();
             SAPGridView oSGV = new();
 
             oSGV.Grids["MyGrid1"] = new Grid()
@@ -33,7 +33,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
                 Columns = new List<Column>() {
                     new() { Data = "Id", Title = "Id" },
-                    new() { Data = "Province", Title = "Province Title" },
+                    new() { Data = "Province", Title = "Province Title", Width = "20" },
                     new() { Data = "Population2005", Title = "Population 2005" },
                     new() { Data = "Population2013", Title = "Population 2013" },
                     new() { Data = "Population2015", Title = "Population 2015" },
@@ -68,9 +68,6 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
         public SAPGridView AddGridChart(SAPGridView oSGV)
         {
             oSGV.Grids["MyGrid1"].Charts.Add(GetPieChart());
-            oSGV.Grids["MyGrid1"].Charts.Add(GetColumnChart());
-            //oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart());
-            oSGV.Grids["MyGrid1"].Charts.Add(GetLineChart2());
             return oSGV;
         }
 
@@ -89,117 +86,13 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
             };
         }
 
-        public LineChart GetLineChart()
-        {
-            return new LineChart()
-            {
-                ChartContainerId = "lineChartContainer",
-
-                Title = new ChartTitle
-                {
-                    Text = "Population in 2005, 2015, 2013",
-                    Align = TitleAlign.Center
-                },
-                SubTitle =
-                {
-                    Text = "SubTitle 1"
-                },
-                XAxis = new LineChartXAxis()
-                {
-                    Categories = "Province"
-                },
-                YAxis = new LineChartYAxis()
-                {
-                    Title = new ChartTitle
-                    {
-                        Text = "YAxis Title 1"
-                    }
-                },
-                Tooltip = new ChartTooltip()
-                {
-                    ValueSuffix = " (Tooltip)"
-                },
-                Series = new List<string>() { "Population2005", "Population2013", "Population2015" }
-            };
-        }
-        public LineChart GetLineChart2()
-        {
-            return new LineChart()
-            {
-                ChartContainerId = "lineChartContainer2",
-
-                Title = new ChartTitle
-                {
-                    Text = "Population 2015",
-                    Align = TitleAlign.Center
-                },
-                SubTitle =
-                {
-                    Text = "SubTitle 1"
-                },
-                XAxis = new LineChartXAxis()
-                {
-                    Categories = "Population2015"
-                },
-                YAxis = new LineChartYAxis()
-                {
-                    Title = new ChartTitle
-                    {
-                        Text = "YAxis Title 1"
-                    }
-                },
-                Tooltip = new ChartTooltip()
-                {
-                    ValueSuffix = " (Tooltip)"
-                },
-                Series = new List<string>() { "Province" }
-            };
-        }
-        public ColumnChart GetColumnChart()
-        {
-            return new ColumnChart()
-            {
-                ChartContainerId = "columnChartContainer",
-
-                Title = new ChartTitle
-                {
-                    Text = "Population in 2005, 2015, 2013",
-                    Align = TitleAlign.Center
-                },
-                XAxis = new ColumnChartXAxis()
-                {
-                    Title = new ChartTitle()
-                    {
-                        Text = "XAxis Title 1"
-                    },
-                    Accessibility = new Accessibility()
-                    {
-                        Description = "Accessibility description"
-                    },
-                    Categories = "Province"
-                },
-                YAxis = new ColumnChartYAxis()
-                {
-                    Title = new ChartTitle
-                    {
-                        Text = "YAxis Title 1"
-                    },
-                    Min = 0
-                },
-                Tooltip = new ChartTooltip()
-                {
-                    ValueSuffix = " (Tooltip)"
-                },
-                Series = new List<string>() { "Population2005", "Population2013", "Population2015" }
-            };
-        }
     }
 
-    public class ChartSampleData
+    public class ChartPieData
     {
-        public List<ChartSampleModel> GetData()
+        public List<ChartPieModel> GetData()
         {
-            var d = new List<ChartSampleModel>
+            var d = new List<ChartPieModel>
             {
                 new() { Id = 1, Province = "Tehran", Population2005 = 11228625, Population2013 = 12183391, Population2015 = 13267637 },
                 new() { Id = 2, Province = "KhorasanRazavi", Population2005 = 5515980, Population2013 = 5994402, Population2015 = 6434501 },
@@ -243,7 +136,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
             return d;
         }
     }
-    public class ChartSampleModel
+    public class ChartPieModel
     {
         public int Id { get; set; }
         public string Province { get; set; }

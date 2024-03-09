@@ -385,10 +385,6 @@ class gridBind {
             let allInput = $(this).closest("tr").find("input");
             let tbodyid = $(this).attr("data-tbodyid");
             self.searchCustomized(allInput, tbodyid, "ColumnSearch", m.tableInfo);
-            if (jQuery.isEmptyObject(m.searchedValues)) {
-                m.tableObject.search('').columns().search('').draw();
-            } else
-                m.tableObject.draw();
         }));
         //$(".dataTables_filter input").on("change keyup", sapGridViewTools.delayFireEvent(function () {
         //    let allInput = $(this);
@@ -966,6 +962,13 @@ class gridBind {
                 }
             }
         });
+
+        if (Object.keys(dataSearch).length == 0) {
+            //if (jQuery.isEmptyObject(m.searchedValues)) {
+                m.tableObject.search('').columns().search('').draw();
+            //}
+        } //else
+            //m.tableObject.draw();
     }
 
     counterColumn(self, m = this.model) {
@@ -1141,8 +1144,8 @@ class charts {
     }
 
     line(chart, self = this) {
-        let categories = self.chartsData && self.chartsData.column && self.chartsData.column.categories ? self.chartsData.column.categories : [];
-        let series = self.chartsData && self.chartsData.column && self.chartsData.column.series ? self.chartsData.column.series : [];
+        let categories = self.chartsData && self.chartsData.line && self.chartsData.line.categories ? self.chartsData.line.categories : [];
+        let series = self.chartsData && self.chartsData.line && self.chartsData.line.series ? self.chartsData.line.series : [];
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName)
