@@ -13,5 +13,16 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\WWWPGrids\WWWPGrids.csproj" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Update="Pages\Examples\ClientSide\ChartLine.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Pages\Examples\ClientSide\ChartMutiple.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
 
 </Project>

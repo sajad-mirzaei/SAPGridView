@@ -32,7 +32,7 @@ namespace WWWPGrids
             };
             var JsonData = JsonConvert.SerializeObject(AllData);
 
-            return new HtmlString("<script>$(document).ready(function() { SapGridViewJSBind(" + JsonData + ", 1, '1'); });</script>");
+            return new HtmlString("<script>$(document).ready(function() { new sapGridView(" + JsonData + ", 1, '1'); });</script>");
         }
         public string AjaxBind(params string[] gridNameList)
         {

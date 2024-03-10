@@ -19,9 +19,24 @@ public class MultipleGrids : PageModel
         SAPGridView oSGV = CreateGrid();
         TempData["SAPGridView"] = oSGV.GridBind("MyGrid1", "MyGrid2");
     }
-    public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
+    public IActionResult OnPostTest1([FromHeader] DatatablesFiltersModel filters)
     {
-        List<MultipleGridsModel> data = MakeList();
+        List<MultipleGridsModel> data = MakeList(1);
+        List<MultipleGridsModel> dt = data.OrderBy(c => c.a).Skip(filters.Start).Take(filters.Length).ToList();
+
+        var oDatatablesModel = new DatatablesModel<MultipleGridsModel>()
+        {
+            Draw = filters.Draw,
+            RecordsFiltered = data.Count(),
+            RecordsTotal = data.Count(),
+            Data = dt
+        };
+        return new JsonResult(oDatatablesModel);
+    }
+
+    public IActionResult OnPostTest2([FromHeader] DatatablesFiltersModel filters)
+    {
+        List<MultipleGridsModel> data = MakeList(2);
         List<MultipleGridsModel> dt = data.OrderBy(c => c.a).Skip(filters.Start).Take(filters.Length).ToList();
 
         var oDatatablesModel = new DatatablesModel<MultipleGridsModel>()
@@ -42,6 +57,10 @@ public class MultipleGrids : PageModel
         {
             ServerSide = true,
             Processing = true,
+            ServerSideOptions = new ServerSideOption()
+            {
+                OnPostMethodName = "Test1"
+            },
             ContainerId = "MyGridId1",
             ContainerHeight = 800,
             GridTitle = "گزارش تست 1",
@@ -79,6 +98,10 @@ public class MultipleGrids : PageModel
         {
             ServerSide = true,
             Processing = true,
+            ServerSideOptions = new ServerSideOption()
+            {
+                OnPostMethodName = "Test2"
+            },
             ContainerId = "MyGridId2",
             ContainerHeight = 800,
             GridTitle = "گزارش تست 2",
@@ -115,7 +138,7 @@ public class MultipleGrids : PageModel
         return oSGV;
     }
 
-    public List<MultipleGridsModel> MakeList()
+    public List<MultipleGridsModel> MakeList(int gridNumber)
     {
         List<MultipleGridsModel> oDT = new();
 
@@ -126,10 +149,7 @@ public class MultipleGrids : PageModel
             Row1.b = "bb " + i.ToString();
             Row1.c = i + 1;
 
-            if (i % 2 == 0)
-                Row1.d = "آریا اکبری";
-            else
-                Row1.d = "آريا اكبري";
+            Row1.d = "Grid number " + gridNumber.ToString();
 
             if (i < 3) Row1.e = 3;
             else if (i < 6) Row1.e = 6;
