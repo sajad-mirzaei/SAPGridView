@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Activities.Expressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using System.Web.Script.Serialization;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 /// <summary>
 /// Summary description for SAPGridView
 /// </summary>
@@ -166,6 +163,8 @@ namespace SAP.WebControls
         [JsonProperty("dropDownFilterButton")] public Boolean DropDownFilterButton { get; set; }
         /// <summary> حذف وضعیت های ذخیره شده </summary>
         [JsonProperty("recycleButton")] public Boolean RecycleButton { get; set; }
+        /// <summary> حذف همه فیلترها و جستجوها </summary>
+        [JsonProperty("removeAllFilters")] public Boolean RemoveAllFilters { get; set; }
         /// <summary> جستجو در کل جدول </summary>
         [JsonProperty("gridSearchTextBox")] public Boolean GridSearchTextBox { get; set; }
         /// <summary> حذف عنوان جدول از سطر اول خروجی اکسل </summary>
@@ -182,6 +181,7 @@ namespace SAP.WebControls
             ColumnsSearchButton = true;
             RecycleButton = true;
             DropDownFilterButton = false;
+            RemoveAllFilters = true;
             GridSearchTextBox = true;
             TitleRowInExelExport = true;
         }

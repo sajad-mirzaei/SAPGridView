@@ -783,9 +783,7 @@ class gridBind {
         if (customOptions["columnsSearchButton"] === true) DefaultOptions.buttons.push(ColumnsSearchButton);
         if (customOptions["dropDownFilterButton"] === true) DefaultOptions.buttons.push(DropDownFilterButton);
         if (customOptions["recycleButton"] === true) DefaultOptions.buttons.push(RecycleButton);
-
-        DefaultOptions.buttons.push(RemoveAllFilters);
-
+        if (customOptions["removeAllFilters"] === true) DefaultOptions.buttons.push(RemoveAllFilters);
         $.each(customOptions, function (k, v) {
             if (["lengthMenu", "order"].includes(k) && Array.isArray(DefaultOptions[k]) !== true) {
                 v = v !== null ? JSON.parse(v.replace(/'/gi, "\"")) : [];
