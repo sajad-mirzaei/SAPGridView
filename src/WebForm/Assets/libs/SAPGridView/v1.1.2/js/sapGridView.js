@@ -263,7 +263,7 @@ return data.d.data;
             SGV_FillDropDownFilters(ThisTableAPI, TheadID, DataArray.columns);
 
         SGV_OnChangeFilters(TableInfo);
-        SGV_KeepScrolHeight(ThisTable, DataArray.containerHeight);
+        //SGV_KeepScrolHeight(ThisTable, DataArray.containerHeight);
         SGVArray[ContainerId] = SGVArray[ContainerId] == undefined ? {} : SGVArray[ContainerId];
         SGVArray[ContainerId][ThisTableID] = { TableId: ThisTableID, TableObject: TableObject, TableAPI: ThisTableAPI };
         if (typeof DataTableCallBackData === "function") {

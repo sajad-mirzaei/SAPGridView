@@ -61,7 +61,7 @@ class gridBind {
         this.addFilters();
         this.fillDropDownFilters();
         this.onChangeFilters();
-        this.keepScrolHeight();
+        //this.keepScrolHeight();
         this.onDraw();
         this.creatingUserSideFunctions();
         this.firstBind();
