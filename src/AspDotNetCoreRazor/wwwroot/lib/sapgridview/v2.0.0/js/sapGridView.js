@@ -1740,7 +1740,7 @@ class sapGridViewOnClick {
         let gridParameters = sapGridViewTools.base64Decode($("#" + ThisTableID).attr("data-gridparameters"));
         let callBackData = {
             GridParameters: JSON.parse(gridParameters),
-            TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, cellName: cellName },
+            TableDetails: { ContainerId: ContainerId, TableID: ThisTableID, CellName: cellName },
             RowData: sapGridViewTools.copyAndCamelCaseIgnore(rowData, cData.MainColumnsName),
             FuncArray: cData.FuncArray
         };
