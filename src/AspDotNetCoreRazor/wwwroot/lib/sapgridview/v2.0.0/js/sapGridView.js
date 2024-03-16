@@ -61,7 +61,7 @@ class gridBind {
         this.addFilters();
         this.fillDropDownFilters();
         this.onChangeFilters();
-        //this.keepScrolHeight();
+        this.keepScrolHeight();
         this.onDraw();
         this.creatingUserSideFunctions();
         this.firstBind();
@@ -195,7 +195,7 @@ class gridBind {
     }
 
     setDefaultOptions(self = this, m = this.model) {
-        m.thisColumnDefs = new sapGridViewFunctions().add(m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName, m.tableObject);
+        m.thisColumnDefs = new sapGridViewFunctions().add(m.totalFunctionDetails, m.footerFields, m.containerId, m.thisTableId, m.mainColumnsName, m.tableObject, m.grid.columns);
         m.defaultOptions = self.getDefaultOptions();
 
         m.defaultOptions["columnDefs"] = m.thisColumnDefs;
@@ -739,7 +739,7 @@ class gridBind {
                 self.clearAllFilters(dt, m.thisTableId);
             }
         };
-        
+
         //-Start---customizeButtons-------
         if (m.grid.customizeButtons) {
             for (const [k, btnArray] of Object.entries(m.grid.customizeButtons)) {
@@ -963,10 +963,10 @@ class gridBind {
 
         if (Object.keys(dataSearch).length == 0) {
             //if (jQuery.isEmptyObject(m.searchedValues)) {
-                m.tableObject.search('').columns().search('').draw();
+            m.tableObject.search('').columns().search('').draw();
             //}
         } //else
-            //m.tableObject.draw();
+        //m.tableObject.draw();
     }
 
     counterColumn(self, m = this.model) {
@@ -1006,7 +1006,7 @@ class charts {
             let rowData = this.data();
             $.each(charts, function (k, chart) {
                 let chartName = self.getChartType(chart.chartName);
-                
+
                 let fName = "set" + chartName + "Data";
                 if (typeof self[fName] === "function") {
                     chartsData = self[fName](chartsData, rowData, chart, chartName); //Example: setpieData
@@ -1197,11 +1197,12 @@ class sapGridViewFunctions {
     mainColumnsName = null;
     tableObject = null;
     cumulativeSum = 0;
+    gridColumns = 0;
     //thisColumnDefs = null;
     //#region functions in columns -> use for addFunctionsToColumns method
 
     //#region add main functions
-    add(totalFunctionDetails, footerFields, containerId, thisTableId, mainColumnsName, tableObject) {
+    add(totalFunctionDetails, footerFields, containerId, thisTableId, mainColumnsName, tableObject, gridColumns) {
         self = this;
         self.totalFunctionDetails = totalFunctionDetails;
         self.footerFields = footerFields;
@@ -1209,6 +1210,7 @@ class sapGridViewFunctions {
         self.thisTableId = thisTableId;
         self.mainColumnsName = mainColumnsName;
         self.tableObject = tableObject;
+        self.gridColumns = gridColumns;
         let thisColumnDefs = [];
         if (self.totalFunctionDetails["forRender"].length > 0) {
             $.each(self.totalFunctionDetails["forRender"], function (k, forRender) {
@@ -1289,7 +1291,7 @@ class sapGridViewFunctions {
     getRenderFunctionsChanges(forRender, cellIndex, cellData, type, rowData, meta, self = this) {
         let rowIndex = meta.row;
         let colIndex = meta.col;
-        let thisCellNewData = cellData;
+        let thisCellNewData = cellData !== undefined && cellData !== null && cellData !== NaN ? cellData : self.gridColumns[colIndex].defaultContent;
         let uniqueKeyArray = [];
         $.each(forRender["functions"], function (kf, func) {
             let fnName = func.funcName;
