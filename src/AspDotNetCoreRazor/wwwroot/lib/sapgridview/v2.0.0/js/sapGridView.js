@@ -30,15 +30,17 @@
     handle(self, level, gridFirstText) {
         $.each(self.mainData["Grids"], function (gridName, grid) {
             grid["data"] = Array.isArray(grid["data"]) == false ? JSON.parse(grid["data"]) : grid["data"];
-            self.gridsArray.push(new gridBind().main(gridName, grid, level, gridFirstText));
+            self.gridsArray.push(new gridBind().main(gridName, grid, level, gridFirstText, self.customData));
         });
     }
 }
 
 class gridBind {
     model = null;
+    customData = null;
 
-    main(gridName, grid, level, gridFirstText) {
+    main(gridName, grid, level, gridFirstText, customData) {
+        this.customData = customData;
         this.model = new gridModel().setModelProperties(gridName, grid, level, gridFirstText);
 
         this.bind();
