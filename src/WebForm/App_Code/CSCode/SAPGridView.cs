@@ -93,6 +93,7 @@ namespace SAP.WebControls
         [JsonProperty("customizeButtons")] public List<CustomizeButton> CustomizeButtons { get; set; }
         [JsonProperty("gridParameters")] public Dictionary<string, string> GridParameters = new Dictionary<string, string>();
         [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }
+        [JsonProperty("charts")] public List<Chart> Charts { get; set; }
         private RowComplex _rowComplex { get; set; }
         [JsonProperty("rowComplex")]
         public RowComplex RowComplex
@@ -121,16 +122,23 @@ namespace SAP.WebControls
             CustomizeButtons = new List<CustomizeButton>();
             Options = new Option();
             RowComplex = new RowComplex();
+            Charts = new List<Chart>();
         }
         public Grid DeepCopy()
         {
             Grid o = (Grid)this.MemberwiseClone();
             o.Columns = new List<Column>(o.Columns);
+            o.Charts = new List<Chart>(o.Charts);
             o.HeaderComplex = new List<HeaderComplexRow>(o.HeaderComplex);
             for (var i = 0; i < o.Columns.Count; i++)
             {
                 if (o.Columns[i] != null)
                     o.Columns[i] = o.Columns[i].DeepCopy();
+            }
+            for (var j = 0; j < o.Charts.Count; j++)
+            {
+                if (o.Charts[j] != null)
+                    o.Charts[j] = (Chart)o.Charts[j].DeepCopy();
             }
             return o;
         }
@@ -658,4 +666,220 @@ namespace SAP.WebControls
         public string Title { get; set; }
         public string Data { get; set; }
     }
+
+    #region Charts
+
+    public class Chart
+    {
+        [JsonProperty("chartName")] protected string ChartName { get; set; }
+        [JsonProperty("chartContainerId")] public string ChartContainerId { get; set; }
+        public virtual object DeepCopy()
+        {
+            return (Chart)MemberwiseClone();
+        }
+    }
+
+    public class ChartTitle
+    {
+        [JsonProperty("text")] public string Text { get; set; }
+        [JsonProperty("align")] public TitleAlign Align { get; set; }
+
+        public ChartTitle()
+        {
+            Text = string.Empty;
+            Align = TitleAlign.Center;
+        }
+    }
+
+    public class ChartSubTitle
+    {
+        [JsonProperty("text")] public string Text { get; set; }
+        [JsonProperty("align")] public TitleAlign Align { get; set; }
+
+        public ChartSubTitle()
+        {
+            Text = string.Empty;
+            Align = TitleAlign.Center;
+        }
+    }
+
+
+    public class ChartTooltip
+    {
+        [JsonProperty("valueSuffix")] public string ValueSuffix { get; set; }
+        public ChartTooltip()
+        {
+            ValueSuffix = string.Empty;
+        }
+    }
+
+    public enum TitleAlign
+    {
+        Right = 0,
+        Center = 1,
+        Left = 2
+    }
+
+    //-ColumnChart-------------
+    public class ColumnChart : Chart
+    {
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+        [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
+        [JsonProperty("xAxis")] public ColumnChartXAxis XAxis { get; set; }
+        [JsonProperty("yAxis")] public ColumnChartYAxis YAxis { get; set; }
+        [JsonProperty("tooltip")] public ChartTooltip Tooltip { get; set; }
+        [JsonProperty("plotOptions")] public ColumnChartPlotOptions PlotOptions { get; set; }
+        [JsonProperty("series")] public List<string> Series { get; set; }
+        public ColumnChart()
+        {
+            ChartName = GetType().Name;
+            Title = new ChartTitle();
+            SubTitle = new ChartSubTitle();
+            XAxis = new ColumnChartXAxis();
+            YAxis = new ColumnChartYAxis();
+            Tooltip = new ChartTooltip();
+            PlotOptions = new ColumnChartPlotOptions();
+            Series = new List<string>();
+        }
+    }
+    public class ColumnChartXAxis
+    {
+        [JsonProperty("categories")] public string Categories { get; set; }
+        [JsonProperty("crosshair")] public bool Crosshair { get; set; }
+        [JsonProperty("accessibility")] public Accessibility Accessibility { get; set; }
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+
+        public ColumnChartXAxis()
+        {
+            Categories = String.Empty;
+            Crosshair = true;
+            Accessibility = new Accessibility();
+            Title = new ChartTitle();
+        }
+    }
+    public class Accessibility
+    {
+        [JsonProperty("description")] public string Description { get; set; }
+
+        public Accessibility()
+        {
+            Description = String.Empty;
+        }
+    }
+    public class ColumnChartYAxis
+    {
+        [JsonProperty("min")] public int Min { get; set; }
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+
+        public ColumnChartYAxis()
+        {
+            Min = 0;
+            Title = new ChartTitle();
+        }
+    }
+    public class ColumnChartPlotOptions
+    {
+        [JsonProperty("column")] public PlotOptionsColumn Column { get; set; }
+
+        public ColumnChartPlotOptions()
+        {
+            Column = new PlotOptionsColumn();
+        }
+    }
+    public class PlotOptionsColumn
+    {
+        [JsonProperty("pointPadding")] public float PointPadding { get; set; }
+        [JsonProperty("borderWidth")] public int BorderWidth { get; set; }
+
+        public PlotOptionsColumn()
+        {
+            PointPadding = 0.2f;
+            BorderWidth = 0;
+        }
+    }
+
+    //-LineChart-------------
+    public class LineChart : Chart
+    {
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+        [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
+        [JsonProperty("xAxis")] public LineChartXAxis XAxis { get; set; }
+        [JsonProperty("yAxis")] public LineChartYAxis YAxis { get; set; }
+        [JsonProperty("tooltip")] public ChartTooltip Tooltip { get; set; }
+        [JsonProperty("plotOptions")] public LineChartPlotOptions PlotOptions { get; set; }
+        [JsonProperty("series")] public List<string> Series { get; set; }
+        public LineChart()
+        {
+            ChartName = GetType().Name;
+            Title = new ChartTitle();
+            SubTitle = new ChartSubTitle();
+            XAxis = new LineChartXAxis();
+            YAxis = new LineChartYAxis();
+            Tooltip = new ChartTooltip();
+            PlotOptions = new LineChartPlotOptions();
+            Series = new List<string>();
+        }
+    }
+    public class LineChartXAxis
+    {
+        [JsonProperty("categories")] public string Categories { get; set; }
+
+        public LineChartXAxis()
+        {
+            Categories = String.Empty;
+        }
+    }
+    public class LineChartYAxis
+    {
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+
+        public LineChartYAxis()
+        {
+            Title = new ChartTitle();
+        }
+    }
+    public class LineChartPlotOptions
+    {
+        [JsonProperty("line")] public PlotOptionsLine Line { get; set; }
+
+        public LineChartPlotOptions()
+        {
+            Line = new PlotOptionsLine();
+        }
+    }
+    public class PlotOptionsLine
+    {
+        [JsonProperty("dataLabels")] public PlotOptionsLineDataLabels DataLabels { get; set; }
+        [JsonProperty("enableMouseTracking")] public bool EnableMouseTracking { get; set; }
+
+        public PlotOptionsLine()
+        {
+            DataLabels = new PlotOptionsLineDataLabels();
+            EnableMouseTracking = true;
+        }
+    }
+    public class PlotOptionsLineDataLabels
+    {
+        [JsonProperty("enabled")] public bool Enabled { get; set; }
+
+        public PlotOptionsLineDataLabels()
+        {
+            Enabled = true;
+        }
+    }
+
+    //-PieChart----------------
+    public class PieChart : Chart
+    {
+        [JsonProperty("key")] public string Key { get; set; }
+        [JsonProperty("value")] public string Value { get; set; }
+        [JsonProperty("title")] public ChartTitle Title { get; set; }
+        [JsonProperty("subTitle")] public ChartSubTitle SubTitle { get; set; }
+        public PieChart()
+        {
+            ChartName = GetType().Name;
+        }
+    }
+
+    #endregion
 }

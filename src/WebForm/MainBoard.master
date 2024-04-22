@@ -43,6 +43,15 @@
     <script type="text/javascript" language="javascript" src="/Assets/libs/DataTables/1.10.20/ColReorder-1.5.2/js/dataTables.colReorder.min.js"></script>
     <script type="text/javascript" language="javascript" src="/Assets/libs/DataTables/1.10.20/Responsive-2.2.3/js/dataTables.responsive.min.js"></script>
     <script type="text/javascript" language="javascript" src="/Assets/libs/DataTables/1.10.20/FixedHeader-3.1.6/js/dataTables.fixedHeader.min.js"></script>
+    
+    
+    
+    <link href="/Assets/libs/highcharts/v11.3.0/css/highcharts.css" rel="stylesheet" type="text/css" />
+    <script src="/Assets/libs/highcharts/v11.3.0/js/highcharts.js"></script>
+    <script src="/Assets/libs/highcharts/v11.3.0/js/exporting.js"></script>
+    <script src="/Assets/libs/highcharts/v11.3.0/js/export-data.js"></script>
+    <script src="/Assets/libs/highcharts/v11.3.0/js/accessibility.js"></script>
+
 </head>
 <body>
     <form id="frmMainBoard" runat="server" class="mainContainer">

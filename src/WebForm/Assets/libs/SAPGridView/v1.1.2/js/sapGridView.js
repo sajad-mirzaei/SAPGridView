@@ -80,6 +80,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
         var rowGrouping = null;
         var cellsToBeMerged = [];
         var numberOfUnVisibleCells = 0;
+        var mainColumnsTitle = {};
         for (var j = 0; j < DataArray.columns.length; j++) {
             var TempColumn = DataArray.columns[j];
             if (TempColumn != null && TempColumn.rowGrouping !== undefined && TempColumn.rowGrouping !== null && TempColumn.rowGrouping.enable === true) {
@@ -115,6 +116,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                 CellIndex++;
                 AllColumns.push(TempColumn);
 
+                mainColumnsTitle[CellName] = TempColumn.title;
                 //-start-headerComplex------------------
                 if (TempColumn.visible == false)
                     numberOfUnVisibleCells++;
@@ -242,6 +244,13 @@ return data.d.data;
         //Add Extra Settings
         var t = 0
         TableObject.on("draw", function () {
+
+            new charts({
+                grid: { charts: DataArray.charts },
+                tableObject: TableObject,
+                mainColumnsTitle: mainColumnsTitle
+            });
+
             if (t > 0) {
                 SGV_AfterFilter_TheadTfootCalc(TableInfo);
             }
@@ -284,6 +293,11 @@ return data.d.data;
         if (rowGrouping !== null)
             TableObject.columns([rowGrouping.rowNumber]).visible(false, false).draw();
 
+        new charts({
+            grid: { charts: DataArray.charts },
+            tableObject: TableObject,
+            mainColumnsTitle: mainColumnsTitle
+        });
     });
 }
 
@@ -1394,6 +1408,216 @@ function SGV_ErrorMessage(errorKey, otherInfo = null) {
         console.log(errorArray[errorKey], otherInfo);
     else
         console.log(errorArray[errorKey]);
+}
+
+class charts {
+    tableObject = null;
+    titleAlign = { 0: "right", 1: "center", 2: "left" };
+    chartsData = null;
+    mainColumnsTitle = null;
+
+    constructor(m) {
+        this.tableObject = m.tableObject;
+        this.mainColumnsTitle = m.mainColumnsTitle;
+
+        console.log(m);
+        //One-time trace data and charts-data assignment
+        this.setChartsData(m.grid.charts);
+
+        //Making requested charts
+        this.traceCharts(m.grid.charts);
+
+        $(".highcharts-credits").hide();
+    }
+
+    //#region Prepare data for charts
+    setChartsData(charts, self = this) {
+        let chartsData = {};
+        self.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
+            let rowData = this.data();
+            $.each(charts, function (k, chart) {
+                let chartName = self.getChartType(chart.chartName);
+
+                let fName = "set" + chartName + "Data";
+                if (typeof self[fName] === "function") {
+                    chartsData = self[fName](chartsData, rowData, chart, chartName); //Example: setpieData
+                }
+            });
+        });
+        self.chartsData = chartsData;
+    }
+
+    setpieData(chartsData, rowData, chart, chartName, self = this) {
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["data"] = [];
+        }
+        chartsData[chartName].data.push({ name: rowData[chart.key], y: rowData[chart.value] });
+        return chartsData;
+    }
+
+    setcolumnData(chartsData, rowData, chart, chartName, self = this) {
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["categories"] = [];
+            chartsData[chartName]["series"] = [];
+            $.each(chart.series, function (k, sery) {
+                chartsData[chartName]["series"].push({ name: self.mainColumnsTitle[sery], customKey: sery, data: [] });
+            });
+        }
+        $.each(chartsData[chartName]["series"], function (k, sery) {
+            chartsData[chartName]["series"][k].data.push(rowData[sery.customKey]);
+        });
+        chartsData[chartName]["categories"].push(rowData[chart.xAxis.categories]);
+        return chartsData;
+    }
+
+    setlineData(chartsData, rowData, chart, chartName, self = this) {
+        if (!chartsData[chartName]) {
+            chartsData[chartName] = {};
+            chartsData[chartName]["categories"] = [];
+            chartsData[chartName]["series"] = [];
+            $.each(chart.series, function (k, sery) {
+                chartsData[chartName]["series"].push({ name: self.mainColumnsTitle[sery], customKey: sery, data: [] });
+            });
+        }
+        $.each(chartsData[chartName]["series"], function (k, sery) {
+            chartsData[chartName]["series"][k].data.push(rowData[sery.customKey]);
+        });
+        chartsData[chartName]["categories"].push(rowData[chart.xAxis.categories]);
+        return chartsData;
+    }
+    //#endregion
+
+    //#region call charts
+    traceCharts(charts, self = this) {
+        $.each(charts, function (k, chart) {
+            let chartName = self.getChartType(chart.chartName);
+            if (typeof self[chartName] === "function") {
+                self[chartName](chart);
+            }
+        });
+    }
+    //#endregion
+
+    //#region charts methods
+    pie(chart, self = this) {
+        let data = self.chartsData && self.chartsData.pie && self.chartsData.pie.data ? self.chartsData.pie.data : [];
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName),
+                styledMode: true
+            },
+            title: {
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
+            },
+            subtitle: {
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
+            },
+            series: [
+                {
+                    data: data
+                }
+            ]
+        });
+    }
+
+    column(chart, self = this) {
+        let categories = self.chartsData && self.chartsData.column && self.chartsData.column.categories ? self.chartsData.column.categories : [];
+        let series = self.chartsData && self.chartsData.column && self.chartsData.column.series ? self.chartsData.column.series : [];
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName)
+            },
+            title: {
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
+            },
+            subtitle: {
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
+            },
+            xAxis: {
+                categories: categories,
+                crosshair: true,
+                accessibility: {
+                    description: chart.xAxis.accessibility
+                },
+                title: {
+                    text: chart.xAxis.title && chart.xAxis.title.text ? chart.xAxis.title.text : "",
+                    //align in xAxix not work
+                    //align: self.titleAlign[chart.xAxis.title.align] ? self.titleAlign[chart.xAxis.title.align] : "center"
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: chart.yAxis.title && chart.yAxis.title.text ? chart.yAxis.title.text : "",
+                    //align in yAxis not work
+                    //align: self.titleAlign[chart.yAxis.title.align] ? self.titleAlign[chart.yAxis.title.align] : "center"
+                }
+            },
+            tooltip: {
+                valueSuffix: chart.tooltip && chart.tooltip.valueSuffix ? chart.tooltip.valueSuffix : ""
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: chart.plotOptions.column.pointPadding,
+                    borderWidth: chart.plotOptions.column.borderWidth
+                }
+            },
+            series: series
+        });
+    }
+
+    line(chart, self = this) {
+        let categories = self.chartsData && self.chartsData.line && self.chartsData.line.categories ? self.chartsData.line.categories : [];
+        let series = self.chartsData && self.chartsData.line && self.chartsData.line.series ? self.chartsData.line.series : [];
+        Highcharts.chart(chart.chartContainerId, {
+            chart: {
+                type: self.getChartType(chart.chartName)
+            },
+            title: {
+                text: chart.title && chart.title.text ? chart.title.text : "",
+                align: self.titleAlign[chart.title.align] ? self.titleAlign[chart.title.align] : "center"
+            },
+            subtitle: {
+                text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
+                align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
+            },
+            xAxis: {
+                categories: categories,
+            },
+            yAxis: {
+                title: {
+                    text: chart.yAxis.title && chart.yAxis.title.text ? chart.yAxis.title.text : "",
+                    //align in yAxis not work
+                    //align: self.titleAlign[chart.yAxis.title.align] ? self.titleAlign[chart.yAxis.title.align] : "center"
+                }
+            },
+            tooltip: {
+                valueSuffix: chart.tooltip && chart.tooltip.valueSuffix ? chart.tooltip.valueSuffix : ""
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: chart.plotOptions.line.enabled
+                    },
+                    enableMouseTracking: chart.plotOptions.line.enableMouseTracking
+                }
+            },
+            series: series
+        });
+    }
+    //#endregion
+
+    //#region tools
+    getChartType(t) {
+        return t.toLowerCase().replace("chart", "");
+    }
+    //#endregion
 }
 
 /*
