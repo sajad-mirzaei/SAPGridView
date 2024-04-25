@@ -1684,9 +1684,16 @@ class sapGridViewTools {
                 destination[key] = source[lowerKey];
             } else if (source.hasOwnProperty(key)) {
                 destination[key] = source[key];
+            } else if (sapGridViewTools.toLowerCaseFirstLetter(key)) {
+                destination[key] = source[sapGridViewTools.toLowerCaseFirstLetter(key)];
             }
         });
         return destination;
+    }
+
+    static toLowerCaseFirstLetter(str) {
+        str = str.charAt(0).toLowerCase() + str.slice(1);
+        return str;
     }
 
     //dely Fire event after n milliseconds
