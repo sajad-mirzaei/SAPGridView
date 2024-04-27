@@ -13,7 +13,7 @@ public partial class GridTestPage_1 : System.Web.UI.Page
         oSGV.Grids["MyGrid1"] = new Grid()
         {
             ContainerId = "MyGridId",
-            ContainerHeight = 400,
+            ContainerHeight = 600,
             Data = dt,
             GridTitle = "گزارش تست 1",
             Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },

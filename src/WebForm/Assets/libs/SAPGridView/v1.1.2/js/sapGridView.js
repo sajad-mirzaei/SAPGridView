@@ -272,7 +272,7 @@ return data.d.data;
             SGV_FillDropDownFilters(ThisTableAPI, TheadID, DataArray.columns);
 
         SGV_OnChangeFilters(TableInfo);
-        //SGV_KeepScrolHeight(ThisTable, DataArray.containerHeight);
+        SGV_HeightControl(ThisTable, DataArray.containerHeight);
         SGVArray[ContainerId] = SGVArray[ContainerId] == undefined ? {} : SGVArray[ContainerId];
         SGVArray[ContainerId][ThisTableID] = { TableId: ThisTableID, TableObject: TableObject, TableAPI: ThisTableAPI };
         if (typeof DataTableCallBackData === "function") {
@@ -1239,10 +1239,12 @@ function SGV_OnChangeFilters(TableInfo) {
     });
 }
 
-function SGV_KeepScrolHeight(ThisTable, gridheight) {
+function SGV_HeightControl(ThisTable, gridheight) {
     ThisTable.closest('.dataTables_scrollBody').each(function () {
         var ThisGridRows = $(this);
         ThisGridRows[0].style.setProperty('max-height', gridheight + 'px', 'important');
+
+        /* -- KeepScrolHeight
         var id = ThisGridRows.find("table.dataTable").attr("id");
         scrollArray = (typeof scrollArray != 'undefined' && scrollArray instanceof Array) ? scrollArray : [];
         if (typeof (scrollArray[id]) !== 'undefined') {
@@ -1256,6 +1258,7 @@ function SGV_KeepScrolHeight(ThisTable, gridheight) {
             }
         });
         ThisGridRows.scrollTop(thisGridScrollValue);
+        */
     });
 }
 
@@ -1420,7 +1423,6 @@ class charts {
         this.tableObject = m.tableObject;
         this.mainColumnsTitle = m.mainColumnsTitle;
 
-        console.log(m);
         //One-time trace data and charts-data assignment
         this.setChartsData(m.grid.charts);
 
