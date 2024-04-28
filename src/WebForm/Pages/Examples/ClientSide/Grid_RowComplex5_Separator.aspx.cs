@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SAP.WebControls;
+using System;
 using System.Collections.Generic;
-using SAP.WebControls;
 using System.Data;
 
 public partial class Grid_RowComplex5_Separator : System.Web.UI.Page
@@ -22,6 +22,7 @@ public partial class Grid_RowComplex5_Separator : System.Web.UI.Page
                 FlatDataForPivot = dt,
 
                 PrimaryKeyId = "Id",
+                ColumnToPivotId = "SupplierId",
                 ColumnToPivotName = "SupplierName",
                 GroupBy = "ProductId",
                 FirstComplexedColumnTitle = "ComplexTitle1",
