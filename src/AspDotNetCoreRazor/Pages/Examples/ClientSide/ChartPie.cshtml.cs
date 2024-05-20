@@ -78,6 +78,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 ChartContainerId = "pieChartContainer",
                 Key = "Province",
                 Value = "Population2013ComparedTo2005",
+                SeriesName = "SeriesName1",
                 Title = new ChartTitle
                 {
                     Text = "Population growth percentage in 2013 compared to 2005",

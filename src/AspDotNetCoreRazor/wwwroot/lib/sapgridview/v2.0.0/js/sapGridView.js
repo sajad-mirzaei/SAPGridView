@@ -1089,6 +1089,7 @@ class charts {
             },
             series: [
                 {
+                    name: chart.seriesName,
                     data: data
                 }
             ]
