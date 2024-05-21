@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web.Services;
 using System.Web.UI;
 
-public partial class Grid_OnClick2 : Page
+public partial class OnClick2 : Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

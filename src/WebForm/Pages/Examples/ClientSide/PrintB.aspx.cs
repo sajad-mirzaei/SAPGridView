@@ -1,18 +1,21 @@
-﻿using System;
+﻿using SAP.WebControls;
+using System;
 using System.Collections.Generic;
-using SAP.WebControls;
 using System.Data;
 
-public partial class Grid_Print1 : System.Web.UI.Page
+public partial class PrintB : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)
     {
         DataTable dt = MakeDataTable();
         var customizeButtonData = new Dictionary<string, string>() {
-            { "SherkatName", "Company Name" },
-            { "User", "Sajad Mirzaei" },
-            { "ImageAddress", "https://s.yimg.com/rz/p/yahoo_homepage_en-US_s_f_p_bestfit_homepage.png" }
+            { "sherkatName", "نام شرکت" },
+            { "user", "سجاد میرزایی" },
+            { "reportName", "گزارش تست 1" },
+            { "logo", "https://delpazirerp.com/SAP/Assets/Styles/images/logoSAP.png" },
+            { "fromDate", "2022/01/01" },
+            { "toDate", "2022/01/13" }
         };
 
         oSGV.Grids["MyGrid1"] = new Grid()
@@ -27,12 +30,7 @@ public partial class Grid_Print1 : System.Web.UI.Page
                     ButtonName = ButtonNames.Print,
                     JavascriptMethodName = "MyPrintButtonMethod",
                     Data = customizeButtonData
-                }/*,
-                new CustomizeButton{
-                    ButtonName = ButtonNames.Excel,
-                    JavascriptMethodName = "MyExcelButtonMethod",
-                    Data = new Dictionary<string, string>() { { "k22", "v22" } }
-                }*/
+                }
             },
 
             Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
@@ -87,7 +85,7 @@ public partial class Grid_Print1 : System.Web.UI.Page
             Row1["b"] = "bb " + i;
             Row1["c"] = i + 1;
 
-            if(i % 2 == 0)
+            if (i % 2 == 0)
                 Row1["d"] = "کسر موجودي";
             else
                 Row1["d"] = "تغيير قيمت";

@@ -3,19 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-public partial class Grid_Print2 : System.Web.UI.Page
+public partial class PrintA : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)
     {
         DataTable dt = MakeDataTable();
         var customizeButtonData = new Dictionary<string, string>() {
-            { "sherkatName", "نام شرکت" },
-            { "user", "سجاد میرزایی" },
-            { "reportName", "گزارش تست 1" },
-            { "logo", "https://delpazirerp.com/SAP/Assets/Styles/images/logoSAP.png" },
-            { "fromDate", "2022/01/01" },
-            { "toDate", "2022/01/13" }
+            { "SherkatName", "Company Name" },
+            { "User", "Sajad Mirzaei" },
+            { "ImageAddress", "https://s.yimg.com/rz/p/yahoo_homepage_en-US_s_f_p_bestfit_homepage.png" }
         };
 
         oSGV.Grids["MyGrid1"] = new Grid()
@@ -30,7 +27,12 @@ public partial class Grid_Print2 : System.Web.UI.Page
                     ButtonName = ButtonNames.Print,
                     JavascriptMethodName = "MyPrintButtonMethod",
                     Data = customizeButtonData
-                }
+                }/*,
+                new CustomizeButton{
+                    ButtonName = ButtonNames.Excel,
+                    JavascriptMethodName = "MyExcelButtonMethod",
+                    Data = new Dictionary<string, string>() { { "k22", "v22" } }
+                }*/
             },
 
             Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },

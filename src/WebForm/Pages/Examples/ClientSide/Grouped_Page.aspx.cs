@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-public partial class Grid_Grouped_Page : System.Web.UI.Page
+public partial class Grouped_Page : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="CustomData.aspx.cs" Inherits="Grid_CustomData" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="HeaderComplex_1.aspx.cs" Inherits="HeaderComplex_1" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -9,27 +9,12 @@
                     <img alt="لطفا چند لحظه صبر کنید..." src="../../../Assets/Styles/images/wait.gif" />
                 </ProgressTemplate>
             </ajax:UpdateProgress>
-
-
-
-
-
-            <div class="FormBox">
-                <div class="HeaderBox">
-                    Test1
-                </div>
-                <div class="ContentBox">
-
-
+            <div id="divData1" runat="server" class="FormBox">
+                <div class="HeaderBox">aaaa</div>
+                <div id="ContentBoxId1" class="ContentBox">
                     <div id="MyGridId"></div>
-
-
-
                 </div>
             </div>
-
-
-
         </ContentTemplate>
     </ajax:UpdatePanel>
 </asp:Content>

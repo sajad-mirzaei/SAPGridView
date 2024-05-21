@@ -1,9 +1,9 @@
-﻿using System;
+﻿using SAP.WebControls;
+using System;
 using System.Collections.Generic;
-using SAP.WebControls;
 using System.Data;
 
-public partial class Grid_CustomData: System.Web.UI.Page
+public partial class CustomDataObject : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)
@@ -11,7 +11,8 @@ public partial class Grid_CustomData: System.Web.UI.Page
         DataTable dt = MakeDataTable();
         DataTable dtCustom = MakeCustomDataTable();
 
-        oSGV.CustomData = new {
+        oSGV.CustomData = new
+        {
             dtCustom = new CustomData { Data = dtCustom, DataKey = "id", DataValue = "name" }
         };
 
@@ -22,8 +23,8 @@ public partial class Grid_CustomData: System.Web.UI.Page
             Data = dt,
             Columns = new List<Column>() {
                 new Column { Data = "id", Title = "کد دیتابیس" },
-                new Column { Data = "id", Title = "نام دیتابیس", 
-                    Functions = { 
+                new Column { Data = "id", Title = "نام دیتابیس",
+                    Functions = {
                         new Calc { Section = Function.SectionValue.Tbody, Formula = "CustomData.dtCustom.Data['id']" }
                     }
                 },

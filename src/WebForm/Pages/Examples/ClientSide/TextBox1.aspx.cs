@@ -5,7 +5,7 @@ using System.Data;
 using System.Web.Services;
 using Newtonsoft.Json;
 
-public partial class Grid_TextBox1 : System.Web.UI.Page
+public partial class TextBox1 : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)

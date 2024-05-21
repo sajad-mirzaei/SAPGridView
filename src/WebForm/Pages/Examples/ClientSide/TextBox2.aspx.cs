@@ -4,7 +4,7 @@ using SAP.WebControls;
 using System.Data;
 using System.Web.UI.WebControls;
 
-public partial class Grid_TextBox2 : System.Web.UI.Page
+public partial class TextBox2 : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)

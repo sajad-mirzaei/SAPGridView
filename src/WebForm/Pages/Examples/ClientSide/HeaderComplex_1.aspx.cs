@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SAP.WebControls;
 
-public partial class Grid_HeaderComplex_1 : System.Web.UI.Page
+public partial class HeaderComplex_1 : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

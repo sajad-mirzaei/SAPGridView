@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Web.Services;
 
-public partial class Grid_AjaxPagination_Page : System.Web.UI.Page
+public partial class AjaxPagination_Page : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

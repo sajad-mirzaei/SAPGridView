@@ -5,20 +5,20 @@ using System.Data;
 using Newtonsoft.Json;
 using System.Web;
 
-public partial class Grid_CumulativeSumAndCalc : System.Web.UI.Page
+public partial class CumulativeSumAndCalc : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load()
     {
         DataTable dt = new DataTable();
-        if (Session["dtGrid_CumulativeSum"] == null)
+        if (Session["dtCumulativeSum"] == null)
         {
             dt = MakeDataTable();
             string JsonData = JsonConvert.SerializeObject(dt);
-            Session["dtGrid_CumulativeSum"] = JsonData;
+            Session["dtCumulativeSum"] = JsonData;
         }
         else {
-            string c = Session["dtGrid_CumulativeSum"].ToString();
+            string c = Session["dtCumulativeSum"].ToString();
             dt = JsonConvert.DeserializeObject<DataTable>(c);
         }
         DataTable dtCustom = MakeCustomDataTable();
@@ -112,7 +112,7 @@ public partial class Grid_CumulativeSumAndCalc : System.Web.UI.Page
     protected void ChangeData_Click(object sender, EventArgs e)
     {
         string JsonData = JsonConvert.SerializeObject(MakeDataTable());
-        Session["dtGrid_CumulativeSum"] = JsonData;
+        Session["dtCumulativeSum"] = JsonData;
         Response.Redirect(HttpContext.Current.Request.Url.ToString());
     }
 

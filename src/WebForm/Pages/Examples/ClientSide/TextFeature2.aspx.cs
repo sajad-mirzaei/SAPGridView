@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SAP.WebControls;
 using System.Data;
 
-public partial class Grid_TextFeature2 : System.Web.UI.Page
+public partial class TextFeature2 : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)

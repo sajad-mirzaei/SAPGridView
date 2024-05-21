@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-public partial class Grid_Grouped_Page_2 : System.Web.UI.Page
+public partial class Grouped_Page_2 : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

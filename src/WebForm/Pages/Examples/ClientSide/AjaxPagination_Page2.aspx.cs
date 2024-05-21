@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using SAP.WebControls;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Web.Services;
 
-public partial class Grid_AjaxPagination_Page2 : System.Web.UI.Page
+public partial class AjaxPagination_Page2 : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
 
@@ -18,7 +18,7 @@ public partial class Grid_AjaxPagination_Page2 : System.Web.UI.Page
 
     public static void DefineGrids()
     {
-        oSGV.Grids["Grid_1"] = new Grid()
+        oSGV.Grids["1"] = new Grid()
         {
             ContainerId = "MyGridId",
             ContainerHeight = 400,
@@ -30,7 +30,7 @@ public partial class Grid_AjaxPagination_Page2 : System.Web.UI.Page
                 new Column { Data="salary", Title ="قیمت" }
             }
         };
-        oSGV.GridBind("Grid_1");
+        oSGV.GridBind("1");
     }
 
 

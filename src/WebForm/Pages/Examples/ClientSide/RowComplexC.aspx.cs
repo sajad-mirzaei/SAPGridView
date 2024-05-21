@@ -1,9 +1,9 @@
-﻿using System;
+﻿using SAP.WebControls;
+using System;
 using System.Collections.Generic;
-using SAP.WebControls;
 using System.Data;
 
-public partial class Grid_RowComplex2 : System.Web.UI.Page
+public partial class RowComplexC : System.Web.UI.Page
 {
     public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)
@@ -11,7 +11,7 @@ public partial class Grid_RowComplex2 : System.Web.UI.Page
         DataTable dt = BuildFlatData();
         oSGV.Grids["MyGrid1"] = new Grid()
         {
-            ContainerId = "MyGridId",
+            ContainerId = "MyGridId1",
             ContainerHeight = 400,
             GridTitle = "گزارش تست 1",
             Columns = new List<Column>() {
@@ -30,11 +30,19 @@ public partial class Grid_RowComplex2 : System.Web.UI.Page
                 new ComplexColumn { Data = "Count", Title = "CountTitle" }
             }
         };
-
+        var pivotData = rowComplex.BuildPivotData(dt);
         oSGV.Grids["MyGrid1"].Columns = rowComplex.AddColumns(oSGV.Grids["MyGrid1"].Columns, dt);
-        oSGV.Grids["MyGrid1"].Data = rowComplex.BuildPivotData(dt);
+        oSGV.Grids["MyGrid1"].Data = pivotData;
 
-        oSGV.GridBind("MyGrid1");
+
+        oSGV.Grids["MyGrid2"] = new Grid()
+        {
+            ContainerId = "MyGridId2",
+            ContainerHeight = 450,
+            GridTitle = "گزارش تست 2",
+            Data = pivotData
+        };
+        oSGV.GridBind("MyGrid1", "MyGrid2");
     }
 
     public DataTable BuildFlatData()
@@ -46,15 +54,15 @@ public partial class Grid_RowComplex2 : System.Web.UI.Page
         dt.Columns.Add("ProductCode", typeof(int));
         dt.Columns.Add("SupplierId", typeof(int));
         dt.Columns.Add("SupplierName", typeof(string));
-        dt.Columns.Add("Count", typeof(int));
+        dt.Columns.Add("Count", typeof(string));
         dt.Columns.Add("Amount", typeof(double));
-        dt.Rows.Add(1, 1, "ProductName_1", 10, 1, "SupplierName_1", 11, 11.1);
-        dt.Rows.Add(2, 1, "ProductName_1", 11, 2, "SupplierName_2", 22, 22.2);
-        dt.Rows.Add(3, 1, "ProductName_1", 12, 3, "SupplierName_3", 33, 33.3);
-        dt.Rows.Add(4, 1, "ProductName_1", 13, 4, "SupplierName_4", 44, 44.4);
-        dt.Rows.Add(5, 1, "ProductName_1", 14, 5, "SupplierName_5", 55, 550);
-        dt.Rows.Add(6, 1, "ProductName_1", 15, 6, "SupplierName_6", 66, 660);
-        dt.Rows.Add(7, 2, "ProductName_2", 16, 6, "SupplierName_6", 77, 770);
+        dt.Rows.Add(1, 1, "ProductName_1", 11, 1, "SupplierName_1", "one", 11.1);
+        dt.Rows.Add(2, 2, "ProductName_2", 12, 2, "SupplierName_2", "two", 22.2);
+        dt.Rows.Add(3, 3, "ProductName_3", 13, 2, "SupplierName_2", "three", 33.3);
+        dt.Rows.Add(4, 4, "ProductName_4", 14, 2, "SupplierName_2", "three", 44.4);
+        dt.Rows.Add(5, 5, "ProductName_5", 15, 2, "SupplierName_2", "sdfdsf1", 550);
+        dt.Rows.Add(6, 6, "ProductName_6", 16, 2, "SupplierName_2", "three", 660);
+        dt.Rows.Add(7, 6, "ProductName_6", 16, 1, "SupplierName_1", "three", 770);
         return dt;
     }
 }
