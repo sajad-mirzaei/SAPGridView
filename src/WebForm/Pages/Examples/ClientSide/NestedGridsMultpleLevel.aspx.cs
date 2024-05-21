@@ -12,13 +12,12 @@ public partial class NestedGridsMultpleLevel : Page
     {
         if (!Page.IsPostBack)
         {
-            var mockData = new MockData().GetMockData();
-            var oSGV = CreatePersonInfoGrid(mockData);
+            var oSGV = CreatePersonInfoGrid();
             oSGV.GridBind("PersonInfo");
         }
     }
 
-    public SAPGridView CreatePersonInfoGrid(MockData mockData)
+    public SAPGridView CreatePersonInfoGrid()
     {
         SAPGridView oSGV = new SAPGridView();
         oSGV.DefaultParameters = new Dictionary<string, string>()
@@ -31,7 +30,7 @@ public partial class NestedGridsMultpleLevel : Page
             ContainerId = "MyGridId",
             ContainerHeight = 300,
             GridTitle = "GridTitle Test",
-            Data = mockData.PersonInfoList,
+            Data = MockData.GetPersonInfo(),
             Columns = new List<Column>() {
                 new Column { Title ="id", Data = "Id" },
                 new Column { Title ="First Name", Data = "FirstName" },
@@ -62,7 +61,6 @@ public partial class NestedGridsMultpleLevel : Page
     public static Grid CreateNextGrids(string nextGrid, Dictionary<string, string> filters)
     {
         SAPGridView oSGV = new SAPGridView();
-        MockData mockData = new MockData().GetMockData();
         //-----------------------AcademicRecords Grid------------------------
         oSGV.Grids["AcademicRecords"] = new Grid()
         {
@@ -110,11 +108,11 @@ public partial class NestedGridsMultpleLevel : Page
         var grid = oSGV.Grids[nextGrid];
         if (nextGrid == "AcademicRecords")
         {
-            grid.Data = mockData.AcademicRecordsList.Where(c => c.PersonInfoId == int.Parse(filters["Id"]));
+            grid.Data = MockData.GetAcademicRecords().Where(c => c.PersonInfoId == int.Parse(filters["Id"]));
         }
         else
         {
-            grid.Data = mockData.AcademicRecordDetailsList.Where(c => c.AcademicRecordsId == int.Parse(filters["Id"]));
+            grid.Data = MockData.GetAcademicRecordDetails().Where(c => c.AcademicRecordsId == int.Parse(filters["Id"]));
         }
         return grid;
     }
@@ -146,11 +144,11 @@ public partial class NestedGridsMultpleLevel : Page
     }
 }
 
-public class MockData
+public static class MockData
 {
-    public List<PersonInfo> PersonInfoList { get; set; }
+    /*public List<PersonInfo> PersonInfoList { get; set; }
     public List<AcademicRecords> AcademicRecordsList { get; set; }
-    public List<AcademicRecordDetails> AcademicRecordDetailsList { get; set; }
+    public List<AcademicRecordDetails> AcademicRecordDetailsList { get; set; }*/
     public class PersonInfo
     {
         public int Id { get; set; }
@@ -175,27 +173,37 @@ public class MockData
         public int AcademicRecordsId { get; set; }
     }
 
-    public MockData GetMockData()
+    public static List<PersonInfo> GetPersonInfo()
     {
-        var mockData = new MockData();
-        mockData.PersonInfoList = new List<PersonInfo>
+        return new List<PersonInfo>
         {
             new PersonInfo { Id = 1, FirstName = "John", LastName = "Doe", Age = "30" },
             new PersonInfo { Id = 2, FirstName = "Jane", LastName = "Smith", Age = "28" },
             new PersonInfo { Id = 3, FirstName = "Alice", LastName = "Johnson", Age = "32" }
         };
+    }
 
-        mockData.AcademicRecordsList = new List<AcademicRecords>
+    public static List<AcademicRecords> GetAcademicRecords()
+    {
+        return new List<AcademicRecords>
         {
-            new AcademicRecords { Id = 1, Degree = "B.Sc.", Major = "Computer Science", Institute = "MIT", PersonInfoId = 1 },
-            new AcademicRecords { Id = 2, Degree = "M.Sc.", Major = "Computer Science", Institute = "Stanford", PersonInfoId = 1 },
-            new AcademicRecords { Id = 3, Degree = "B.A.", Major = "English Literature", Institute = "Harvard", PersonInfoId = 2 },
-            new AcademicRecords { Id = 4, Degree = "M.A.", Major = "English Literature", Institute = "Yale", PersonInfoId = 2 },
-            new AcademicRecords { Id = 5, Degree = "B.Sc.", Major = "Physics", Institute = "Caltech", PersonInfoId = 3 },
-            new AcademicRecords { Id = 6, Degree = "Ph.D.", Major = "Physics", Institute = "UC Berkeley", PersonInfoId = 3 }
+            new AcademicRecords
+                { Id = 1, Degree = "B.Sc.", Major = "Computer Science", Institute = "MIT", PersonInfoId = 1 },
+            new AcademicRecords
+                { Id = 2, Degree = "M.Sc.", Major = "Computer Science", Institute = "Stanford", PersonInfoId = 1 },
+            new AcademicRecords
+                { Id = 3, Degree = "B.A.", Major = "English Literature", Institute = "Harvard", PersonInfoId = 2 },
+            new AcademicRecords
+                { Id = 4, Degree = "M.A.", Major = "English Literature", Institute = "Yale", PersonInfoId = 2 },
+            new AcademicRecords
+                { Id = 5, Degree = "B.Sc.", Major = "Physics", Institute = "Caltech", PersonInfoId = 3 },
+            new AcademicRecords
+                { Id = 6, Degree = "Ph.D.", Major = "Physics", Institute = "UC Berkeley", PersonInfoId = 3 }
         };
-
-        mockData.AcademicRecordDetailsList = new List<AcademicRecordDetails>
+    }
+    public static List<AcademicRecordDetails> GetAcademicRecordDetails()
+    {
+        return new List<AcademicRecordDetails>
         {
             new AcademicRecordDetails { Id = 1, StartDate = "2010-09-01", EndDate = "2014-06-15", Average = "20", AcademicRecordsId = 1 },
             new AcademicRecordDetails { Id = 2, StartDate = "2014-09-01", EndDate = "2016-06-15", Average = "19", AcademicRecordsId = 2 },
@@ -204,6 +212,5 @@ public class MockData
             new AcademicRecordDetails { Id = 5, StartDate = "2009-09-01", EndDate = "2013-06-15", Average = "16", AcademicRecordsId = 5 },
             new AcademicRecordDetails { Id = 6, StartDate = "2013-09-01", EndDate = "2018-06-15", Average = "15", AcademicRecordsId = 6 }
         };
-        return mockData;
     }
 }
