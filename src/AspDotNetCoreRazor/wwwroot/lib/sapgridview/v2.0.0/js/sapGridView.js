@@ -1679,6 +1679,8 @@ class sapGridViewTools {
     }
 
     static copyAndCamelCaseIgnore(source, destination) {
+        if ([null, undefined, NaN, 'undefined', 'NaN', 'null'].includes(destination))
+            return {};
         Object.keys(destination).forEach(key => {
             const lowerKey = key.toLowerCase();
             if (source.hasOwnProperty(lowerKey)) {
