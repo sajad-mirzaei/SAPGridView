@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web.Services;
 using System.Web.UI;
 
-public partial class OnClick2 : Page
+public partial class NestedGridsMultpleLevel : Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -203,7 +203,7 @@ public partial class OnClick2 : Page
     }
 }
 
-public class GridLevel2Model
+public class MultpleLevelModel1
 {
     public int Id { get; set; }
     public string FirstName { get; set; }

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="OnClick1.aspx.cs" Inherits="OnClick1"
+﻿<%@ Page Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="NestedGridsOneLevel.aspx.cs" Inherits="NestedGridsOneLevel"
     Title="گزارش تست" %>
 
 <asp:Content ID="Content" ContentPlaceHolderID="cphMain" runat="Server">

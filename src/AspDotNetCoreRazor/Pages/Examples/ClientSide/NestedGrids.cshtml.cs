@@ -7,12 +7,12 @@ using WWWPGrids.Models;
 namespace AspDotNetCoreRazor.Pages.Examples.ClientSide;
 
 [IgnoreAntiforgeryToken]
-public class NestedLevels : PageModel
+public class NestedGrids : PageModel
 {
-    private readonly ILogger<NestedLevels> _logger;
+    private readonly ILogger<NestedGrids> _logger;
     DateTime dtbAzTarikh = DateTime.Now.AddMonths(-20);
     DateTime dtbTaTarikh = DateTime.Now;
-    public NestedLevels(ILogger<NestedLevels> logger)
+    public NestedGrids(ILogger<NestedGrids> logger)
     {
         _logger = logger;
     }
@@ -33,7 +33,7 @@ public class NestedLevels : PageModel
             { "TaTarikh", dtbTaTarikh.ToString() },
             { "Id", "" }
         };
-        List<NestedLevelsL1Model> dt = Get_DataTable1();
+        List<NestedGridsL1Model> dt = Get_DataTable1();
         //-----------------------Grid1------------------------
         oSGV.Grids["Grid1"] = new Grid()
         {
@@ -83,14 +83,14 @@ public class NestedLevels : PageModel
         return oSGV;
     }
 
-    public List<NestedLevelsL1Model> Get_DataTable1()
+    public List<NestedGridsL1Model> Get_DataTable1()
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<NestedLevelsL1Model> dt = new();
+        List<NestedGridsL1Model> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            NestedLevelsL1Model row = new()
+            NestedGridsL1Model row = new()
             {
                 Id = i,
                 Col1 = i + 10000,
@@ -104,14 +104,14 @@ public class NestedLevels : PageModel
         return result;
     }
 
-    public List<NestedLevelsL2Model> Get_DataTable2(Dictionary<string, string> param)
+    public List<NestedGridsL2Model> Get_DataTable2(Dictionary<string, string> param)
     {
         //در صورتیکه اطلاعات را از دیتابیس فراخوانی میکنید، نیازی به این متد نیست
-        List<NestedLevelsL2Model> dt = new();
+        List<NestedGridsL2Model> dt = new();
 
         for (int i = 1; i <= 20; i++)
         {
-            NestedLevelsL2Model row = new()
+            NestedGridsL2Model row = new()
             {
                 Id = i,
                 property1 = i + 10000 * int.Parse(param["Id"]),
@@ -184,7 +184,7 @@ public class NestedLevels : PageModel
     }
 }
 
-public class NestedLevelsL1Model
+public class NestedGridsL1Model
 {
     public int Id { get; set; }
     public int Col1 { get; set; }
@@ -193,7 +193,7 @@ public class NestedLevelsL1Model
     public DateTime Tarikh { get; set; }
 }
 
-public class NestedLevelsL2Model
+public class NestedGridsL2Model
 {
     public int Id { get; set; }
     public DateTime Tarikh { get; set; }
