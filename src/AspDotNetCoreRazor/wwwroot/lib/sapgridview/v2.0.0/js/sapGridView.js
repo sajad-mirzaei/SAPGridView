@@ -448,7 +448,7 @@ class gridBind {
                             let nextTabTitle = FuncArray.nextTabTitle ? FuncArray.nextTabTitle : "";
                             ThisValue = cellText;
                             if (FuncArray.enable == true) {
-                                ThisVal_OpenTag += "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellName + "' data-containerid='" + ContainerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.tableInfo["TableId"] + "' onclick='sapGridViewOnClick.ajaxClick(this)'>"
+                                ThisVal_OpenTag += "<a class='" + cssClass + "' data-nexttabtitle='" + nextTabTitle + "' data-cellname='" + cellName + "' data-containerid='" + m.containerId + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + m.tableInfo["TableId"] + "' onclick='sapGridViewOnClick.ajaxClick(this)'>"
                                 ThisValue = cellText;
                                 ThisVal_CloseTag += "</a>";
                             }
