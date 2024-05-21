@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_CheckBox1.aspx.cs" Inherits="Grid_CheckBox1" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="CheckBox1.aspx.cs" Inherits="Grid_CheckBox1" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">

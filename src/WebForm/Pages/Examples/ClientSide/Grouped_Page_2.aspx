@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_Grouped_Page_2.aspx.cs" Inherits="Grid_Grouped_Page_2" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grouped_Page_2.aspx.cs" Inherits="Grid_Grouped_Page_2" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">

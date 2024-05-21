@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_RowComplex4.aspx.cs" Inherits="Grid_RowComplex4" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="SumFooter1.aspx.cs" Inherits="Grid_SumFooter1" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -15,14 +15,16 @@
                     Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
                 </div>
                 <div class="ContentBox">
-                    <div class="alert alert-info text-center">Multiple product with same supplier</div>
-                    <div id="MyGridId1"></div>
-                    <hr />
-                    <div class="alert alert-info text-center">Multiple product and same product with same supplier</div>
-                    <div id="MyGridId2"></div>
+                    <div id="MyGridId"></div>
                 </div>
             </div>
 
         </ContentTemplate>
     </ajax:UpdatePanel>
+    <script>
+        /*function DataTableCallBackData(oData) {
+            console.log("----------------");
+            console.log(oData);
+        }*/
+    </script>
 </asp:Content>

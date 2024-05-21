@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_RowComplex5_Separator.aspx.cs" Inherits="Grid_RowComplex5_Separator" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="CumulativeSumAndCalc.aspx.cs" Inherits="Grid_CumulativeSumAndCalc" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -12,13 +12,14 @@
 
             <div class="FormBox">
                 <div class="HeaderBox">
-                    Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
+                    MyGrid1
+                    <asp:LinkButton runat="server" ID="ChangeData" CssClass="float-left" OnClick="ChangeData_Click">تغییر اطلاعات جدول</asp:LinkButton>
                 </div>
                 <div class="ContentBox">
-                    <div id="MyGridId"></div>
+                    <div id="MyGridId1"></div>
                 </div>
             </div>
-
+            
         </ContentTemplate>
     </ajax:UpdatePanel>
 </asp:Content>

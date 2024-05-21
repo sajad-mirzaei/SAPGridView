@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_SumFooter1.aspx.cs" Inherits="Grid_SumFooter1" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="ChartPie.aspx.cs" Inherits="Grid_ChartPie" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -15,16 +15,11 @@
                     Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
                 </div>
                 <div class="ContentBox">
+                    <div id="pieChartContainer" style="margin-bottom: 1em;" class="chart-display"></div>
                     <div id="MyGridId"></div>
                 </div>
             </div>
 
         </ContentTemplate>
     </ajax:UpdatePanel>
-    <script>
-        /*function DataTableCallBackData(oData) {
-            console.log("----------------");
-            console.log(oData);
-        }*/
-    </script>
 </asp:Content>

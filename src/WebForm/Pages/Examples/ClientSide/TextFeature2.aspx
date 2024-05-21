@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_CustomData.aspx.cs" Inherits="Grid_CustomData" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="TextFeature2.aspx.cs" Inherits="Grid_TextFeature2" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -27,8 +27,6 @@
 
                 </div>
             </div>
-
-
 
         </ContentTemplate>
     </ajax:UpdatePanel>

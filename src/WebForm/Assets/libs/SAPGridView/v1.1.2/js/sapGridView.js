@@ -1518,6 +1518,12 @@ class charts {
                 text: chart.subTitle && chart.subTitle.text ? chart.subTitle.text : "",
                 align: chart.subTitle && self.titleAlign[chart.subTitle.align] ? self.titleAlign[chart.subTitle.align] : "center"
             },
+            /*tooltip: {
+                formatter: function () {
+                    let Tooltip = (this.y) + "___" + this.point.name;
+                    return Tooltip;
+                }
+            },*/
             series: [
                 {
                     name: chart.seriesName,

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_ChartPie.aspx.cs" Inherits="Grid_ChartPie" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grouped_Page.aspx.cs" Inherits="Grid_Grouped_Page" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -9,17 +9,12 @@
                     <img alt="لطفا چند لحظه صبر کنید..." src="../../../Assets/Styles/images/wait.gif" />
                 </ProgressTemplate>
             </ajax:UpdateProgress>
-
-            <div class="FormBox">
-                <div class="HeaderBox">
-                    Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
-                </div>
-                <div class="ContentBox">
-                    <div id="pieChartContainer" style="margin-bottom: 1em;" class="chart-display"></div>
+            <div id="divData1" runat="server" class="FormBox">
+                <div class="HeaderBox">aaaa</div>
+                <div id="ContentBoxId1" class="ContentBox">
                     <div id="MyGridId"></div>
                 </div>
             </div>
-
         </ContentTemplate>
     </ajax:UpdatePanel>
 </asp:Content>

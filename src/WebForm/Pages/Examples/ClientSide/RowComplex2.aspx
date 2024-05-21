@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_TestPage2.aspx.cs" Inherits="GridTestPage_Simple" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="RowComplex2.aspx.cs" Inherits="Grid_RowComplex2" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -10,30 +10,14 @@
                 </ProgressTemplate>
             </ajax:UpdateProgress>
 
-
-
-
-
             <div class="FormBox">
                 <div class="HeaderBox">
-                    Test1
+                    Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
                 </div>
                 <div class="ContentBox">
-
-
                     <div id="MyGridId"></div>
-
-
-
                 </div>
             </div>
-
-            <script>
-                function DataTableCallBackData(oData) {
-                    console.log(oData);
-                }
-            </script>
-
 
         </ContentTemplate>
     </ajax:UpdatePanel>

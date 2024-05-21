@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_CumulativeSum.aspx.cs" Inherits="Grid_CumulativeSum" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="TestPage_Simple.aspx.cs" Inherits="GridTestPage_Simple" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -9,25 +9,26 @@
                     <img alt="لطفا چند لحظه صبر کنید..." src="../../../Assets/Styles/images/wait.gif" />
                 </ProgressTemplate>
             </ajax:UpdateProgress>
-            
+
+
+
+
+            <input id="myInput" />
             <div class="FormBox">
                 <div class="HeaderBox">
-                    MyGrid1 
-                    <asp:LinkButton runat="server" ID="ChangeData" CssClass="float-left" OnClick="ChangeData_Click">تغییر اطلاعات جدول</asp:LinkButton>
+                    Test1
                 </div>
                 <div class="ContentBox">
-                    <div id="MyGridId1"></div>
+
+
+                    <div id="MyGridId"></div>
+
+
+
                 </div>
             </div>
-            
-            <div class="FormBox">
-                <div class="HeaderBox">
-                    MyGrid2
-                </div>
-                <div class="ContentBox">
-                    <div id="MyGridId2"></div>
-                </div>
-            </div>
+
+
 
         </ContentTemplate>
     </ajax:UpdatePanel>

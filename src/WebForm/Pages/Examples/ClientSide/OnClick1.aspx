@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="Grid_Levels1.aspx.cs" Inherits="Grid_Levels1"
+﻿<%@ Page Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="OnClick1.aspx.cs" Inherits="Grid_OnClick1"
     Title="گزارش تست" %>
 
 <asp:Content ID="Content" ContentPlaceHolderID="cphMain" runat="Server">
@@ -12,7 +12,7 @@
             </ajax:UpdateProgress>
                 <div class="card">
                     <div class="card-header">
-                        <asp:Label ID="lblNameSystem" Text=" Grid_Levels1 " runat="server"></asp:Label>
+                        <asp:Label ID="lblNameSystem" Text=" Grid_OnClick1 " runat="server"></asp:Label>
                     </div>
                     <div class="card-body">
                         <asp:Label runat="server" Visible="false" ID="lblErrorBox"></asp:Label>

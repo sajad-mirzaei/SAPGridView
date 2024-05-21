@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="GridTestPage_2.aspx.cs" Inherits="GridTestPage_2" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="CustomData.aspx.cs" Inherits="Grid_CustomData" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -10,14 +10,25 @@
                 </ProgressTemplate>
             </ajax:UpdateProgress>
 
+
+
+
+
             <div class="FormBox">
                 <div class="HeaderBox">
-                    Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
+                    Test1
                 </div>
                 <div class="ContentBox">
+
+
                     <div id="MyGridId"></div>
+
+
+
                 </div>
             </div>
+
+
 
         </ContentTemplate>
     </ajax:UpdatePanel>

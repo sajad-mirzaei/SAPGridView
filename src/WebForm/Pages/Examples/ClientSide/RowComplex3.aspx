@@ -1,4 +1,4 @@
-﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="GridTestPage_3.aspx.cs" Inherits="GridTestPage_3" %>
+﻿<%@ Page Title="گزارش تست" Language="C#" MasterPageFile="~/MainBoard.master" AutoEventWireup="true" CodeFile="RowComplex3.aspx.cs" Inherits="Grid_RowComplex3" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphMain" runat="Server">
     <ajax:UpdatePanel runat="server" ID="upForm" RenderMode="block" UpdateMode="Always">
@@ -15,7 +15,15 @@
                     Test1 <i class='fa fa-solid fa-filter-circle-xmark'></i>
                 </div>
                 <div class="ContentBox">
-                    <div id="MyGridId"></div>
+                    <div id="MyGridId1"></div>
+                </div>
+            </div>
+            <div class="FormBox">
+                <div class="HeaderBox">
+                    Test2 <i class='fa fa-solid fa-filter-circle-xmark'></i>
+                </div>
+                <div class="ContentBox">
+                    <div id="MyGridId2"></div>
                 </div>
             </div>
 
