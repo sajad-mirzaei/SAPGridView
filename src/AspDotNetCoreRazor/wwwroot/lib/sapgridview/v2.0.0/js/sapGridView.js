@@ -1077,7 +1077,10 @@ class charts {
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName),
-                styledMode: true
+                styledMode: false,
+                style: {
+                    fontFamily: 'inherit'
+                }
             },
             title: {
                 text: chart.title && chart.title.text ? chart.title.text : "",

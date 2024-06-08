@@ -968,6 +968,8 @@ function SGV_AjaxClick(obj) {
 }
 
 function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
+    //console.log("SGV_AfterFilter_TheadTfootCalc");
+
     var ThisFooter = $("#" + TableInfo["TableId"]).closest(".dataTables_wrapper").find(".dataTables_scrollFoot");
     ThisFooter.find(".DT_TrTfootCalc").find("th").html("");
     var showFooter = false;
@@ -975,6 +977,7 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
     var ColumnNumberIncludingStatus = 0;
     $.each(TableInfo.SGVGlobalVariables[ContainerId][TableInfo["TableId"]].columns, function (CellIndex, cell) {
         if (TableInfo.Columns[CellIndex].visible === true) {
+            //console.log("cell.footerValue: " + cell.footerValue);
             var ThisValue = cell.footerValue;
             var ThisDisplayValue = "";
             var ThisVal_OpenTag = "";
@@ -1053,14 +1056,30 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
                     TableInfo.SGVGlobalVariables[ContainerId][TableInfo["TableId"]].columns[CellIndex]["footerValue"] = ThisValue;
                 }
             });
-            var TempThisVal = ThisDisplayValue !== "" ? ThisVal_OpenTag + ThisDisplayValue + ThisVal_CloseTag : ThisVal_OpenTag + ThisValue + ThisVal_CloseTag;
+
+            var tVal = ThisDisplayValue !== "" ? ThisDisplayValue : ThisValue;
+            var TempThisVal = ThisVal_OpenTag + tVal + ThisVal_CloseTag;
             var TdId = "Footer_" + TableInfo.TableId + "_" + cell.name; //dataTables_scrollFoot
             if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
-                $(".dataTables_scrollFoot #" + TdId).html(TempThisVal);
-                ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(TempThisVal);
+                
+                var x = ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html();
+                //console.log(TempThisVal);
+                //console.log($(".dataTables_scrollFoot #" + TdId).html());
+                //console.log(x);
+                if (x.length > 0) {
+                    $(x).html(TempThisVal);
+                    console.log(x);
+                    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(x);
+                    $(".dataTables_scrollFoot #" + TdId).html(x);
+                } else {
+                    ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(TempThisVal);
+                    $(".dataTables_scrollFoot #" + TdId).html(TempThisVal);
+                }
+
                 $(".dataTables_scrollFoot #" + TdId).attr("title", tdTitle);
                 ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").attr("title", tdTitle);
                 //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); after a column to be false visible, not Work
+                
             }
             if (ItemCss != "") {
                 $(".dataTables_scrollFoot #" + TdId).addClass(ItemCss);
@@ -1069,6 +1088,7 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
             showFooter = true;
             ColumnNumberIncludingStatus++;
         }
+        console.log("--------------------------------");
     });
     /*if (showFooter)
         ThisFooter.show();*/
@@ -1193,6 +1213,14 @@ function SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, Th
         SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId);
         $("#" + TabsContainerID).show();
     }
+
+    //console.log(ThisTabID);
+    //console.log(ThisTabContentID);
+    //console.log(TabsContainerID);
+    //console.log(Level);
+    //console.log(ThisTabTitle);
+    //console.log(ContainerId);
+    //console.log("----------------");
     return ThisTab;
 }
 
@@ -1508,7 +1536,10 @@ class charts {
         Highcharts.chart(chart.chartContainerId, {
             chart: {
                 type: self.getChartType(chart.chartName),
-                styledMode: true
+                styledMode: false,
+                style: {
+                    fontFamily: 'inherit'
+                }
             },
             title: {
                 text: chart.title && chart.title.text ? chart.title.text : "",
