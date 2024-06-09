@@ -1503,6 +1503,7 @@ class sapGridViewFunctions {
         let nextTabTitle = cellInfo.funcArray.nextTabTitle ? cellInfo.funcArray.nextTabTitle : "";
         let httpRequestType = cellInfo.funcArray.httpRequestType ? parseInt(cellInfo.funcArray.httpRequestType) : 0;
         let ThisCellNewData = cellInfo.cellData;
+        self.footerFields[self.containerId][self.thisTableId].hasTfoot = sectionValue.isFooter(cellInfo.funcArray.section) && self.footerFields[self.containerId][self.thisTableId].hasTfoot === 0 ? 1 : self.footerFields[self.containerId][self.thisTableId].hasTfoot;
         if (sectionValue.isBody(cellInfo.funcArray.section) && cellInfo.funcArray.enable == true) {
             switch (httpRequestType) {
                 case 0:

@@ -467,6 +467,8 @@ function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVaria
     var nextTabTitle = FuncArray.nextTabTitle ? FuncArray.nextTabTitle : "";
     var httpRequestType = FuncArray.httpRequestType ? parseInt(FuncArray.httpRequestType) : 0;
     var ThisCellNewData = cellData;
+    SGVGlobalVariables[ContainerId][ThisTableID].hasThead = parseInt(FuncArray.section) === 0 && SGVGlobalVariables[ContainerId][ThisTableID].hasThead === 0 ? 1 : SGVGlobalVariables[ContainerId][ThisTableID].hasThead;
+    SGVGlobalVariables[ContainerId][ThisTableID].hasTfoot = parseInt(FuncArray.section) === 2 && SGVGlobalVariables[ContainerId][ThisTableID].hasTfoot === 0 ? 1 : SGVGlobalVariables[ContainerId][ThisTableID].hasTfoot;
     if (parseInt(FuncArray.section) == 1 && FuncArray.enable == true) {
         switch (httpRequestType) {
             case 0:
@@ -968,8 +970,6 @@ function SGV_AjaxClick(obj) {
 }
 
 function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
-    //console.log("SGV_AfterFilter_TheadTfootCalc");
-
     var ThisFooter = $("#" + TableInfo["TableId"]).closest(".dataTables_wrapper").find(".dataTables_scrollFoot");
     ThisFooter.find(".DT_TrTfootCalc").find("th").html("");
     var showFooter = false;
@@ -977,7 +977,6 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
     var ColumnNumberIncludingStatus = 0;
     $.each(TableInfo.SGVGlobalVariables[ContainerId][TableInfo["TableId"]].columns, function (CellIndex, cell) {
         if (TableInfo.Columns[CellIndex].visible === true) {
-            //console.log("cell.footerValue: " + cell.footerValue);
             var ThisValue = cell.footerValue;
             var ThisDisplayValue = "";
             var ThisVal_OpenTag = "";
@@ -1063,12 +1062,8 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
             if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
                 
                 var x = ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html();
-                //console.log(TempThisVal);
-                //console.log($(".dataTables_scrollFoot #" + TdId).html());
-                //console.log(x);
                 if (x.length > 0) {
                     $(x).html(TempThisVal);
-                    console.log(x);
                     ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html(x);
                     $(".dataTables_scrollFoot #" + TdId).html(x);
                 } else {
@@ -1088,7 +1083,6 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
             showFooter = true;
             ColumnNumberIncludingStatus++;
         }
-        console.log("--------------------------------");
     });
     /*if (showFooter)
         ThisFooter.show();*/
@@ -1111,7 +1105,6 @@ function SGV_TheadTfootCalc(TableInfo) {
             var TdId = "Footer_" + TableInfo.TableId + "_" + cell.name;
             $.each(TableInfo.Columns[CellIndex].functions, function (k, FuncArray) {
                 if ([2].includes(parseInt(FuncArray.section))) {
-
                     if (FuncArray.funcName == "OnClick") {
                         var rowAllData = {};
                         rowAllData["FuncArray"] = FuncArray;
