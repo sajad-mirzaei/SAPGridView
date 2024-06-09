@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web.Services;
 using System.Web.UI;
 
-public partial class NestedGridsOneLevel : Page
+public partial class NestedGrids : Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {

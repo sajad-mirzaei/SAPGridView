@@ -1,22 +1,24 @@
-﻿using Newtonsoft.Json;
-using SAP.WebControls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Services;
-using System.Web.UI;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using WWWPGrids;
+using WWWPGrids.Models;
 
-public partial class NestedGridsMultpleLevel : Page
+namespace AspDotNetCoreRazor.Pages.Examples.ClientSide;
+
+[IgnoreAntiforgeryToken]
+public class NestedGridsMultpleLevel : PageModel
 {
-    protected void Page_Load(object sender, EventArgs e)
+    private readonly ILogger<NestedGridsMultpleLevel> _logger;
+    public NestedGridsMultpleLevel(ILogger<NestedGridsMultpleLevel> logger)
     {
-        if (!Page.IsPostBack)
-        {
-            var oSGV = CreatePersonInfoGrid();
-            oSGV.GridBind("PersonInfo");
-        }
+        _logger = logger;
     }
-
+    public void OnGet()
+    {
+        var oSGV = CreatePersonInfoGrid();
+        var x = oSGV.GridBind("PersonInfo");
+        TempData["SAPGridView"] = x;
+    }
     public SAPGridView CreatePersonInfoGrid()
     {
         SAPGridView oSGV = new SAPGridView();
@@ -225,31 +227,30 @@ public partial class NestedGridsMultpleLevel : Page
         }
         return d;
     }
-
-    [WebMethod]
-    public static string SapGridEvent(string CallBackData)
+    public IActionResult OnPostSapGridEvent([FromBody] SAPGridEventInputModel inputs)
     {
-        SapGridCallBackEvent oData = JsonConvert.DeserializeObject<SapGridCallBackEvent>(CallBackData);
         //--clicked row data-------------------------------------
-        var rowData = oData.RowData;
-        List<string> dataKeys = oData.FuncArray.DataKeys;
-        string nextGrid = oData.FuncArray.NextGrid;
-        string clicked_CellName = oData.TableDetails["CellName"];
-        int level = int.Parse(oData.FuncArray.Level);
+        var rowData = inputs.RowData;
+        List<string> dataKeys = inputs.FuncArray.DataKeys;
+        string nextGrid = inputs.FuncArray.NextGrid;
+        string clicked_CellName = inputs.TableDetails["CellName"];
+        int level = int.Parse(inputs.FuncArray.Level);
 
-        var gridParameters = new Dictionary<string, string>(oData.GridParameters);
+        var filters = new Dictionary<string, string>(inputs.GridParameters);
         foreach (string dataKey in dataKeys)
         {
             if (rowData.Count != 0)
-                gridParameters[dataKey] = rowData[dataKey];
+                filters[dataKey] = rowData[dataKey];
         }
-        var oSGV = new SAPGridView();
-        oSGV.Grids[nextGrid] = CreateNextGrids(nextGrid, gridParameters, rowData.Count == 0);
-        oSGV.Grids[nextGrid].GridParameters = gridParameters;
-        oSGV.Grids[nextGrid].GridParameters["Level"] = oData.FuncArray.Level;
 
-        return oSGV.AjaxBind(nextGrid);
+        var oSGV = new SAPGridView();
+        oSGV.Grids[nextGrid] = CreateNextGrids(nextGrid, filters, rowData.Count == 0);
+        oSGV.Grids[nextGrid].GridParameters = filters;
+        oSGV.Grids[nextGrid].GridParameters["Level"] = inputs.FuncArray.Level;
+
+        return new JsonResult(oSGV.AjaxBind(nextGrid));
     }
+
 }
 
 public static class MockDataMultpleLevel
