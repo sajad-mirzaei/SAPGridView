@@ -76,7 +76,19 @@ public class NestedGrids : PageModel
                         new Separator { Section = Function.SectionValue.Tfoot, DecimalPlaces = 0 }
                     }
                 },
-                new Column { Title ="ستون 2", Data="Col2" },
+                new Column
+                {
+                    Title ="ستون 2", Data="Col2",
+                    Functions =
+                    {
+                        new OnClick()
+                        {
+                            Section = Function.SectionValue.Tbody,
+                            JavaScriptMethodName = "saman",
+                            HttpRequestType = OnClick.HttpRequestTypeValue.CallJavaScriptMethod
+                        }
+                    }
+                },
                 new Column { Title ="ستون 3", Data="Col3" }
             }
         };
