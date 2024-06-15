@@ -1813,6 +1813,28 @@ class sapGridViewOnClick {
             }
         });
     }
+    
+    static changeDataWithHeader(methodName, callBackData, headerRquest) {
+        $(".SGV_LoadingContainer").show();
+        $.ajax({
+            type: "POST",
+            url: document.location.origin + document.location.pathname + "?handler=" + methodName,
+            data: JSON.stringify(callBackData),
+            contentType: "application/json; charset=utf-8",
+            headers: headerRquest, //sample: headerRquest={ RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            dataType: "json",
+            success: function (data) {
+                var d = JSON.parse(data);
+                new sapGridView(d, 1, "1");
+                $(".SGV_LoadingContainer").hide();
+            },
+            error: function (error) {
+                createLog.error(error);
+                $(".SGV_LoadingContainer").hide();
+                alert("خطایی در ارتباط با سرور وجود دارد");
+            }
+        });
+    }
 
     static closeTab(obj) {
         let ThisTabID = obj.dataset.tabid;
