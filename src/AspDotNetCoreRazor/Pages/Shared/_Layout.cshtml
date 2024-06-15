@@ -65,6 +65,7 @@
                             string folderPath = hostingEnvironment.ContentRootPath + "/Pages/Examples";
                             var clientSideFilesList = new DirectoryInfo(folderPath + "/ClientSide").GetFiles("*.cshtml");
                             var serverSideFilesList = new DirectoryInfo(folderPath + "/ServerSide").GetFiles("*.cshtml");
+                            var clientAndServerSideList = new DirectoryInfo(folderPath + "/ClientAndServerSide").GetFiles("*.cshtml");
                         }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -91,6 +92,22 @@
                                 {
                                     string fileName = System.IO.Path.GetFileNameWithoutExtension(file2.Name);
                                     string pagePath = $"/Examples/ServerSide/{fileName}";
+
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="@pagePath">@fileName</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                ClientAndServerSide
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var file2 in clientAndServerSideList)
+                                {
+                                    string fileName = System.IO.Path.GetFileNameWithoutExtension(file2.Name);
+                                    string pagePath = $"/Examples/ClientAndServerSide/{fileName}";
 
                                     <li>
                                         <a class="dropdown-item" asp-area="" asp-page="@pagePath">@fileName</a>
