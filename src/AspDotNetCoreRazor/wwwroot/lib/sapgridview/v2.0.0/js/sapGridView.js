@@ -262,6 +262,12 @@ class gridBind {
 
                     //delete d.columns;
                     // d.custom = $('#myInput').val();
+                },
+                beforeSend: function () {
+                    $(".SGV_LoadingContainer").show();
+                },
+                complete: function () {
+                    $(".SGV_LoadingContainer").hide();
                 }
             };
             //m.defaultOptions["order"] = [[0, 'desc']];
