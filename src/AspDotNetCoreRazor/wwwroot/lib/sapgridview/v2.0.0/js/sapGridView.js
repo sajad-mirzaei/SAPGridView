@@ -268,6 +268,28 @@ class gridBind {
                 },
                 complete: function () {
                     $(".SGV_LoadingContainer").hide();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    createLog.error(textStatus);
+                    createLog.error(errorThrown);
+                    let message;
+                    switch (jqXHR.status) {
+                        case 0:
+                            message = 'ارتباط با سرور برقرار نشد. لطفاً اتصال اینترنت خود را بررسی کنید.';
+                            break;
+                        case 404:
+                            message = 'درخواست انجام نشد. متد مورد نظر یافت نشد (404).';
+                            break;
+                        case 500:
+                            message = 'خطای سرور داخلی رخ داده است (500). لطفاً بعداً دوباره تلاش کنید.';
+                            break;
+                        default:
+                            message = 'خطای نامشخص رخ داده است';
+                            break;
+                    };
+                    alert(message);
+                    createLog.error(message);
+                    //console.error(jqXHR.responseText);
                 }
             };
             //m.defaultOptions["order"] = [[0, 'desc']];
