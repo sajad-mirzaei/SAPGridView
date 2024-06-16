@@ -45,6 +45,7 @@
 
     .SGV_TabsContainer .SGV_Tab {
         position: relative;
+        z-index: 1;
         background: #dddddd;
         color: #000000;
         padding: 5px 10px 5px 20px;
@@ -86,13 +87,13 @@
             }
 
     .SGV_TabsContainer .SGV_CloseTab {
-        position: absolute;
-        float: left;
+        position: relative;
+        z-index: 2;
+        float: right;
         cursor: pointer;
-        margin-left: -10px;
+        margin-right: -20px;
         margin-top: -4px;
         padding: 3px;
-        margin-right: -20px;
         /*-webkit-border-top-left-radius: 4px;
     -moz-border-radius-topleft: 4px;
     border-top-left-radius: 4px;*/

@@ -212,7 +212,7 @@ class gridBind {
             m.gridArray[m.containerId][m.thisTableId]["TableAPI"].destroy();
             self.tabSwitch();
             $("#" + m.tabsContainerId).show();
-            $("#" + m.thisTabId).html(m.thisTabTitle);
+            //$("#" + m.thisTabId).html(m.thisTabTitle);
         }
     }
 
@@ -590,8 +590,8 @@ class gridBind {
             ThisTab += "data-tabid='" + m.thisTabId + "' ";
             ThisTab += "data-contentid='" + m.thisTabContentId + "' > ";
             ThisTab += m.thisTabTitle;
-            //ThisTab += (parseInt(m.level) > 1) ? "<i class='fa fa-remove SGV_CloseTab' onclick='sapGridViewOnClick.closeTab(this);' data-tabid='" + m.thisTabId + "' data-contentid='" + m.thisTabContentId + "'></i>" : ThisTab;
             ThisTab += " </div> ";
+            ThisTab += parseInt(m.level) > 1 ? "<i class='fa fa-remove SGV_CloseTab' onclick='sapGridViewOnClick.closeTab(this);' data-thistableid='" + m.thisTableID + "' data-containerid='" + m.containerId + "' data-tabid='" + m.thisTabId + "' data-contentid='" + m.thisTabContentId + "'></i>" : "";
         }
         if (parseInt(m.level) > 1) {
             self.tabSwitch();
@@ -1849,14 +1849,23 @@ class sapGridViewOnClick {
     }
 
     static closeTab(obj) {
-        let ThisTabID = obj.dataset.tabid;
-        let ThisTabContentID = obj.dataset.contentid;
-        $("#" + ThisTabID).hide();
-        $("#" + ThisTabContentID).hide();
-        //$(obj).hide();
-
-        $("#" + ThisTabID).closest(".SGV_TabsContainer").find(".SGV_Tab").eq(0).addClass("SGV_ActiveTabTitle");
-        $("#" + ThisTabContentID).parent().find(".SGV_GridContent").eq(0).addClass("SGV_ActiveTabContent");
+        var ThisTabID = obj.dataset.tabid;
+        var ThisTabContentID = obj.dataset.contentid;
+        var containerid = obj.dataset.containerid;
+        var thistableid = obj.dataset.thistableid;
+        /*
+        SGVArray[containerid][thistableid]["TableAPI"].clear();
+        SGVArray[containerid][thistableid]["TableAPI"].destroy();
+        delete SGVArray[containerid][thistableid];
+        */
+        $(obj).remove();
+        $("#" + ThisTabID).remove();
+        $("#" + ThisTabContentID).remove();
+        var tabsContainer = $("#" + containerid).find(".SGV_TabsContainer");
+        if (tabsContainer.find(".SGV_ActiveTabTitle").length == 0) {
+            tabsContainer.find(".SGV_Tab").eq(0).addClass("SGV_ActiveTabTitle")
+            $("#" + containerid).find(".SGV_GridContent").eq(0).addClass("SGV_ActiveTabContent");
+        }
     }
 
     static tabOnClick(obj) {
