@@ -5,7 +5,6 @@ using WWWPGrids;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ClientSide;
 
-[IgnoreAntiforgeryToken]
 public class ChangeData : PageModel
 {
     private readonly ILogger<ChangeData> _logger;

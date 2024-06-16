@@ -5,7 +5,6 @@ using WWWPGrids.Models;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
-[IgnoreAntiforgeryToken]
 public class MultipleGrids : PageModel
 {
     private readonly ILogger<MultipleGrids> _logger;

@@ -5,7 +5,6 @@ using WWWPGrids.Models;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ClientSide;
 
-[IgnoreAntiforgeryToken]
 public class NestedGridsMultpleLevel : PageModel
 {
     private readonly ILogger<NestedGridsMultpleLevel> _logger;

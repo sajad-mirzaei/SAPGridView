@@ -5,7 +5,6 @@ using WWWPGrids.Models;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
-[IgnoreAntiforgeryToken]
 public class SimpleServerSide : PageModel
 {
     private readonly ILogger<SimpleServerSide> _logger;

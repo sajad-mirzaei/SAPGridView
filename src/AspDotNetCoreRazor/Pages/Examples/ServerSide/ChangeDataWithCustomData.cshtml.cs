@@ -6,7 +6,6 @@ using WWWPGrids.Models;
 
 namespace AspDotNetCoreRazor.Pages.Examples.ServerSide;
 
-[IgnoreAntiforgeryToken]
 public class ChangeDataWithCustomData : PageModel
 {
     private readonly ILogger<ChangeDataWithCustomData> _logger;

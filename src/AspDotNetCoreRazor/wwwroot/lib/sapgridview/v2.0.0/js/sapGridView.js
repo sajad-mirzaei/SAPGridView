@@ -245,6 +245,10 @@ class gridBind {
             m.defaultOptions["ajax"] = {
                 url: document.location.origin + document.location.pathname + "?handler=" + thisWebMethodName,
                 type: 'POST',
+                headers: {
+                    RequestVerificationToken:
+                        $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
                 data: function (d) {
                     d.gridInfo = {
                         containerId: m.grid.containerId,
@@ -1765,13 +1769,13 @@ class sapGridViewOnClick {
         $.ajax({
             type: "POST",
             url: document.location.origin + document.location.pathname + "?handler=" + ThisWebMethodName,
-            data: JSON.stringify(callBackData),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
             headers: {
                 RequestVerificationToken:
                     $('input:hidden[name="__RequestVerificationToken"]').val()
             },
+            data: JSON.stringify(callBackData),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
             success: function (data) {
                 let d = JSON.parse(data);
                 if (ThisWebMethodName == "SapGridEvent") {
@@ -1801,6 +1805,10 @@ class sapGridViewOnClick {
             data: JSON.stringify(callBackData),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
             success: function (data) {
                 var d = JSON.parse(data);
                 new sapGridView(d, 1, "1");
@@ -1823,6 +1831,10 @@ class sapGridViewOnClick {
             contentType: "application/json; charset=utf-8",
             headers: headerRquest, //sample: headerRquest={ RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
             dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
             success: function (data) {
                 var d = JSON.parse(data);
                 new sapGridView(d, 1, "1");
