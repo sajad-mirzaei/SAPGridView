@@ -162,7 +162,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
         TableHtml += "<tfoot class='DT_Tfoot' >" + TfootTr + "</tfoot>";
         TableHtml += "</table>";
         var GridContentHtml_End = "</div>";
-        var ThisTab = SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId);
+        var ThisTab = SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId, ThisTableID);
 
         if (Level == "1" && ThisTab != "Exist") {
             var TableHtml = "<div class='SGV_TabsContainer sortableSection " + ContainerId + "TabsContainer' id='" + TabsContainerID + "'>" + ThisTab + "</div>" + GridContentHtml_Start + TableHtml + GridContentHtml_End;
@@ -188,33 +188,9 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             SGVArray[ContainerId][ThisTableID]["TableAPI"].destroy();
             SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId);
             $("#" + TabsContainerID).show();
-            $("#" + ThisTabID).html(ThisTabTitle);
+            //$("#" + ThisTabID).html(ThisTabTitle + "-----");
         }
 
-
-        /*Ajax Paganation---
-         * 
-         * SGVDefaultOptions["processing"] = true;
-        SGVDefaultOptions["serverSide"] = true,
-            SGVDefaultOptions["ajax"] = {
-                "type": "POST",
-                "contentType": "application/json; charset=utf-8",
-                "url": document.location.origin + document.location.pathname + "/TestMethod",
-                "data": function (d) {
-                    *//*console.log(d);*//*
-return "{ CallBackData:'" + JSON.stringify(d) + "' }";
-},
-"dataType": "text",
-"dataSrc": function (data) {
-if (Array.isArray(data) !== true) {
-data = JSON.parse(data);
-if (Array.isArray(data.d) !== true)
-data.d = JSON.parse(data.d);
-}
-return data.d.data;
-},
-"cache": false
-};*/
         //Row Grouping
         if (rowGrouping !== null) {
             var columnsCount = SGVDefaultOptions.columns.length;
@@ -1193,39 +1169,40 @@ function SGV_TheadTfootCalc(TableInfo) {
         ThisFooter.show();
 }
 
-function SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId) {
+function SGV_TabsControl(ThisTabID, ThisTabContentID, TabsContainerID, Level, ThisTabTitle, ContainerId, ThisTableID) {
     if ($("#" + ThisTabID).length > 0) {
         ThisTab = "Exist";
     } else {
         var ThisTab = "<div class='SGV_Tab SGV_ActiveTabTitle " + ContainerId + "Tab' id='" + ThisTabID + "' onclick='SGV_TabOnClick(this)' data-containerid='" + ContainerId + "' data-tabid='" + ThisTabID + "' data-contentid='" + ThisTabContentID + "' > ";
         ThisTab += ThisTabTitle;
         ThisTab += " </div> ";
-        //ThisTab += "<i class='fa fa-remove SGV_CloseTab' onclick='SGV_CloseTab(this);' data-tabid='" + ThisTabID + "' data-contentid='" + ThisTabContentID + "'></i>";
+        ThisTab += parseInt(Level) > 1 ? "<i class='fa fa-remove SGV_CloseTab' onclick='SGV_CloseTab(this);' data-thistableid='" + ThisTableID + "' data-containerid='" + ContainerId + "' data-tabid='" + ThisTabID + "' data-contentid='" + ThisTabContentID + "'></i>" : "";
+
     }
     if (parseInt(Level) > 1) {
         SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId);
         $("#" + TabsContainerID).show();
     }
-
-    //console.log(ThisTabID);
-    //console.log(ThisTabContentID);
-    //console.log(TabsContainerID);
-    //console.log(Level);
-    //console.log(ThisTabTitle);
-    //console.log(ContainerId);
-    //console.log("----------------");
     return ThisTab;
 }
 
 function SGV_CloseTab(obj) {
     var ThisTabID = obj.dataset.tabid;
     var ThisTabContentID = obj.dataset.contentid;
-    $("#" + ThisTabID).hide(500);
-    $("#" + ThisTabContentID).hide(500);
-    //$("#" + ThisTabContentID).hide(500);
+    var containerid = obj.dataset.containerid;
+    var thistableid = obj.dataset.thistableid;
+    SGVArray[containerid][thistableid]["TableAPI"].clear();
+    SGVArray[containerid][thistableid]["TableAPI"].destroy();
+    delete SGVArray[containerid][thistableid];
 
-    /*$("#" + ThisTabID).closest(".SGV_TabsContainer").find(".SGV_Tab").eq(0).addClass("SGV_ActiveTabTitle");
-    $("#" + ThisTabContentID).parent().find(".SGV_GridContent").eq(0).addClass("SGV_ActiveTabContent");*/
+    $(obj).remove();
+    $("#" + ThisTabID).remove();
+    $("#" + ThisTabContentID).remove();
+    var tabsContainer = $("#" + containerid).find(".SGV_TabsContainer");
+    if (tabsContainer.find(".SGV_ActiveTabTitle").length == 0) {
+        tabsContainer.find(".SGV_Tab").eq(0).addClass("SGV_ActiveTabTitle")
+        $("#" + containerid).find(".SGV_GridContent").eq(0).addClass("SGV_ActiveTabContent");
+    }
 }
 
 function SGV_TabOnClick(obj) {
