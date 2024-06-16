@@ -1,0 +1,33 @@
+﻿@page
+@model AjaxLoad
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+<span id="loadGrid" class="btn btn-primary" onclick="loadGrid();">click to load Grid</span><hr/>
+<div id="MyGridId"></div>
+@TempData["SAPGridView"]
+@Html.AntiForgeryToken()
+
+<script>
+    function loadGrid() {
+        $.ajax({
+            type: "POST",
+            url: document.location.origin + document.location.pathname + "?handler=LoadGrid1",
+            //data: "{}",//JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            headers: {
+                RequestVerificationToken:
+                    $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function (data) {
+                let d = JSON.parse(data);
+                console.log(d);
+                new sapGridView(JSON.parse(d.grids), d.level, d.firstTextTitle);
+            },
+            error: function (error) {
+                alert("خطایی در ارتباط با سرور وجود دارد");
+            }
+        });
+    }
+</script>
