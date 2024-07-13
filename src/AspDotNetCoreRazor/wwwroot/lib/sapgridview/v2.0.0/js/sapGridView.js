@@ -1432,7 +1432,7 @@ class sapGridViewFunctions {
                 //$(cellInfo.td).addClass(isFalseCssClass); //forRender 1
                 //ThisTDNewData = isFalseText; //forRender 2
 
-                ThisTDNewData = "<span class='" + isTrueCssClass + "'>" + isFalseText + "</span>"; //render
+                ThisTDNewData = "<span class='" + isFalseCssClass + "'>" + isFalseText + "</span>"; //render
             }
         } else {
             createLog.error("TextFeatureConditionNotFound");
