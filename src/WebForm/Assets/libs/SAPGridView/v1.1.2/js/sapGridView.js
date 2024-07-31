@@ -188,7 +188,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             SGVArray[ContainerId][ThisTableID]["TableAPI"].destroy();
             SGV_TabSwitch(ThisTabID, ThisTabContentID, ContainerId);
             $("#" + TabsContainerID).show();
-            //$("#" + ThisTabID).html(ThisTabTitle + "-----");
+            $("#" + ThisTabID).html(ThisTabTitle);
         }
 
         //Row Grouping
