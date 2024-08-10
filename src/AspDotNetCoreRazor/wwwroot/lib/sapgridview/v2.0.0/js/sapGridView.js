@@ -1785,7 +1785,7 @@ class sapGridViewOnClick {
         let rowData = {};
         $.each(cData.RowData, function (key, val) {
             GridFirstText = sapGridViewTools.customStrReplace(GridFirstText, key, val);
-            rowData[key] = val.toString();
+            rowData[key] = [null, undefined, NaN, 'undefined', 'NaN', 'null'].includes(val) ? "" : val.toString();
         });
         let gridParameters = sapGridViewTools.base64Decode($("#" + ThisTableID).attr("data-gridparameters"));
         let callBackData = {
