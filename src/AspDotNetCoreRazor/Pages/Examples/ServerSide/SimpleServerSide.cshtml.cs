@@ -21,8 +21,11 @@ public class SimpleServerSide : PageModel
     }
     public IActionResult OnPostSapGridServerSide([FromHeader] DatatablesFiltersModel filters)
     {
+        int length = filters.Length == -1 ? 100 : filters.Length;
+
+
         var data = MakeList().OrderBy(c => c.id).ToList();
-        List<SimpleServerSideModel> dt = data.OrderBy(c => c.id).Skip(filters.Start).Take(filters.Length).ToList();
+        List<SimpleServerSideModel> dt = data.OrderBy(c => c.id).Skip(filters.Start).Take(length).ToList();
 
         int cumulativeSumStartingNumber = data.OrderBy(c => c.id).Select(c => c.a)
             .Where(c => c < dt[0].a).Sum();
@@ -48,6 +51,7 @@ public class SimpleServerSide : PageModel
             Processing = true,
             ContainerId = "MyGridId",
             ContainerHeight = 800,
+            CounterColumn = false,
             GridTitle = "گزارش تست 1",
             Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
             Columns = new List<Column>() {
@@ -57,7 +61,7 @@ public class SimpleServerSide : PageModel
                     Title = "CheckBox",
                     Data = "CheckBox",
                     DefaultContent = "<input type='checkbox' class='checkbox' onclick='func1(this);' data-aaa='a'>"
-                },
+                }/*,
                 new Column { Data = "a", Title = "aa",
                     Functions = {
                         new Calc { Section = Function.SectionValue.Tfoot, Operator = Calc.OperatorValue.VerticalSum },
@@ -67,6 +71,17 @@ public class SimpleServerSide : PageModel
                             Section = Function.SectionValue.Tbody,
                             Condition = "1==1",
                             IsTrueText = "<span class='text-danger' data-b1='b'>a</span>"
+                        }
+                    }
+                }*/,
+                new Column { Data = "a", Title = "aa",
+                    Functions = {
+                        new TextFeature()
+                        {
+                            Section = Function.SectionValue.Tbody,
+                            Condition = "id != 1",
+                            IsTrueText = "yess",
+                            IsFalseText = "nooo"
                         }
                     }
                 },
@@ -106,7 +121,12 @@ public class SimpleServerSide : PageModel
                     Data = "f", Title = "ff",
                     Functions =
                     {
-                        new TextFeature(){ Section = Function.SectionValue.Tbody, Condition = "1==1", IsTrueCssClass = "text-info"}
+                        new TextFeature()
+                        {
+                            Section = Function.SectionValue.Tbody,
+                            Condition = "e % 2 == 0",
+                            IsTrueCssClass = "text-danger"
+                        }
                     }
                 },
                 new Column

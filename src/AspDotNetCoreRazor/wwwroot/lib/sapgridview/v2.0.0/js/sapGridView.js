@@ -69,7 +69,7 @@ class gridBind {
         this.firstBind();
         this.setGridArray();
         this.actionsAtEndOfBind();
-        this.counterColumn();
+        this.fillRowCounter();
         new sapGridViewFunctions().callAfterDrawFunctions(this.model);
         new charts(this.model);
     }
@@ -78,7 +78,8 @@ class gridBind {
     //#region Public Functions
     addRowCounter(self = this, m = this.model) {
         if (m.grid.columns.length == 0 && m.grid["data"] != null && m.grid["data"].length > 0) {
-            m.grid.columns.push(m.counterForColumns);
+            if (m.grid.counterColumn == true)
+                m.grid.columns.push(m.counterForColumns);
             $.each(m.grid["data"][0], function (k, v) {
                 m.grid.columns.push({
                     title: k,
@@ -87,7 +88,7 @@ class gridBind {
                     orderable: true
                 });
             });
-        } else {
+        } else if (m.grid.counterColumn == true) {
             m.grid.columns.unshift(m.counterForColumns);
         }
     }
@@ -561,7 +562,7 @@ class gridBind {
 
     onDraw(self = this, m = this.model) {
         m.tableObject.on("draw", function (a, b, c, d) {
-            self.counterColumn();
+            self.fillRowCounter();
             new sapGridViewFunctions().callAfterDrawFunctions(m);
             if (m.grid.serverSide == true) self.setFooter();
             new charts(m);
@@ -1003,7 +1004,7 @@ class gridBind {
         //m.tableObject.draw();
     }
 
-    counterColumn(self, m = this.model) {
+    fillRowCounter(self, m = this.model) {
         if (m.grid.counterColumn == true) {
             let i = 1;
             m.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
