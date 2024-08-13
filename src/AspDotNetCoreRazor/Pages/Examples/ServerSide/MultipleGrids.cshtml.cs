@@ -63,7 +63,7 @@ public class MultipleGrids : PageModel
             ContainerId = "MyGridId1",
             ContainerHeight = 800,
             GridTitle = "گزارش تست 1",
-            Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+            Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
             Columns = new List<Column>() {
                 //new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
                 new Column { Data = "a", Title = "aa",
@@ -104,7 +104,7 @@ public class MultipleGrids : PageModel
             ContainerId = "MyGridId2",
             ContainerHeight = 800,
             GridTitle = "گزارش تست 2",
-            Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+            Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
             Columns = new List<Column>() {
                 //new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
                 new Column { Data = "a", Title = "aa",

@@ -603,7 +603,7 @@ function SGV_FillDropDownFilters(ThisTableAPI, TheadID, DataArrayColumns) {
 function SGV_DefaultOptions(customOptions, GridTitle, ThisTableID, customizeButtons) {
     var ariaControls = "";
     var ExportTitle = "";
-    if (customOptions["titleRowInExelExport"] === true) {
+    if (customOptions["titleRowInExcelExport"] === true) {
         ExportTitle = [null, undefined, NaN, ""].includes(GridTitle) !== true ? SGV_CustomStrReplace(GridTitle, " ", "-") + "-" : "";
         ExportTitle += jalali_today() + "-" + (new Date()).getHours() + ":" + (new Date()).getMinutes() + ":" + (new Date()).getSeconds();
     }

@@ -28,7 +28,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 ContainerHeight = 400,
                 Data = dt,
                 GridTitle = "گزارش تست 1",
-                Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+                Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
                 Columns = new List<Column>() {
                     new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
                     new Column { Data = "a", Title = "aa",

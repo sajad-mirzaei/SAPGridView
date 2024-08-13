@@ -30,7 +30,7 @@ namespace AspDotNetCoreRazor.Pages.Examples.ClientSide
                 ContainerHeight = 400,
                 Data = dt,
                 GridTitle = "Test Report 1",
-                Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+                Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
                 Columns = new List<Column>() {
                     new() { Data = "Id", Title = "Id" },
                     new() { Data = "Province", Title = "Province Title", Width = "20" },

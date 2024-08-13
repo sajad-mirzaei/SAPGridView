@@ -639,7 +639,7 @@ class gridBind {
     getDefaultOptions(self = this, m = this.model) {
         let customOptions = m.grid.options;
         let ExportTitle = "";
-        if (customOptions["titleRowInExelExport"] === true) {
+        if (customOptions["titleRowInExcelExport"] === true) {
             ExportTitle = [null, undefined, NaN, ""].includes(m.grid.gridTitle) !== true ? sapGridViewTools.customStrReplace(m.grid.gridTitle, " ", "-") + "-" : "";
             ExportTitle += jalaliConvert.jalaliToday() + "-" + (new Date()).getHours() + ":" + (new Date()).getMinutes() + ":" + (new Date()).getSeconds();
         }

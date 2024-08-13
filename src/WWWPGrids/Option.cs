@@ -28,7 +28,7 @@ namespace WWWPGrids
         /// <summary> جستجو در کل جدول </summary>
         [JsonProperty("gridSearchTextBox")] public bool GridSearchTextBox { get; set; }
         /// <summary> حذف عنوان جدول از سطر اول خروجی اکسل </summary>
-        [JsonProperty("titleRowInExelExport")] public bool TitleRowInExelExport { get; set; }
+        [JsonProperty("titleRowInExcelExport")] public bool TitleRowInExcelExport { get; set; }
         public Option()
         {
             PageLength = 10;
@@ -43,7 +43,7 @@ namespace WWWPGrids
             DropDownFilterButton = false;
             RemoveAllFilters = true;
             GridSearchTextBox = true;
-            TitleRowInExelExport = true;
+            TitleRowInExcelExport = true;
         }
     }
 }

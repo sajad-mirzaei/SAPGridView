@@ -22,7 +22,7 @@ public partial class ChartColumn : System.Web.UI.Page
             ContainerHeight = 400,
             Data = dt,
             GridTitle = "Test Report 1",
-            Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+            Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
             Columns = new List<Column>() {
                     new Column() { Data = "Id", Title = "Id" },
                     new Column() { Data = "Province", Title = "Province Title", Width = "20" },

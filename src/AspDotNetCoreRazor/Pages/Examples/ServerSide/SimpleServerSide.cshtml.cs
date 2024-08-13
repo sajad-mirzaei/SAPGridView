@@ -53,7 +53,7 @@ public class SimpleServerSide : PageModel
             ContainerHeight = 800,
             CounterColumn = false,
             GridTitle = "گزارش تست 1",
-            Options = new Option() { DropDownFilterButton = true, TitleRowInExelExport = false },
+            Options = new Option() { DropDownFilterButton = true, TitleRowInExcelExport = false },
             Columns = new List<Column>() {
                 //new Column { Data = "v1", Title = "vv1", DefaultContent = "vv2", Visible = false },
                 new Column

@@ -176,7 +176,7 @@ namespace SAP.WebControls
         /// <summary> جستجو در کل جدول </summary>
         [JsonProperty("gridSearchTextBox")] public Boolean GridSearchTextBox { get; set; }
         /// <summary> حذف عنوان جدول از سطر اول خروجی اکسل </summary>
-        [JsonProperty("titleRowInExelExport")] public Boolean TitleRowInExelExport { get; set; }
+        [JsonProperty("titleRowInExcelExport")] public Boolean TitleRowInExcelExport { get; set; }
         public Option()
         {
             PageLength = 10;
@@ -191,7 +191,7 @@ namespace SAP.WebControls
             DropDownFilterButton = false;
             RemoveAllFilters = true;
             GridSearchTextBox = true;
-            TitleRowInExelExport = true;
+            TitleRowInExcelExport = true;
         }
     }
     public class CustomizeButton
