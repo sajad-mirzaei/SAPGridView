@@ -14,7 +14,6 @@ namespace WWWPGrids
         [JsonProperty("webMethodName")] public string WebMethodName { get; set; }
         [JsonProperty("javaScriptMethodName")] public string JavaScriptMethodName { get; set; }
         /// <summary>yourTitle - {clickedItem} : انتخاب نام برای تب، یک کلمه یا رشته می پذیرد می توان بصورت ترکیبی کلمه - گزینه ای که کلیک شده تعریف کرد مثال </summary>
-        /// <summary>   </summary>
         [JsonProperty("nextTabTitle")] public string NextTabTitle { get; set; }
         public List<string> DataKeys { get; set; }
         public string NextGrid { get; set; }
