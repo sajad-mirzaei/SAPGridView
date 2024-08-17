@@ -22,6 +22,7 @@ namespace WWWPGrids
         [JsonProperty("gridParameters")] public Dictionary<string, string> GridParameters = new Dictionary<string, string>();
         [JsonProperty("headerComplex")] public List<HeaderComplexRow> HeaderComplex { get; set; }
         [JsonProperty("charts")] public List<Chart> Charts { get; set; }
+        [JsonProperty("chartOnly")] public bool ChartOnly { get; set; }
         private RowComplex _rowComplex { get; set; }
         [JsonProperty("rowComplex")]
         public RowComplex RowComplex
@@ -47,6 +48,7 @@ namespace WWWPGrids
             CounterColumn = true;
             Columns = new List<Column>();
             Charts = new List<Chart>();
+            ChartOnly = false;
             HeaderComplex = new List<HeaderComplexRow>();
             CustomizeButtons = new List<CustomizeButton>();
             Options = new Option();

@@ -1,0 +1,16 @@
+﻿@page
+@model ChartOnly_Pie
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+
+<div id="pieChartContainer" style="margin-bottom: 1em;" class="chart-display"></div>
+<div id="MyGridId"></div>
+@TempData["SAPGridView"]
+
+<script>
+    //optional
+    // function DataTableCallBackData(oData) {
+    //     console.log(oData);
+    // }
+</script>

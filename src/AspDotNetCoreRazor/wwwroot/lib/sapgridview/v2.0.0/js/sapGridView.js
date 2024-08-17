@@ -42,9 +42,12 @@ class gridBind {
     main(gridName, grid, level, gridFirstText, customData) {
         this.customData = customData;
         this.model = new gridModel().setModelProperties(gridName, grid, level, gridFirstText);
-
-        this.bind();
-        return this.model.gridArray;
+        if (grid.chartOnly === false) {
+            this.bind();
+            return this.model.gridArray;
+        } else if (grid.chartOnly === true) {
+            new charts(this.model);
+        }
     }
 
     //#region bind
@@ -1018,7 +1021,7 @@ class gridBind {
 class charts {
     tableObject = null;
     titleAlign = { 0: "right", 1: "center", 2: "left" };
-    chartsData = null;
+    chartsData = {};
     mainColumnsTitle = null;
 
     constructor(m) {
@@ -1026,7 +1029,7 @@ class charts {
         this.mainColumnsTitle = m.mainColumnsTitle;
 
         //One-time trace data and charts-data assignment
-        this.setChartsData(m.grid.charts);
+        this.setChartsData(m.grid);
 
         //Making requested charts
         this.traceCharts(m.grid.charts);
@@ -1035,20 +1038,27 @@ class charts {
     }
 
     //#region Prepare data for charts
-    setChartsData(charts, self = this) {
-        let chartsData = {};
-        self.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
-            let rowData = this.data();
+    setChartsData(grid, self = this) {
+        if (grid.chartOnly == false) {
+            self.tableObject.rows({ order: 'applied', filter: 'applied', search: 'applied' }).every(function (rowIdx, tableLoop, rowLoop) {
+                let rowData = this.data();
+                callChart(grid.charts, rowData);
+            });
+        } else {
+            $.each(grid.data, function (k, rowData) {
+                callChart(grid.charts, rowData);
+            });
+        }
+        function callChart(charts, rowData) {
             $.each(charts, function (k, chart) {
                 let chartName = self.getChartType(chart.chartName);
 
                 let fName = "set" + chartName + "Data";
                 if (typeof self[fName] === "function") {
-                    chartsData = self[fName](chartsData, rowData, chart, chartName); //Example: setpieData
+                    self.chartsData = self[fName](self.chartsData, rowData, chart, chartName); //Example: setpieData
                 }
             });
-        });
-        self.chartsData = chartsData;
+        }
     }
 
     setpieData(chartsData, rowData, chart, chartName, self = this) {
