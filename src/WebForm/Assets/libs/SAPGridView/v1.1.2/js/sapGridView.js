@@ -88,8 +88,6 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
             }
             if (TempColumn != null /*&& TempColumn.visible == true*/) {
                 var CellName = TempColumn["data"] ? TempColumn["data"].trim() : "";
-                AllTitleTh += "<th data-tbodyid='" + TbodyID + "'>" + TempColumn.title + "</th>";
-                AllFooterTh += "<th data-tbodyid='" + TbodyID + "' id='Footer_" + ThisTableID + "_" + CellName + "'>" + TempColumn.title + "</th>";
                 if (TempColumn["functions"] && TempColumn["functions"] !== null && TempColumn["functions"].length > 0) {
                     SGVGlobalVariables[ContainerId][ThisTableID].columnsName[CellName] = CellIndex;
                     $.each(TempColumn["functions"], function (k, FuncArray) {
@@ -102,6 +100,10 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                             SGVGlobalVariables[ContainerId][ThisTableID].columns[CellIndex]["name"] = CellName;
                             SGVGlobalVariables[ContainerId][ThisTableID].columns[CellIndex]["tfootOnClick"] = true;
                             SGVGlobalVariables[ContainerId][ThisTableID].columns[CellIndex]["footerText"] = FuncArray.footerText !== undefined ? FuncArray.footerText : null;
+                        } else if (FuncArray.funcName == "SAPCheckBox" && [1].includes(parseInt(FuncArray.section))) {
+                            TempColumn["title"] =
+                                FuncArray.selectAll === true ?
+                                getSAPCheckBox("", [], FuncArray, CellName, ThisTableID, ContainerId, true) : TempColumn["title"];
                         }
                         if (SGVFunctionList[FuncArray.funcName]["FuncListBuild"]) {
                             $.each(SGVFunctionList[FuncArray.funcName]["FuncListBuild"], function (k, DTMethodName) {
@@ -112,7 +114,11 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                             });
                         }
                     });
+
                 }
+                AllTitleTh += "<th data-tbodyid='" + TbodyID + "'>" + TempColumn.title + "</th>";
+                AllFooterTh += "<th data-tbodyid='" + TbodyID + "' id='Footer_" + ThisTableID + "_" + CellName + "'>" + TempColumn.title + "</th>";
+
                 CellIndex++;
                 AllColumns.push(TempColumn);
 
@@ -478,14 +484,10 @@ function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalV
     var ThisRowData = JSON.stringify(rowAllData);
     var ThisRowData = SGV_Base64Encode(ThisRowData);
     var cssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
-    var webMethodName = FuncArray.webMethodName ? FuncArray.webMethodName : "SapGridEvent";
-    var ThisCellNewData = cellData;
-    if (FuncArray.enable == true) {
-        ThisCellNewData = "<input type='checkbox' class='" + cssClass + "' data-webmethodname='" + webMethodName + "' data-row='" + ThisRowData + "' data-tableid='" + ThisTableID + "' onclick='SAPCheckBoxClick_SGV(this)' >" + cellData;
-    }
+    var javascriptMethodName = FuncArray.javascriptMethodName ? FuncArray.javascriptMethodName : "SAPCheckBoxClick_SGV";
+    var ThisCellNewData = getSAPCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, false);
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
-
 function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
     var ThisCellNewData = cellData;
     var CellIndex = SGVGlobalVariables[ContainerId][ThisTableID]["columnsName"][cellName];
@@ -500,6 +502,57 @@ function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGloba
     } else
         SGV_ErrorMessage("CumulativeSumSourceFieldNotFound");
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
+}
+
+function getSAPCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, IsSelectAllCheckBoxEvent) {
+    var rowAllData = {};
+    rowAllData["FuncArray"] = FuncArray;
+    rowAllData["RowData"] = rowData;
+    var ThisRowData = JSON.stringify(rowAllData);
+    var ThisRowData = SGV_Base64Encode(ThisRowData);
+    var userCssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
+    var javascriptMethodName = FuncArray.javascriptMethodName ? FuncArray.javascriptMethodName : "SAPCheckBoxClick_SGV";
+    var ThisCellNewData = cellData;
+    if (FuncArray.enable == true) {
+        var rowsCssClass = ContainerId + ThisTableID + cellName + "CssClass";
+        var selectedAllCssClass = rowsCssClass + "SelectedAll";
+        var tempCssClass = IsSelectAllCheckBoxEvent ? selectedAllCssClass : rowsCssClass;
+        ThisCellNewData = "<input type='checkbox' ";
+        ThisCellNewData += "class= '" + userCssClass + " " + tempCssClass +"'";
+        ThisCellNewData += "data-row='" + ThisRowData + "' ";
+        ThisCellNewData += "data-tableid='" + ThisTableID + "' ";
+        ThisCellNewData += "data-javascriptmethodname='" + javascriptMethodName + "' ";
+        ThisCellNewData += "data-containerid='" + ContainerId + "' ";
+        ThisCellNewData += "data-cellname='" + cellName + "' ";
+        ThisCellNewData += "data-rowscssclass='" + rowsCssClass + "' ";
+        ThisCellNewData += "data-selectedallcssclass='" + selectedAllCssClass + "' ";
+        ThisCellNewData += "data-isselectallcheckboxevent='" + IsSelectAllCheckBoxEvent + "' ";
+        ThisCellNewData += "onclick='SAPCheckBoxClick_SGV(this)' >" + cellData;
+    }
+    return ThisCellNewData;
+}
+
+function SAPCheckBoxClick_SGV(obj) {
+    let r = sapGridViewTools.base64Decode(obj.dataset.row);
+    let rowData = JSON.parse(r);
+    let args = {
+        type: "CheckBox",
+        obj: obj,
+        rowData: rowData.RowData,
+        funcArray: rowData.FuncArray,
+        tableAPI: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableAPI,
+        tableObject: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableObject,
+        containerId: obj.dataset.containerid,
+        tableId: obj.dataset.tableid,
+        cellName: obj.dataset.cellname,
+        rowsCssClass: obj.dataset.rowscssclass,
+        selectedAllCssClass: obj.dataset.selectedallcssclass,
+        isSelectAllCheckBoxEvent: ["true", true, 1, "1"].includes(obj.dataset.isselectallcheckboxevent) ? true : false
+    }
+    var fn = window[obj.dataset.javascriptmethodname];
+    if (typeof fn === "function") {
+        fn.apply(window, [args]);
+    }
 }
 
 function SGV_HeaderComplex(DataArray, CellName) {
@@ -1630,62 +1683,134 @@ class charts {
     //#endregion
 }
 
-/*
- *
- *
- *
-function OLDDDDDDDDD____SGV_SearchCustomized(allInput, tbodyid, SearchInTr) {
-                var dataSearch = [];
-                var i = 0;
-                allInput.each(function () {
-                    var inputData = $(this).val();
-                    let persianInputData = SGV_ArabicToPersianChar(inputData);
-                    var columnNum = $(this).attr("data-columnnum");
-                    if (persianInputData.trim() != "" && persianInputData != "undefined") {
-                        dataSearch[i] = { "inputData": persianInputData, "columnNum": columnNum, "tbodyid": tbodyid };
-                        i++;
-                    }
-                });
-                $("#" + tbodyid + " > tr").show();
-                $("#" + tbodyid + " > tr").each(function () {
-                    var thisTr = $(this).closest("tr");
-                    $.each(dataSearch, function (k, v) {
-                        if (SearchInTr === 0)
-                            var thisSearchField = thisTr.find("td:eq(" + v.columnNum + ")");
-                        else
-                            var thisSearchField = thisTr;
-                        var text = thisSearchField.text();
-                        thisSearchField.find("input, select, button, a, span").each(function () {
-                            if ($(this).is("button, a, span")) {
-                                text += $(this).text();
-                            } else
-                                text += $(this).val();
-                        });
-                        let persianText = SGV_ArabicToPersianChar(text);
-                        if (persianText.indexOf(v.inputData) < 0) {
-                            thisTr.hide();
-                        }
-                    });
-                });
-            }
- function EventFired_SGV(TableObject) {
-    TableObject.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-        cell.innerHTML = i + 1;
-    });
-}*
----------------------------------------------------------
- *
- * function Options_SGV(DataArray, options) {
-    if (options !== null) {
-        options["lengthMenu"] = JSON.parse(options["lengthMenu"].replace(/'/gi, "\""));
-        $.each(options, function (k, v) {
-            DataArray[k] = v;
-        });
+//#region from razor version
+
+class sapGridViewTools {
+    static strToFloat(str) {
+        str = str !== undefined && str != null && str != NaN && $("<span>" + str + "</span>").text().trim() != "" ? $("<span>" + str + "</span>").text().trim() : 0;
+        str = this.customStrReplace(str.toString(), "/", ".");
+        str = str.replace(/[^\d.-]/g, '');
+        return parseFloat(str);
     }
-    return DataArray;
+
+    static customStrReplace(str, searchValue, replaceValue, matchWholeWord, findAllAndReplace) {
+        findAllAndReplace = findAllAndReplace ? findAllAndReplace : true;
+        str = (str + " ").trim();
+        if (findAllAndReplace) {
+            if ([null, NaN, undefined, 'null', 'NaN', 'undefined', ""].includes(str) === false) {
+                if (matchWholeWord)
+                    str = str.replace(new RegExp("\\b" + searchValue + "\\b", "g"), replaceValue);
+                else
+                    str = str.replace((new RegExp(searchValue, "g")), replaceValue);
+            }
+        } else {
+            str = str.replace(searchValue, replaceValue);
+        }
+        return str;
+    }
+
+    static isValidDate(dateObject) {
+        return new Date(dateObject).toString() !== 'Invalid Date';
+    }
+
+    static datatableHeaderFilters(TableId, type) {
+        let thisDataTable = $("#" + TableId).closest(".dataTables_wrapper");
+        let thisThead = thisDataTable.find(".DT_TrFilters");
+        let allTheadFiltersID = thisDataTable.find(".DT_TrFilters").find(".DT_ColumnFilterContainer, .DT_ColumnSearchContainer");
+        let thisTheadFilterID = thisDataTable.find(".DT_TrFilters").find(".DT_Column" + type + "Container");
+        let flag = thisThead.attr("data-flag");
+        if (flag == "hide" || flag != type) {
+            thisThead.attr("data-flag", type);
+            thisThead.slideDown();
+            allTheadFiltersID.hide();
+            thisTheadFilterID.fadeIn();
+        } else {
+            thisThead.attr("data-flag", "hide");
+            thisThead.hide();
+            allTheadFiltersID.slideUp();
+        }
+    };
+
+    static base64Decode(str) {
+        // Unicode support
+        return decodeURIComponent(atob(str).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+    static base64Encode(str) {
+        // Unicode support
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+            function toSolidBytes(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+    }
+
+    static arabicToPersianChar(str) {
+        //let c = str.replace(/ى/g,"ی");
+        let c = str.replace(/ي/g, "ی");
+        c = c.replace(/ئ/g, "ی");
+        c = c.replace(/ة/g, "ه");
+        c = c.replace(/ك/g, "ک");
+        c = c.replace(/ؤ/g, "و");
+        return c;
+    }
+
+    static persianToArabicChar(str) {
+        //let c = str.replace(/ى/g,"ي");
+        //let c = str.replace(/ى/g,"ی");
+        let c = str.replace(/ی/g, "ي");
+        c = c.replace(/ک/g, "ك");
+        return c;
+    }
+
+    static toCamelCase(str) {
+        if (typeof str !== 'string' || str.length === 0) {
+            return str;
+        }
+        return str.charAt(0).toLowerCase() + str.slice(1);
+    }
+
+    static isKeyExist(array, k) {
+        if (array[k] != undefined && array[k] != NaN && k != null) {
+            return true;
+        }
+        return false;
+    }
+
+    static copyAndCamelCaseIgnore(source, destination) {
+        if ([null, undefined, NaN, 'undefined', 'NaN', 'null'].includes(destination))
+            return {};
+        Object.keys(destination).forEach(key => {
+            const lowerKey = key.toLowerCase();
+            if (source.hasOwnProperty(lowerKey)) {
+                destination[key] = source[lowerKey];
+            } else if (source.hasOwnProperty(key)) {
+                destination[key] = source[key];
+            } else if (sapGridViewTools.toLowerCaseFirstLetter(key)) {
+                destination[key] = source[sapGridViewTools.toLowerCaseFirstLetter(key)];
+            }
+        });
+        return destination;
+    }
+
+    static toLowerCaseFirstLetter(str) {
+        str = str.charAt(0).toLowerCase() + str.slice(1);
+        return str;
+    }
+
+    //dely Fire event after n milliseconds
+    static delayFireEvent(f, delay) {
+        var timer = null;
+        return function () {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = window.setTimeout(function () {
+                f.apply(context, args);
+            },
+                delay || 700);
+        };
+    }
 }
- *
- *
----------------------------------------------------------
----------------------------------------------------------
-*/
+
+//#endregion

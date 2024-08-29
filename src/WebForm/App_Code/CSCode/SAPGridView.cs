@@ -369,12 +369,17 @@ namespace SAP.WebControls
     public class SAPCheckBox : Function
     {
         [JsonProperty("cssClass")] public string CssClass { get; set; }
-        [JsonProperty("enable")] public Boolean Enable { get; set; }
+        [JsonProperty("enable")] public bool Enable { get; set; }
+        [JsonProperty("javascriptMethodName")] public string JavascriptMethodName { get; set; }
+        [JsonProperty("selectAll")] public bool SelectAll { get; set; }
         public SAPCheckBox()
         {
             Section = SectionValue.Tbody;
+            CssClass = "sapCheckBox";
             FuncName = this.GetType().Name;
             Enable = true;
+            JavascriptMethodName = "sapJavascriptMethodName";
+            SelectAll = true;
         }
         public override object DeepCopy()
         {
