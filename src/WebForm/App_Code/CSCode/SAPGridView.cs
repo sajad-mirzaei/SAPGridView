@@ -370,7 +370,10 @@ namespace SAP.WebControls
     {
         [JsonProperty("cssClass")] public string CssClass { get; set; }
         [JsonProperty("enable")] public bool Enable { get; set; }
+        /// <summary> نام متد جاوااسکریپتی خود را بدهید تا بعد از هر رخداد اطلاعات مربوط به آن به متد شما ارسال شود  </summary>
         [JsonProperty("javascriptMethodName")] public string JavascriptMethodName { get; set; }
+        /// <summary> در صورتیکه نام یک ستون را به این پارامتر بدهید جمع و تعداد سطرهایی که انتخاب شده اند ارسال می شود، در صورتیکه یک فرمول از تعدادی ستون بدهید ابتدا فرمول شما حساب می شود سپس جمع و تعداد سطرهایی که انتخاب شده ارسال می شود </summary>
+        [JsonProperty("sumFormula")] public string SumFormula { get; set; }
         [JsonProperty("selectAll")] public bool SelectAll { get; set; }
         public SAPCheckBox()
         {

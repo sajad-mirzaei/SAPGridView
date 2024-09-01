@@ -103,7 +103,7 @@ function SapGridViewJSBind(RData, Level, GridFirstText) {
                         } else if (FuncArray.funcName == "SAPCheckBox" && [1].includes(parseInt(FuncArray.section))) {
                             TempColumn["title"] =
                                 FuncArray.selectAll === true ?
-                                getSAPCheckBox("", [], FuncArray, CellName, ThisTableID, ContainerId, true) : TempColumn["title"];
+                                    new SapCheckBox().getSapCheckBox("", [], FuncArray, CellName, ThisTableID, ContainerId, true) : TempColumn["title"];
                         }
                         if (SGVFunctionList[FuncArray.funcName]["FuncListBuild"]) {
                             $.each(SGVFunctionList[FuncArray.funcName]["FuncListBuild"], function (k, DTMethodName) {
@@ -484,10 +484,11 @@ function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalV
     var ThisRowData = JSON.stringify(rowAllData);
     var ThisRowData = SGV_Base64Encode(ThisRowData);
     var cssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
-    var javascriptMethodName = FuncArray.javascriptMethodName ? FuncArray.javascriptMethodName : "SAPCheckBoxClick_SGV";
-    var ThisCellNewData = getSAPCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, false);
+    var javascriptMethodName = FuncArray.javascriptMethodName;
+    var ThisCellNewData = new SapCheckBox().getSapCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, false);
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
+
 function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
     var ThisCellNewData = cellData;
     var CellIndex = SGVGlobalVariables[ContainerId][ThisTableID]["columnsName"][cellName];
@@ -502,57 +503,6 @@ function CumulativeSum_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGloba
     } else
         SGV_ErrorMessage("CumulativeSumSourceFieldNotFound");
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
-}
-
-function getSAPCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, IsSelectAllCheckBoxEvent) {
-    var rowAllData = {};
-    rowAllData["FuncArray"] = FuncArray;
-    rowAllData["RowData"] = rowData;
-    var ThisRowData = JSON.stringify(rowAllData);
-    var ThisRowData = SGV_Base64Encode(ThisRowData);
-    var userCssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
-    var javascriptMethodName = FuncArray.javascriptMethodName ? FuncArray.javascriptMethodName : "SAPCheckBoxClick_SGV";
-    var ThisCellNewData = cellData;
-    if (FuncArray.enable == true) {
-        var rowsCssClass = ContainerId + ThisTableID + cellName + "CssClass";
-        var selectedAllCssClass = rowsCssClass + "SelectedAll";
-        var tempCssClass = IsSelectAllCheckBoxEvent ? selectedAllCssClass : rowsCssClass;
-        ThisCellNewData = "<input type='checkbox' ";
-        ThisCellNewData += "class= '" + userCssClass + " " + tempCssClass +"'";
-        ThisCellNewData += "data-row='" + ThisRowData + "' ";
-        ThisCellNewData += "data-tableid='" + ThisTableID + "' ";
-        ThisCellNewData += "data-javascriptmethodname='" + javascriptMethodName + "' ";
-        ThisCellNewData += "data-containerid='" + ContainerId + "' ";
-        ThisCellNewData += "data-cellname='" + cellName + "' ";
-        ThisCellNewData += "data-rowscssclass='" + rowsCssClass + "' ";
-        ThisCellNewData += "data-selectedallcssclass='" + selectedAllCssClass + "' ";
-        ThisCellNewData += "data-isselectallcheckboxevent='" + IsSelectAllCheckBoxEvent + "' ";
-        ThisCellNewData += "onclick='SAPCheckBoxClick_SGV(this)' >" + cellData;
-    }
-    return ThisCellNewData;
-}
-
-function SAPCheckBoxClick_SGV(obj) {
-    let r = sapGridViewTools.base64Decode(obj.dataset.row);
-    let rowData = JSON.parse(r);
-    let args = {
-        type: "CheckBox",
-        obj: obj,
-        rowData: rowData.RowData,
-        funcArray: rowData.FuncArray,
-        tableAPI: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableAPI,
-        tableObject: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableObject,
-        containerId: obj.dataset.containerid,
-        tableId: obj.dataset.tableid,
-        cellName: obj.dataset.cellname,
-        rowsCssClass: obj.dataset.rowscssclass,
-        selectedAllCssClass: obj.dataset.selectedallcssclass,
-        isSelectAllCheckBoxEvent: ["true", true, 1, "1"].includes(obj.dataset.isselectallcheckboxevent) ? true : false
-    }
-    var fn = window[obj.dataset.javascriptmethodname];
-    if (typeof fn === "function") {
-        fn.apply(window, [args]);
-    }
 }
 
 function SGV_HeaderComplex(DataArray, CellName) {
@@ -1089,7 +1039,7 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
             var TempThisVal = ThisVal_OpenTag + tVal + ThisVal_CloseTag;
             var TdId = "Footer_" + TableInfo.TableId + "_" + cell.name; //dataTables_scrollFoot
             if (["undefined", undefined, "NaN", NaN].includes(TempThisVal) === false) {
-                
+
                 var x = ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").html();
                 if (x.length > 0) {
                     $(x).html(TempThisVal);
@@ -1103,7 +1053,7 @@ function SGV_AfterFilter_TheadTfootCalc(TableInfo) {
                 $(".dataTables_scrollFoot #" + TdId).attr("title", tdTitle);
                 ThisFooter.find(".DT_TrWidthControl").children("th." + cell.name + "_Class").attr("title", tdTitle);
                 //ThisFooter.find(".DT_TrTfootCalc th").eq(CellIndex).html(TempThisVal); after a column to be false visible, not Work
-                
+
             }
             if (ItemCss != "") {
                 $(".dataTables_scrollFoot #" + TdId).addClass(ItemCss);
@@ -1813,4 +1763,143 @@ class sapGridViewTools {
     }
 }
 
+let selectedItems = {};
+class SapCheckBox {
+
+    getSapCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, IsSelectAllCheckBoxEvent) {
+        var rowAllData = {};
+        rowAllData["FuncArray"] = FuncArray;
+        rowAllData["RowData"] = rowData;
+        var ThisRowData = JSON.stringify(rowAllData);
+        var ThisRowData = SGV_Base64Encode(ThisRowData);
+        var userCssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
+        var javascriptMethodName = FuncArray.javascriptMethodName;
+        var ThisCellNewData = cellData;
+        if (FuncArray.enable == true) {
+            var rowsCssClass = ContainerId + ThisTableID + cellName + "CssClass";
+            var selectedAllCssClass = rowsCssClass + "SelectedAll";
+            var tempCssClass = IsSelectAllCheckBoxEvent ? selectedAllCssClass : rowsCssClass;
+            ThisCellNewData = "<input type='checkbox' ";
+            ThisCellNewData += "class= '" + userCssClass + " " + tempCssClass + "'";
+            ThisCellNewData += "data-row='" + ThisRowData + "' ";
+            ThisCellNewData += "data-tableid='" + ThisTableID + "' ";
+            ThisCellNewData += "data-javascriptmethodname='" + javascriptMethodName + "' ";
+            ThisCellNewData += "data-containerid='" + ContainerId + "' ";
+            ThisCellNewData += "data-cellname='" + cellName + "' ";
+            ThisCellNewData += "data-rowscssclass='" + rowsCssClass + "' ";
+            ThisCellNewData += "data-selectedallcssclass='" + selectedAllCssClass + "' ";
+            ThisCellNewData += "data-isselectallcheckboxevent='" + IsSelectAllCheckBoxEvent + "' ";
+            ThisCellNewData += "data-sumformula='" + FuncArray.sumFormula + "' ";
+            ThisCellNewData += "onclick='new SapCheckBox().sapCheckBoxOnClick(this)' >" + cellData;
+        }
+        return ThisCellNewData;
+    }
+
+    sapCheckBoxOnClick(obj, self = this) {
+        let r = sapGridViewTools.base64Decode(obj.dataset.row);
+        let rowData = JSON.parse(r);
+        let args = {
+            type: "CheckBox",
+            obj: obj,
+            rowData: rowData.RowData,
+            funcArray: rowData.FuncArray,
+            tableAPI: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableAPI,
+            tableObject: SGVArray[obj.dataset.containerid][obj.dataset.tableid].TableObject,
+            containerId: obj.dataset.containerid,
+            tableId: obj.dataset.tableid,
+            cellName: obj.dataset.cellname,
+            rowsCssClass: obj.dataset.rowscssclass,
+            selectedAllCssClass: obj.dataset.selectedallcssclass,
+            isSelectAllCheckBoxEvent: ["true", true, 1, "1"].includes(obj.dataset.isselectallcheckboxevent) ? true : false
+        }
+        var fn = window[obj.dataset.javascriptmethodname];
+        if ([null, "null", undefined, "", "", NaN, "NaN"].includes(obj.dataset.sumformula) === true && typeof fn === "function") {
+            fn.apply(window, [args]);
+        } else if ([null, "null", undefined, "", "", NaN, "NaN"].includes(obj.dataset.sumformula) === false && typeof fn === "function") {
+            var result = self.handle(args, obj.dataset.sumformula);
+            args["result"] = result;
+            fn.apply(window, [args]);
+        }
+    }
+
+    handle(oData, tmpFormula, self = this) {
+        var r = {};
+        if (oData.isSelectAllCheckBoxEvent) {
+            r = self.selectAllOnChanged(oData, tmpFormula);
+        }
+        else {
+            if (!selectedItems[oData.tableId]) {
+                selectedItems[oData.tableId] = {
+                    sum: 0,
+                    count: 0
+                };
+            }
+            r = self.singleOnChanged(oData, tmpFormula);
+        }
+        return r;
+    }
+
+    selectAllOnChanged(oData, tmpFormula, self = this) {
+        var table = oData.tableObject;
+        var checked = oData.obj.checked;
+        var sum = 0;
+        var count = 0;
+        table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            oData.rowData = this.data();
+            var d = self.countFormula(oData, tmpFormula);
+            $(this.node()).find('input.' + oData.rowsCssClass).prop('checked', checked);
+            if (checked) {
+                count++;
+                sum += d;
+            } else {
+                count = 0;
+                sum = 0;
+            }
+        });
+        selectedItems[oData.tableId] = {
+            sum: sum,
+            count: count
+        };
+        return selectedItems[oData.tableId];
+    }
+
+    singleOnChanged(oData, tmpFormula, self = this) {
+        var checked = $(oData.obj).is(':checked');
+        var rowData = oData.rowData;
+        var selectedAllCssClass = oData.selectedAllCssClass;
+        $("." + selectedAllCssClass).prop("checked", false);
+        var sum = selectedItems[oData.tableId].sum;
+        var count = selectedItems[oData.tableId].count;
+        var d = self.countFormula(oData, tmpFormula);
+        if (checked === true) {
+            count += 1;
+            sum += d;
+        } else {
+            count -= 1;
+            sum -= d;
+        }
+        selectedItems[oData.tableId] = {
+            sum: sum,
+            count: count
+        };
+        return selectedItems[oData.tableId];
+    }
+
+    countFormula(oData, tmpFormula, self = this) {
+        var d = 0;
+        $.each(oData.rowData, function (key, val) {
+            var valNumber = SGV_StrToFloat(val);
+            tmpFormula = SGV_CustomStrReplace(tmpFormula, key, valNumber, true);
+        });
+        try {
+            d = eval(tmpFormula);
+        } catch (e) {
+            if (e instanceof SyntaxError) {
+                console.log(e.message);
+                console.log("-------------------------");
+            }
+        }
+        return d;
+    }
+}
 //#endregion

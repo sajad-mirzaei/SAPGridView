@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 
-public partial class CheckBox1 : System.Web.UI.Page
+public partial class CheckBoxWithoutFormula : System.Web.UI.Page
 {
-    public static SAPGridView oSGV = new SAPGridView();
     protected void Page_Load(object sender, EventArgs e)
     {
+        SAPGridView oSGV = new SAPGridView();
         oSGV.Grids["MyGrid1"] = new Grid()
         {
             ContainerId = "MyGridId",
@@ -26,7 +26,6 @@ public partial class CheckBox1 : System.Web.UI.Page
                         {
                             Section = Function.SectionValue.Tbody,
                             JavascriptMethodName = "myJavascriptMethodName"
-
                         }
                     }
                 },
@@ -41,12 +40,12 @@ public partial class CheckBox1 : System.Web.UI.Page
         oSGV.GridBind("MyGrid1");
     }
 
-    public List<CheckBox1Model> FakeList()
+    public List<CheckBoxWithoutFormulaModel> FakeList()
     {
-        List<CheckBox1Model> oData = new List<CheckBox1Model>();
+        List<CheckBoxWithoutFormulaModel> oData = new List<CheckBoxWithoutFormulaModel>();
         for (int i = 1; i <= 100; i++)
         {
-            CheckBox1Model row = new CheckBox1Model();
+            CheckBoxWithoutFormulaModel row = new CheckBoxWithoutFormulaModel();
             row.id = i;
             row.price = i * 10;
             row.x2 = "Name1 " + i + 1;
@@ -57,7 +56,7 @@ public partial class CheckBox1 : System.Web.UI.Page
         return oData;
     }
 
-    public class CheckBox1Model
+    public class CheckBoxWithoutFormulaModel
     {
         public int id { get; set; }
         public decimal price { get; set; }
