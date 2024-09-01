@@ -478,13 +478,6 @@ function OnClick_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVaria
 }
 
 function SAPCheckBox_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVariables, cellName, ThisTableID, ContainerId) {
-    var rowAllData = {};
-    rowAllData["FuncArray"] = FuncArray;
-    rowAllData["RowData"] = rowData;
-    var ThisRowData = JSON.stringify(rowAllData);
-    var ThisRowData = SGV_Base64Encode(ThisRowData);
-    var cssClass = FuncArray.cssClass ? FuncArray.cssClass : "btn btn-link text-danger p-0 m-0";
-    var javascriptMethodName = FuncArray.javascriptMethodName;
     var ThisCellNewData = new SapCheckBox().getSapCheckBox(cellData, rowData, FuncArray, cellName, ThisTableID, ContainerId, false);
     return [ThisCellNewData, SGVGlobalVariables, ThisCellNewData];
 }
