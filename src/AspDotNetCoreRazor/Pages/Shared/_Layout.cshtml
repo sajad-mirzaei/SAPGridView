@@ -68,10 +68,10 @@
                             var clientAndServerSideList = new DirectoryInfo(folderPath + "/ClientAndServerSide").GetFiles("*.cshtml");
                         }
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="clientSideDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 ClientSide
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="clientSideDropdown">
                                 @foreach (var file1 in clientSideFilesList)
                                 {
                                     string fileName = System.IO.Path.GetFileNameWithoutExtension(file1.Name);
@@ -84,10 +84,10 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="serverSideDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 ServerSide
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="serverSideDropdown">
                                 @foreach (var file2 in serverSideFilesList)
                                 {
                                     string fileName = System.IO.Path.GetFileNameWithoutExtension(file2.Name);
@@ -100,10 +100,10 @@
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="clientAndServerSideDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 ClientAndServerSide
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu" aria-labelledby="clientAndServerSideDropdown">
                                 @foreach (var file2 in clientAndServerSideList)
                                 {
                                     string fileName = System.IO.Path.GetFileNameWithoutExtension(file2.Name);
