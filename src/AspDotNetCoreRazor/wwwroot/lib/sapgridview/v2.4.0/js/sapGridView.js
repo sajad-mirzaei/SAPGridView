@@ -133,17 +133,18 @@ class gridBind {
                 if (TempColumn.visible == false)
                     m.numberOfUnVisibleCells++;
                 if (m.grid.headerComplex != null && m.grid.headerComplex.length > 0) {
+
                     let temp = self.headerComplex(m.grid, cellName);
-                    if (cellsToBeMerged.includes(cellName)) {
+                    if (m.cellsToBeMerged.includes(cellName)) {
                     }
                     else if (temp.title != "") {
-                        cellsToBeMerged = temp.columnsToBeMerged;
-                        let colspan = cellsToBeMerged.length + m.numberOfUnVisibleCells;
+                        m.cellsToBeMerged = temp.columnsToBeMerged;
+                        let colspan = m.cellsToBeMerged.length + m.numberOfUnVisibleCells;
                         m.numberOfUnVisibleCells = 0;
-                        AllComplexedTh += "<th rowspan='1' colspan='" + colspan + "'>" + temp.title + "</th> ";
+                        m.allComplexedTh += "<th rowspan='1' colspan='" + colspan + "'>" + temp.title + "</th> ";
                     }
                     else if (TempColumn.visible !== false) {
-                        AllComplexedTh += "<th rowspan='1' colspan='1'>" + TempColumn.title + "</th> ";
+                        m.allComplexedTh += "<th rowspan='1' colspan='1'>" + TempColumn.title + "</th> ";
                     }
                 }
                 //-end-headerComplex-------------------------------

@@ -1,0 +1,9 @@
+﻿@page
+@model HeaderComplex
+@{
+    ViewData["Title"] = "Grid Page 1";
+}
+
+<div id="MyGridId"></div>
+@TempData["SAPGridView"]
+@Html.AntiForgeryToken()
