@@ -287,21 +287,23 @@ function Separator_ServerCall_SGV(td, cellData, rowData, FuncArray, SGVGlobalVar
     var ThisCellNewData = cellData;
     if ([0, null, 'null', '0', '', ' ', undefined, NaN, 'undefined', 'NaN'].includes(ThisCellNewData) === false) {
         var ThisCellNewData = SGV_StrToFloat(ThisCellNewData);
+        var minFraction = FuncArray.minimumFractionDigits;
+        var maxFraction = FuncArray.maximumFractionDigits;
         if ([null, 0, 2].includes(parseInt(FuncArray.section)) == false) {
-            var minFraction = 0;
-            var maxFraction = 0;
-            if (!Number.isInteger(ThisCellNewData)) {
+            if (FuncArray.minimumFractionDigits == 1) {
+                console.log("مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد");
+                //if (!Number.isInteger(ThisCellNewData)) {
                 /*مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد*/
-                minFraction = FuncArray.minimumFractionDigits > FuncArray.maximumFractionDigits ? FuncArray.maximumFractionDigits : FuncArray.minimumFractionDigits;
-                maxFraction = FuncArray.maximumFractionDigits;
-                if (maxFraction > 1 && minFraction < 1) {
-                    minFraction = 2;
-                }
-                else if (maxFraction == 1) {
-                    ThisCellNewData = SGV_StrToFloat(Number(ThisCellNewData).toFixed(1));
-                    minFraction = 2;
-                    maxFraction = 2;
-                }
+                //minFraction = FuncArray.minimumFractionDigits > FuncArray.maximumFractionDigits ? FuncArray.maximumFractionDigits : FuncArray.minimumFractionDigits;
+                //if (maxFraction > 1 && minFraction < 1) {
+                //    minFraction = 2;
+                //}
+                //else if (maxFraction == 1) {
+                //    ThisCellNewData = SGV_StrToFloat(Number(ThisCellNewData).toFixed(1));
+                //    minFraction = 2;
+                //    maxFraction = 2;
+                //}
+                //}
             }
             ThisCellNewData = ThisCellNewData.toLocaleString(FuncArray.locales, {
                 minimumFractionDigits: minFraction,

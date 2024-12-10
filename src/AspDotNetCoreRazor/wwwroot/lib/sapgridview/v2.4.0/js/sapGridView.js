@@ -1375,27 +1375,32 @@ class sapGridViewFunctions {
         let ThisCellNewData = cellInfo.cellData;
         if ([0, null, 'null', '0', '', ' ', undefined, NaN, 'undefined', 'NaN'].includes(ThisCellNewData) === false) {
             ThisCellNewData = sapGridViewTools.strToFloat(ThisCellNewData);
+            let minFraction = cellInfo.funcArray.minimumFractionDigits;
+            let maxFraction = cellInfo.funcArray.maximumFractionDigits;
             if (sectionValue.isBody(cellInfo.funcArray.section)) {
-                let minFraction = 0;
-                let maxFraction = 0;
-                if (!Number.isInteger(ThisCellNewData)) {
+                //if (!Number.isInteger(ThisCellNewData)) {
+
+                if (minFraction == 1) {
+                    createLog.log("مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد");
                     /*مینیمم نباید یک باشد، چراکه فرمت عددی برای اکسل غیرقابل محاصبه می شود، یا هیچ عددی بعد ممیز نباشد یا بیشتر از یک عدد باید باشد*/
-                    minFraction = cellInfo.funcArray.minimumFractionDigits > cellInfo.funcArray.maximumFractionDigits ? cellInfo.funcArray.maximumFractionDigits : cellInfo.funcArray.minimumFractionDigits;
-                    maxFraction = cellInfo.funcArray.maximumFractionDigits;
-                    if (maxFraction > 1 && minFraction < 1) {
-                        minFraction = 2;
-                    }
-                    else if (maxFraction == 1) {
-                        ThisCellNewData = sapGridViewTools.strToFloat(Number(ThisCellNewData).toFixed(1));
-                        minFraction = 2;
-                        maxFraction = 2;
-                    }
+                    //minFraction = cellInfo.funcArray.minimumFractionDigits > cellInfo.funcArray.maximumFractionDigits ? cellInfo.funcArray.maximumFractionDigits : cellInfo.funcArray.minimumFractionDigits;
+                    //minFraction = cellInfo.funcArray.minimumFractionDigits;
+                    //maxFraction = cellInfo.funcArray.maximumFractionDigits;
+                    //if (maxFraction > 1 && minFraction < 1) {
+                    //    minFraction = 2;
+                    //}
+                    //else if (maxFraction == 1) {
+                    //    ThisCellNewData = sapGridViewTools.strToFloat(Number(ThisCellNewData).toFixed(1));
+                    //    minFraction = 2;
+                    //    maxFraction = 2;
+                    //}
                 }
-                ThisCellNewData = ThisCellNewData.toLocaleString(cellInfo.funcArray.locales, {
-                    minimumFractionDigits: minFraction,
-                    maximumFractionDigits: maxFraction
-                });
             }
+            ThisCellNewData = ThisCellNewData.toLocaleString(cellInfo.funcArray.locales, {
+                minimumFractionDigits: minFraction,
+                maximumFractionDigits: maxFraction
+            });
+            //}
         }
         return ThisCellNewData;
     }
